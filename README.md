@@ -41,7 +41,7 @@
 * **Social Impact:** ช่วยลดระยะเวลาตัดสินใจของผู้ป่วย เพิ่มโอกาสการเข้าถึงยารักษาทันท่วงที เซฟชีวิตและลดโอกาสการพิการตลอดชีวิต
 
 ## ✨ 4. การรันโปรแกรม 
-python -m venv venv
-venv\Scripts\activate
-pip install -r requirements.txt
-python main.py
+- python -m venv venv
+- venv\Scripts\activate
+- pip install -r requirements.txt
+- python main.py
