@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+env/
+
+# Logs / output
+logs/
+*.log
+
+# OS / Editor
+.DS_Store
+.vscode/
+.idea/
+
+# Model files (ถ้ามีการดาวน์โหลด YOLO/MediaPipe models เพิ่มเติม)
+*.task
+*.tflite
+*.pt
