@@ -1,0 +1,14 @@
+{
+  "background": "#101820",
+  "surface": "#1B2732",
+  "preview": "#0B1118",
+  "text": "#F0F5F8",
+  "muted": "#B1C0CD",
+  "accent": "#64D9C1",
+  "accent_text": "#08231E",
+  "warning": "#FFC777",
+  "danger": "#FF9999",
+  "font": "Leelawadee UI",
+  "font_size": 11,
+  "spacing": 20
+}

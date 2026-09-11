@@ -1,145 +1,150 @@
-"""
-arm_pose.py
-===========
-โมดูลตรวจจับแขนอ่อนแรง (A - Arm) ตามหลัก FAST
-ให้ผู้ใช้ยกแขนค้างไว้ตามเวลาที่กำหนด (config.ARM_HOLD_DURATION_SEC)
-แล้วติดตามตำแหน่งข้อมือ (wrist) ว่ามีอาการ "แขนตก" (Arm Drift) หรือไม่
+"""YOLO pose acquisition with shoulder-normalized drift and research angles.
 
-สถานะ: IMPLEMENTED — ใช้ YOLOv8-Pose (ultralytics) เป็น backend
-โมเดล yolov8n-pose.pt จะถูกดาวน์โหลดอัตโนมัติจาก ultralytics ในการรันครั้งแรก
-(ต้องมีอินเทอร์เน็ตตอนรันครั้งแรกเท่านั้น หลังจากนั้นแคชไว้ในเครื่อง)
+2026-09-11: removed duplicate pixel drift tracking and legacy risk flags.
+Only visible, stable shoulder/wrist samples advance the hold timer.
 """
 
 import time
+import math
 
 from ultralytics import YOLO
+from src.arm_features import ArmFeatures
+from src.projected_arm_angle import ProjectedArmAngle
 
 from config import (
-    ARM_DRIFT_THRESHOLD_PX,
     ARM_HOLD_DURATION_SEC,
+    ARM_KEYPOINT_CONF_THRESHOLD,
     YOLO_POSE_MODEL,
     YOLO_CONF_THRESHOLD,
+    YOLO_DEVICE,
+    YOLO_IMAGE_SIZE,
 )
 
-# COCO keypoint index ที่ YOLOv8-Pose ใช้ (17 จุดมาตรฐาน)
-# อ้างอิง: https://docs.ultralytics.com/tasks/pose/
+# COCO keypoint indices used by YOLOv8-Pose (17 standard points)
+# Reference: https://docs.ultralytics.com/tasks/pose/
 LEFT_SHOULDER = 5
 RIGHT_SHOULDER = 6
-LEFT_ELBOW = 7
-RIGHT_ELBOW = 8
 LEFT_WRIST = 9
 RIGHT_WRIST = 10
 
 
 class ArmPoseAnalyzer:
     """
-    ติดตามตำแหน่งแขนด้วย YOLOv8-Pose เพื่อตรวจ Arm Drift
-    ใช้งาน: start_test() -> analyze(frame) วนหลายเฟรมระหว่างทดสอบ
+    Tracks arm position with YOLOv8-Pose to detect Arm Weakness.
+    Usage: start_test() -> analyze(frame) repeatedly across frames during the test.
     """
 
-    def __init__(self, model_path=YOLO_POSE_MODEL, conf_threshold=YOLO_CONF_THRESHOLD):
+    def __init__(self, model_path=YOLO_POSE_MODEL, conf_threshold=YOLO_CONF_THRESHOLD,
+                 keypoint_conf_threshold=ARM_KEYPOINT_CONF_THRESHOLD):
         self._model = YOLO(model_path)
-        self._conf_threshold = conf_threshold
-        self._test_start_time = None
-        self._baseline_wrist_y = {}  # {"left": y_px, "right": y_px}
+        self._conf_threshold = conf_threshold                    # used for person detection
+        self._keypoint_conf_threshold = keypoint_conf_threshold  # used for individual keypoints (wrists)
+        self._started = False
+        self._detected_elapsed_sec = 0.0
+        self._last_detected_at = None
         self._last_yolo_results = None
+        self.normalized = ArmFeatures()
+        self.projected_angle = ProjectedArmAngle()
 
     def start_test(self):
-        """เริ่มจับเวลาการทดสอบยกแขนค้าง และล้าง baseline เดิม"""
-        self._test_start_time = time.time()
-        self._baseline_wrist_y = {}
+        """Starts a new arm-hold test and clears all state from the previous round."""
+        self._started = True
+        self._detected_elapsed_sec = 0.0
+        self._last_detected_at = None
+        self.normalized = ArmFeatures()
+        self.projected_angle = ProjectedArmAngle()
 
     @staticmethod
-    def _empty_result(elapsed_sec=0.0, test_complete=False):
+    def _empty_result(elapsed_sec=0.0, test_complete=False, person_found=False):
         return {
             "pose_found": False,
+            "person_found": person_found,   # True if a person was detected but wrists weren't visible/confident enough
             "elapsed_sec": round(elapsed_sec, 1),
-            "left_wrist_drift_px": 0.0,
-            "right_wrist_drift_px": 0.0,
-            "is_drift_suspected": False,
             "test_complete": test_complete,
         }
 
     def analyze(self, frame_bgr):
-        """
-        รับภาพ (BGR) 1 เฟรมระหว่างช่วงทดสอบยกแขน (ต้องเรียก start_test() ก่อน)
-        คืนค่า dict:
-        {
-            "pose_found": bool,
-            "elapsed_sec": float,
-            "left_wrist_drift_px": float,   # ระยะที่ข้อมือซ้ายขยับลงจาก baseline (พิกเซล)
-            "right_wrist_drift_px": float,
-            "is_drift_suspected": bool,     # true ถ้าข้างใดข้างหนึ่งขยับลงเกิน threshold
-            "test_complete": bool,          # true เมื่อครบเวลา ARM_HOLD_DURATION_SEC
-        }
-        """
-        if self._test_start_time is None:
-            raise RuntimeError("ต้องเรียก start_test() ก่อนเริ่ม analyze()")
-
-        elapsed = time.time() - self._test_start_time
-        test_complete = elapsed >= ARM_HOLD_DURATION_SEC
+        """Return normalized measurements and visibility/timing metadata."""
+        if not self._started:
+            raise RuntimeError("start_test() must be called before analyze()")
 
         results = self._model.predict(
-            frame_bgr, conf=self._conf_threshold, verbose=False
+            frame_bgr, conf=self._conf_threshold, verbose=False, device=YOLO_DEVICE, imgsz=YOLO_IMAGE_SIZE
         )
         self._last_yolo_results = results
 
-        if not results or results[0].keypoints is None or len(results[0].keypoints) == 0:
-            return self._empty_result(elapsed_sec=elapsed, test_complete=test_complete)
+        pose = results[0].keypoints if results else None
+        shape = pose.xy.shape if pose is not None else ()
+        # Some Ultralytics versions represent no detection as (1, 0, 2).
+        person_found = len(shape) == 3 and shape[0] == 1 and shape[1] >= 17 and shape[2] == 2
 
-        # ใช้คนแรกที่ตรวจพบ (สมมติมีผู้ทดสอบคนเดียวหน้ากล้อง)
+        if not person_found:
+            self._last_detected_at = None
+            detected_elapsed = self._detected_elapsed_sec
+            test_complete = detected_elapsed >= ARM_HOLD_DURATION_SEC
+            return self._empty_result(elapsed_sec=detected_elapsed, test_complete=test_complete, person_found=False)
+
         keypoints = results[0].keypoints.xy[0]  # tensor shape (17, 2)
         conf_scores = results[0].keypoints.conf
         confs = conf_scores[0] if conf_scores is not None else None
 
         def _get_point(idx):
-            if confs is not None and confs[idx] < self._conf_threshold:
-                return None
+            # Individual keypoints use a more lenient threshold than the person box itself -
+            # a raised wrist near the edge of frame often scores lower than the person as a whole.
+            if confs is not None:
+                confidence = float(confs[idx])
+                if not math.isfinite(confidence) or confidence < self._keypoint_conf_threshold:
+                    return None
             x, y = keypoints[idx]
             x, y = float(x), float(y)
-            if x == 0.0 and y == 0.0:
+            if not math.isfinite(x) or not math.isfinite(y) or not (0 < x < frame_bgr.shape[1] and 0 < y < frame_bgr.shape[0]):
                 return None
             return (x, y)
 
         left_wrist = _get_point(LEFT_WRIST)
         right_wrist = _get_point(RIGHT_WRIST)
+        shoulders = {"left": _get_point(LEFT_SHOULDER), "right": _get_point(RIGHT_SHOULDER)}
 
-        if left_wrist is None and right_wrist is None:
-            return self._empty_result(elapsed_sec=elapsed, test_complete=test_complete)
+        # The README's arm test requires both arms to be visible. Pausing the
+        # timer on a missing wrist avoids accepting a partial pose as a full
+        # ten-second hold.
+        if left_wrist is None or right_wrist is None or any(p is None for p in shoulders.values()):
+            self._last_detected_at = None
+            detected_elapsed = self._detected_elapsed_sec
+            test_complete = detected_elapsed >= ARM_HOLD_DURATION_SEC
+            # The person is visible, but the required shoulder/wrist set is incomplete.
+            return self._empty_result(elapsed_sec=detected_elapsed, test_complete=test_complete, person_found=True)
 
-        # บันทึก baseline ในเฟรมแรกที่เจอข้อมือแต่ละข้าง
-        if left_wrist is not None and "left" not in self._baseline_wrist_y:
-            self._baseline_wrist_y["left"] = left_wrist[1]
-        if right_wrist is not None and "right" not in self._baseline_wrist_y:
-            self._baseline_wrist_y["right"] = right_wrist[1]
-
-        left_drift = 0.0
-        right_drift = 0.0
-        if left_wrist is not None and "left" in self._baseline_wrist_y:
-            # y เพิ่มขึ้น = แขนตกลง (แกน y ของภาพนับจากบนลงล่าง)
-            left_drift = max(0.0, left_wrist[1] - self._baseline_wrist_y["left"])
-        if right_wrist is not None and "right" in self._baseline_wrist_y:
-            right_drift = max(0.0, right_wrist[1] - self._baseline_wrist_y["right"])
-
-        is_drift_suspected = (
-            left_drift > ARM_DRIFT_THRESHOLD_PX or right_drift > ARM_DRIFT_THRESHOLD_PX
-        )
+        # Both wrists are visible: accumulate continuous detected hold time.
+        now = time.monotonic()
+        proposed_elapsed = self._detected_elapsed_sec + (now - self._last_detected_at if self._last_detected_at is not None else 0)
+        if not self.normalized.observe({"left": left_wrist, "right": right_wrist}, shoulders,
+                                       frame_bgr.shape[1], frame_bgr.shape[0], proposed_elapsed):
+            self._last_detected_at = None
+            return self._empty_result(elapsed_sec=self._detected_elapsed_sec, person_found=True)
+        if self._last_detected_at is not None:
+            self._detected_elapsed_sec += now - self._last_detected_at
+        self._last_detected_at = now
+        detected_elapsed = self._detected_elapsed_sec
+        self.projected_angle.observe({"left": left_wrist, "right": right_wrist}, shoulders, detected_elapsed)
+        test_complete = detected_elapsed >= ARM_HOLD_DURATION_SEC
 
         return {
             "pose_found": True,
-            "elapsed_sec": round(elapsed, 1),
-            "left_wrist_drift_px": round(left_drift, 1),
-            "right_wrist_drift_px": round(right_drift, 1),
-            "is_drift_suspected": is_drift_suspected,
+            "person_found": True,
+            "elapsed_sec": round(detected_elapsed, 1),
             "test_complete": test_complete,
+            "normalized_features": self.normalized.vector(),
+            "capture_setup": self.normalized.setup,
+            "research_angles": self.projected_angle.vector(),
         }
 
     def draw_debug(self, frame_bgr):
-        """วาด skeleton ที่ YOLOv8-Pose ตรวจพบล่าสุด (ใช้ ultralytics .plot() ในตัว)"""
-        if self._last_yolo_results is None:
+        """Draws the skeleton last detected by YOLOv8-Pose (uses ultralytics' built-in .plot())."""
+        if not self._last_yolo_results:
             return frame_bgr
         return self._last_yolo_results[0].plot(img=frame_bgr)
 
     def close(self):
-        # YOLO (ultralytics) ไม่มี handle ที่ต้องปิดแบบ MediaPipe
-        pass
+        self._last_yolo_results = None
+        self._model = None

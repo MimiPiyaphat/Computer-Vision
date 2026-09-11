@@ -1,9 +1,19 @@
 # Virtual environment
 venv/
+.venv/
+env/
+.env/
+ENV/
+venv-*/
+.venv-*/
+.runtime/
 
 # Python cache
 __pycache__/
 *.pyc
+*.pyo
+.pytest_cache/
+.ruff_cache/
 
 # Jupyter
 .ipynb_checkpoints/
@@ -11,6 +21,20 @@ __pycache__/
 # Model weights
 *.pt
 *.pth
+*.task
+*.tflite
+*.download
+
+# Runtime screening summaries
+logs/
+data/
+*.sqlite3
+*.sqlite3-wal
+*.sqlite3-shm
+identity.key
+validation/deployment_threshold.json
+validation/*report*.json
+validation/*candidate*.json
 
 # Environment
 .env

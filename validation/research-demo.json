@@ -1,0 +1,213 @@
+{
+  "data_source": "hand-authored synthetic software fixtures",
+  "clinical_validation": false,
+  "yfp_evaluated": false,
+  "measured_sensitivity": null,
+  "measured_specificity": null,
+  "research_parameters": {
+    "profile": "university-ipd-ratio-prototype-v2",
+    "research_only": true,
+    "deployment_approved": false,
+    "face_delta_threshold": 0.1,
+    "face_threshold_basis": "Engineering placeholder for v2 IPD regional ratio deltas (changed 2026-09-11); requires fresh tuning. Not fitted to data or inferred from performance percentages.",
+    "arm_angle_delta_threshold_deg": 28.9,
+    "arm_angle_alternative_deg": 33.0,
+    "arm_threshold_basis": "User-selected demo rule for a 2D shoulder-wrist descent proxy. The cited values describe sensor-measured pronation summaries, not validated drift cutoffs.",
+    "targets": {
+      "face_sensitivity": 0.878,
+      "face_specificity": 0.993,
+      "overall_sensitivity_minimum": 0.77,
+      "overall_sensitivity_stretch": 0.86
+    },
+    "literature": {
+      "ipronator": {
+        "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3404034/",
+        "patient_pronation_average_summary_deg": 28.9,
+        "patient_pronation_maximum_summary_deg": 33.0,
+        "control_pronation_average_summary_deg": 3.8,
+        "patient_drift_average_summary_deg": 26.8,
+        "summary_statistic": "Group medians of per-person metrics, not diagnostic decision thresholds",
+        "measurement": "Forearm-mounted accelerometers; pronation is not observable from YOLO's shoulder/elbow/wrist locations alone"
+      },
+      "facial_weakness_2022": {
+        "url": "https://www.frontiersin.org/journals/neurology/articles/10.3389/fneur.2022.878282/full",
+        "paramedic_sensitivity": 0.878,
+        "paramedic_specificity": 0.993,
+        "algorithm_sensitivity": 0.903,
+        "algorithm_specificity": 0.875
+      },
+      "fast_meta_analysis": {
+        "url": "https://www.frontiersin.org/journals/neurology/articles/10.3389/fneur.2021.765069/full",
+        "pooled_sensitivity": 0.77,
+        "sensitivity_95ci": [
+          0.64,
+          0.86
+        ],
+        "pooled_specificity": 0.6,
+        "note": "0.86 is this estimate's upper confidence bound, used here only as a project stretch target. This prototype does not implement speech testing."
+      }
+    }
+  },
+  "scenarios": [
+    {
+      "scenario": "below provisional rules",
+      "synthetic": true,
+      "expected_alert": false,
+      "result": {
+        "status": "research_below_placeholder",
+        "alert": false,
+        "research_only": true,
+        "measurement": {
+          "deltas": {
+            "neutral_mouth_ratio": 0.05,
+            "neutral_brow_ratio": 0.0,
+            "neutral_eyelid_ratio": 0.0,
+            "smile_mouth_ratio": 0.0,
+            "closed_eyelid_ratio": 0.0,
+            "left_arm_drift": 0.0,
+            "right_arm_drift": 0.0,
+            "arm_lift_skew": 0.0
+          },
+          "face_delta": 0.05,
+          "arm_delta": 0.0,
+          "score": 0.05
+        },
+        "threshold": null,
+        "policy_id": "research-2e149339e93041ebf4b023e5",
+        "care_message": "Reported symptoms need prompt medical attention. For sudden facial drooping, arm weakness, speech difficulty or other stroke signs, call local emergency services now. Do not wait for this camera test or a high AI score.",
+        "reason": "Unvalidated university demo: rules were not exceeded; this cannot exclude disease.",
+        "research_measurement": {
+          "arm_angle_delta_deg": 14.45,
+          "angle_deltas": {
+            "left_projected_drift_deg": 14.45,
+            "right_projected_drift_deg": 0.0
+          },
+          "face_delta_threshold": 0.1,
+          "arm_angle_delta_threshold_deg": 28.9,
+          "face_alert": false,
+          "arm_alert": false
+        }
+      }
+    },
+    {
+      "scenario": "face rule exceeded",
+      "synthetic": true,
+      "expected_alert": true,
+      "result": {
+        "status": "research_alert",
+        "alert": true,
+        "research_only": true,
+        "measurement": {
+          "deltas": {
+            "neutral_mouth_ratio": 0.11,
+            "neutral_brow_ratio": 0.0,
+            "neutral_eyelid_ratio": 0.0,
+            "smile_mouth_ratio": 0.0,
+            "closed_eyelid_ratio": 0.0,
+            "left_arm_drift": 0.0,
+            "right_arm_drift": 0.0,
+            "arm_lift_skew": 0.0
+          },
+          "face_delta": 0.11,
+          "arm_delta": 0.0,
+          "score": 0.11
+        },
+        "threshold": null,
+        "policy_id": "research-2e149339e93041ebf4b023e5",
+        "care_message": "Reported symptoms need prompt medical attention. For sudden facial drooping, arm weakness, speech difficulty or other stroke signs, call local emergency services now. Do not wait for this camera test or a high AI score.",
+        "reason": "Unvalidated university demo: a provisional rule was exceeded.",
+        "research_measurement": {
+          "arm_angle_delta_deg": 0.0,
+          "angle_deltas": {
+            "left_projected_drift_deg": 0.0,
+            "right_projected_drift_deg": 0.0
+          },
+          "face_delta_threshold": 0.1,
+          "arm_angle_delta_threshold_deg": 28.9,
+          "face_alert": true,
+          "arm_alert": false
+        }
+      }
+    },
+    {
+      "scenario": "arm rule exceeded",
+      "synthetic": true,
+      "expected_alert": true,
+      "result": {
+        "status": "research_alert",
+        "alert": true,
+        "research_only": true,
+        "measurement": {
+          "deltas": {
+            "neutral_mouth_ratio": 0.0,
+            "neutral_brow_ratio": 0.0,
+            "neutral_eyelid_ratio": 0.0,
+            "smile_mouth_ratio": 0.0,
+            "closed_eyelid_ratio": 0.0,
+            "left_arm_drift": 0.0,
+            "right_arm_drift": 0.0,
+            "arm_lift_skew": 0.0
+          },
+          "face_delta": 0.0,
+          "arm_delta": 0.0,
+          "score": 0.0
+        },
+        "threshold": null,
+        "policy_id": "research-2e149339e93041ebf4b023e5",
+        "care_message": "Reported symptoms need prompt medical attention. For sudden facial drooping, arm weakness, speech difficulty or other stroke signs, call local emergency services now. Do not wait for this camera test or a high AI score.",
+        "reason": "Unvalidated university demo: a provisional rule was exceeded.",
+        "research_measurement": {
+          "arm_angle_delta_deg": 29.9,
+          "angle_deltas": {
+            "left_projected_drift_deg": 29.9,
+            "right_projected_drift_deg": 0.0
+          },
+          "face_delta_threshold": 0.1,
+          "arm_angle_delta_threshold_deg": 28.9,
+          "face_alert": false,
+          "arm_alert": true
+        }
+      }
+    },
+    {
+      "scenario": "exactly at arm rule",
+      "synthetic": true,
+      "expected_alert": false,
+      "result": {
+        "status": "research_below_placeholder",
+        "alert": false,
+        "research_only": true,
+        "measurement": {
+          "deltas": {
+            "neutral_mouth_ratio": 0.0,
+            "neutral_brow_ratio": 0.0,
+            "neutral_eyelid_ratio": 0.0,
+            "smile_mouth_ratio": 0.0,
+            "closed_eyelid_ratio": 0.0,
+            "left_arm_drift": 0.0,
+            "right_arm_drift": 0.0,
+            "arm_lift_skew": 0.0
+          },
+          "face_delta": 0.0,
+          "arm_delta": 0.0,
+          "score": 0.0
+        },
+        "threshold": null,
+        "policy_id": "research-2e149339e93041ebf4b023e5",
+        "care_message": "Reported symptoms need prompt medical attention. For sudden facial drooping, arm weakness, speech difficulty or other stroke signs, call local emergency services now. Do not wait for this camera test or a high AI score.",
+        "reason": "Unvalidated university demo: rules were not exceeded; this cannot exclude disease.",
+        "research_measurement": {
+          "arm_angle_delta_deg": 28.9,
+          "angle_deltas": {
+            "left_projected_drift_deg": 28.9,
+            "right_projected_drift_deg": 0.0
+          },
+          "face_delta_threshold": 0.1,
+          "arm_angle_delta_threshold_deg": 28.9,
+          "face_alert": false,
+          "arm_alert": false
+        }
+      }
+    }
+  ]
+}

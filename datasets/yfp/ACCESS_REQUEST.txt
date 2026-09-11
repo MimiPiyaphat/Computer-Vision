@@ -1,0 +1,25 @@
+DRAFT CHECKLIST - not sent, not signed, and not an access grant.
+
+Official form and current restrictions:
+https://github.com/AvLab-CV/YouTube-Facial-Palsy-Database
+
+The repository lists the administrator as avlabdba@gmail.com and asks applicants
+to copy Prof. Gee-Sern (Jison) Hsu at jison@mail.ntust.edu.tw. Verify the current
+addresses on the official page before sending from your university account.
+
+Suggested subject: Application to download the YFP database
+
+Complete the required fields yourself:
+- Name
+- University affiliation
+- Department
+- Current position
+- University email address
+- Postal address
+- Phone number
+- Research purpose and intended research-group access
+- Review and personally accept the authors' current terms, if you agree
+- Your signature
+
+The repository describes a password-protected archive and research-only access.
+This project does not contain the password or the licensed dataset.

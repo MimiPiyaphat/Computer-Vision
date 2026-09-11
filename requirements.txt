@@ -1,5 +1,14 @@
 opencv-python==4.10.0.84
 mediapipe==0.10.14
 numpy==1.26.4
-scipy==1.13.1
+# Desktop camera rendering (preview mode uses only Python/Tkinter).
+Pillow>=10.4,<12
+# Keep the native PyTorch and torchvision binaries from the same CPU wheel set.
+# Mixing CPU/CUDA builds (or incompatible versions) causes `torchvision::nms`
+# to be unavailable when YOLOv8-Pose starts its first inference.
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.5.1
+torchvision==0.20.1
 ultralytics==8.3.28
+# 2.5.3 supports the existing torch/torchvision pair; 2.6 pins older binaries.
+facenet-pytorch==2.5.3
