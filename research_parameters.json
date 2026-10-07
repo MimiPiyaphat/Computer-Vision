@@ -1,0 +1,41 @@
+{
+  "profile": "university-ipd-ratio-prototype-v2",
+  "research_only": true,
+  "deployment_approved": false,
+  "face_delta_threshold": 0.10,
+  "face_threshold_basis": "Engineering placeholder for v2 IPD regional ratio deltas (changed 2026-09-11); requires fresh tuning. Not fitted to data or inferred from performance percentages.",
+  "arm_angle_delta_threshold_deg": 28.9,
+  "arm_angle_alternative_deg": 33.0,
+  "arm_threshold_basis": "User-selected demo rule for a 2D shoulder-wrist descent proxy. The cited values describe sensor-measured pronation summaries, not validated drift cutoffs.",
+  "targets": {
+    "face_sensitivity": 0.878,
+    "face_specificity": 0.993,
+    "overall_sensitivity_minimum": 0.77,
+    "overall_sensitivity_stretch": 0.86
+  },
+  "literature": {
+    "ipronator": {
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3404034/",
+      "patient_pronation_average_summary_deg": 28.9,
+      "patient_pronation_maximum_summary_deg": 33.0,
+      "control_pronation_average_summary_deg": 3.8,
+      "patient_drift_average_summary_deg": 26.8,
+      "summary_statistic": "Group medians of per-person metrics, not diagnostic decision thresholds",
+      "measurement": "Forearm-mounted accelerometers; pronation is not observable from YOLO's shoulder/elbow/wrist locations alone"
+    },
+    "facial_weakness_2022": {
+      "url": "https://www.frontiersin.org/journals/neurology/articles/10.3389/fneur.2022.878282/full",
+      "paramedic_sensitivity": 0.878,
+      "paramedic_specificity": 0.993,
+      "algorithm_sensitivity": 0.903,
+      "algorithm_specificity": 0.875
+    },
+    "fast_meta_analysis": {
+      "url": "https://www.frontiersin.org/journals/neurology/articles/10.3389/fneur.2021.765069/full",
+      "pooled_sensitivity": 0.77,
+      "sensitivity_95ci": [0.64, 0.86],
+      "pooled_specificity": 0.60,
+      "note": "0.86 is this estimate's upper confidence bound, used here only as a project stretch target. This prototype does not implement speech testing."
+    }
+  }
+}
