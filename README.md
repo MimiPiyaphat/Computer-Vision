@@ -1,5 +1,18 @@
 # StrokeVision AI
 
+## ภาพรวมโครงการ (Project overview)
+
+โครงงานมหาวิทยาลัยด้าน Computer Vision สำหรับเปรียบเทียบการเคลื่อนไหวของใบหน้า
+และแขนก่อน–หลังการนวด โดยใช้กล้องเว็บแคมและหน้าจอภาษาไทย
+มีโหมด **ก่อนนวด · Baseline** และ **หลังนวด · Recheck** พร้อมตรวจสอบว่าเป็นบุคคลเดิม
+ด้วย FaceNet ก่อนเปรียบเทียบ ใช้ MediaPipe Face Mesh วัดอัตราส่วนภายในใบหน้า
+และ YOLOv8-Pose วัดการเคลื่อนไหวของแขน เก็บเฉพาะคุณลักษณะและเวกเตอร์ยืนยันตัวตน
+ไม่บันทึกภาพหรือวิดีโอของผู้ใช้งาน
+
+ระบบนี้เป็นต้นแบบเพื่อการศึกษา ยังไม่ได้ผ่านการรับรองทางคลินิก
+ไม่ใช้วินิจฉัยโรคหรือยืนยันความปลอดภัยในการนวด
+ดูวิธีติดตั้งและใช้งานในหัวข้อ **How to run** ด้านล่าง
+
 A local university research prototype that captures pre-massage measurements
 and compares them with a routine or symptom-reported post-massage recheck. The desktop UI contains the
 camera window; UI components, acquisition, identity checks and validation tools
@@ -247,6 +260,11 @@ customer-facing result.
   Python runtime can run pure tests but does not include this desktop toolkit.
 
 ## Changelog
+
+### 2026-10-07 — branch documentation merge
+
+- Reconciled the Thai project overview from `main` with the current prototype's
+  models and limitations, retaining the complete setup and workflow instructions.
 
 ### 2026-10-07 — capture and dataset reliability
 
