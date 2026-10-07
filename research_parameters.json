@@ -1,9 +1,9 @@
 {
-  "profile": "university-ipd-ratio-prototype-v2",
+  "profile": "university-neutral-referenced-closure-increase-v3",
   "research_only": true,
   "deployment_approved": false,
   "face_delta_threshold": 0.10,
-  "face_threshold_basis": "Engineering placeholder for v2 IPD regional ratio deltas (changed 2026-09-11); requires fresh tuning. Not fitted to data or inferred from performance percentages.",
+  "face_threshold_basis": "Unfitted engineering placeholder for increases in regional asymmetry. Closure is normalized by resting eye opening in v3; requires fresh paired captures and held-out tuning. Not a stroke probability or a validated clinical cutoff.",
   "arm_angle_delta_threshold_deg": 28.9,
   "arm_angle_alternative_deg": 33.0,
   "arm_threshold_basis": "User-selected demo rule for a 2D shoulder-wrist descent proxy. The cited values describe sensor-measured pronation summaries, not validated drift cutoffs.",

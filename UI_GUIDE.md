@@ -14,8 +14,13 @@ customer's reported symptoms. See `validation/LITERATURE_BASELINES.md`.
 The desktop UI now displays Thai text. Choose **ก่อนนวด · Baseline** or
 **หลังนวด · Recheck** in the dedicated panel above the visit form. Stop an active
 capture before switching. IDs remain in the form; setup confirmation must be
-checked again. Selecting Recheck does not check the symptom-report box for you.
-The UI uses the same backend mode keys and identity checks as before.
+checked again. Recheck works for routine post-massage tracking even when no symptom
+is reported. Selecting Recheck does not check the optional symptom-report box for
+you; checking it adds urgent safety guidance. The UI uses the same backend mode
+keys and identity checks as before.
+The symptom field is hidden in Baseline mode and shown only in Recheck mode.
+A previously selected Recheck symptom value does not block baseline capture;
+existing care guidance remains visible.
 
 `ui/visit_panel.py` contains the reusable selector, `ui/visit_state.py` its copy
 and lock rules, and `ui/thai.py` Thai messages/font selection. Leelawadee UI is the
@@ -39,9 +44,13 @@ cosine threshold in `config.py`; face position/scale matching is removed, while
 the 18-degree rotation limit remains. See `validation/RATIO_IDENTITY.md`.
 
 Enter a customer ID and visit reference, choose baseline or recheck, and confirm
-the capture setup. Rechecks require a customer symptom report. Click **Connect
-camera**, wait for the models, and click **Start visit step**. See the README
+the capture setup. A recheck may be started with or without a symptom report.
+Click **Connect camera**, wait for the models, and click **Start visit step**. See the README
 for the paired workflow and its unconfigured clinical threshold.
+If recheck reports an expired or incompatible baseline, switch to **ก่อนนวด ·
+Baseline** and keep the same customer and visit IDs. A completed capture archives
+the old baseline and its rechecks, then activates the new baseline for subsequent
+comparisons.
 Use **Stop** to discard an in-progress acquisition, **Restart visit step** to start
 fresh, and **Disconnect** to release the camera. The camera number can be changed
 while disconnected. **Overlay** toggles face/pose annotations.
@@ -78,8 +87,8 @@ what the result means and the next action:
 | Backend status | Customer meaning |
 | --- | --- |
 | `baseline_saved` | Before-massage reference saved; this is not a risk assessment. |
-| `research_alert`, `delta_alert` | Warning; notify staff immediately for medical assessment. |
-| `research_below_placeholder`, `below_threshold` | Change did not exceed the applicable rule; still report symptoms. |
+| `research_alert`, `delta_alert` | Names the changed measurement category and tells the customer to notify staff immediately. |
+| `research_below_placeholder`, `below_threshold` | Change did not exceed the applicable rule; complete routine tracking, but report any symptoms. |
 | `research_incomplete` | Comparison data incomplete; staff should review capture. |
 | `inconclusive` | Assessment unavailable; staff should review the data/workflow. |
 | `threshold_unconfigured` | System not configured to assess the comparison; contact staff. |
@@ -99,6 +108,18 @@ not establish which region triggered it. Numerical thresholds and raw technical
 errors are not substituted for customer-facing result explanations. Preview
 continues to label simulated outcomes. Restart the app after Python copy/layout
 edits; F5 only reloads theme tokens.
+
+Every saved recheck records the actual `symptoms_reported` value. Exports preserve
+that value instead of treating routine post-massage observations as symptomatic
+research samples. A deployment threshold validated only for a symptomatic cohort
+is not applied to a routine no-symptom recheck.
+
+The v3 research face rule responds to an increase in asymmetry, not its absolute
+change. The result can name the contributing task (resting mouth, brows, open
+eyes, smile, or eye closure). Eye closure uses resting eye opening as its
+denominator to reduce near-zero amplification. This is an engineering correction;
+it has not been trained or clinically calibrated. Because the capture formula
+changed, restart and collect a new baseline before the next paired demo.
 
 The arm step gives concrete live guidance such as “ยังไม่เห็นข้อมือทั้งสองข้าง”
 and “กรุณากางแขนออกด้านข้าง”. Every acquisition stage has a 45-second wall-clock

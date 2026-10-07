@@ -22,38 +22,38 @@ CUSTOMER_RESULTS = {
         "ขั้นตอนต่อไป: แจ้งเจ้าหน้าที่ว่าบันทึกเสร็จแล้ว\n\nข้อมูลนี้ยังไม่ได้บอกความเสี่ยงโรค และไม่ใช่การรับรองความปลอดภัยในการนวด",
     ),
     "research_alert": (
-        "พบสัญญาณเตือน · แจ้งเจ้าหน้าที่ทันที",
-        "ควรทำตอนนี้: แจ้งเจ้าหน้าที่ทันทีเพื่อช่วยประสานการประเมินจากบุคลากรทางการแพทย์ ไม่ต้องรอให้ตรวจครบ\n\n"
-        "สิ่งที่พบ: ค่าที่วัดได้เปลี่ยนจากก่อนนวดเกินเกณฑ์ทดลอง ผลนี้ไม่ใช่การวินิจฉัยว่าเป็นโรคหลอดเลือดสมอง\n\n" + CARE_TH,
+        "ค่าหลังนวดเปลี่ยนมากกว่าระดับทดลอง · แจ้งเจ้าหน้าที่ทันที",
+        "สิ่งที่พบ: ค่าที่ระบบวัดหลังนวดเปลี่ยนจากก่อนนวดมากกว่าระดับทดลอง\n\n"
+        "สิ่งที่ควรทำ: แจ้งเจ้าหน้าที่ทันทีเพื่อช่วยประเมินอาการร่วมกัน ผลจากกล้องนี้ไม่ใช่การวินิจฉัยโรค\n\n" + CARE_TH,
     ),
     "delta_alert": (
-        "พบสัญญาณเตือน · แจ้งเจ้าหน้าที่ทันที",
-        "ควรทำตอนนี้: แจ้งเจ้าหน้าที่ทันทีเพื่อช่วยประสานการประเมินจากบุคลากรทางการแพทย์ ไม่ต้องรอให้ตรวจครบ\n\n"
-        "สิ่งที่พบ: ค่าของใบหน้าและแขนเมื่อเปรียบเทียบกับก่อนนวดเกินเกณฑ์ที่กำหนด ผลนี้ไม่ใช่การวินิจฉัยว่าเป็นโรคหลอดเลือดสมอง\n\n" + CARE_TH,
+        "ค่าหลังนวดเปลี่ยนมากกว่าระดับที่กำหนด · แจ้งเจ้าหน้าที่ทันที",
+        "สิ่งที่พบ: ค่ารวมที่ระบบวัดจากใบหน้าและแขนหลังนวดเปลี่ยนจากก่อนนวดมากกว่าระดับที่กำหนด\n\n"
+        "สิ่งที่ควรทำ: แจ้งเจ้าหน้าที่ทันทีเพื่อช่วยประเมินอาการร่วมกัน ผลจากกล้องนี้ไม่ใช่การวินิจฉัยโรค\n\n" + CARE_TH,
     ),
     "research_below_placeholder": (
         "ไม่พบการเปลี่ยนแปลงเกินเกณฑ์ทดลอง",
         "สิ่งที่พบ: ค่าที่เปรียบเทียบกับก่อนนวดยังไม่เกินเกณฑ์ทดลอง\n\n"
-        "ขั้นตอนต่อไป: แจ้งอาการผิดปกติที่คุณมีให้เจ้าหน้าที่ทราบ แม้ผลจะไม่เกินเกณฑ์\n\n"
-        "ผลนี้ไม่สามารถยืนยันว่าไม่มีโรคหลอดเลือดสมอง\n\n" + CARE_TH,
+        "ขั้นตอนต่อไป: แจ้งเจ้าหน้าที่ว่าตรวจติดตามหลังนวดเสร็จแล้ว\n\n"
+        "ผลนี้ไม่สามารถยืนยันว่าไม่มีโรคหลอดเลือดสมอง",
     ),
     "below_threshold": (
         "ไม่พบการเปลี่ยนแปลงเกินเกณฑ์",
         "สิ่งที่พบ: ค่าที่เปรียบเทียบกับก่อนนวดยังไม่เกินเกณฑ์ที่กำหนด\n\n"
-        "ขั้นตอนต่อไป: แจ้งอาการผิดปกติที่คุณมีให้เจ้าหน้าที่ทราบ แม้ผลจะไม่เกินเกณฑ์\n\n"
-        "ผลนี้ไม่สามารถยืนยันว่าไม่มีโรคหลอดเลือดสมอง\n\n" + CARE_TH,
+        "ขั้นตอนต่อไป: แจ้งเจ้าหน้าที่ว่าตรวจติดตามหลังนวดเสร็จแล้ว\n\n"
+        "ผลนี้ไม่สามารถยืนยันว่าไม่มีโรคหลอดเลือดสมอง",
     ),
     "threshold_unconfigured": (
         "ระบบยังไม่พร้อมประเมิน · ติดต่อเจ้าหน้าที่",
-        "ระบบยังไม่พร้อมประเมินผลการเปรียบเทียบ กรุณาแจ้งเจ้าหน้าที่เพื่อช่วยตรวจสอบ\n\n" + CARE_TH,
+        "ระบบยังไม่พร้อมประเมินผลการเปรียบเทียบ กรุณาแจ้งเจ้าหน้าที่เพื่อช่วยตรวจสอบ",
     ),
     "research_incomplete": (
         "ข้อมูลไม่ครบ · ติดต่อเจ้าหน้าที่",
-        "ระบบได้รับข้อมูลสำหรับเปรียบเทียบไม่ครบ กรุณาให้เจ้าหน้าที่ช่วยตรวจสอบขั้นตอนการเก็บข้อมูล\n\n" + CARE_TH,
+        "ระบบได้รับข้อมูลสำหรับเปรียบเทียบไม่ครบ กรุณาให้เจ้าหน้าที่ช่วยตรวจสอบขั้นตอนการเก็บข้อมูล",
     ),
     "inconclusive": (
         "ประเมินผลไม่ได้ · ติดต่อเจ้าหน้าที่",
-        "ระบบยังประเมินผลครั้งนี้ไม่ได้ กรุณาแจ้งเจ้าหน้าที่เพื่อช่วยตรวจสอบข้อมูลและขั้นตอนการตรวจ\n\n" + CARE_TH,
+        "ระบบยังประเมินผลครั้งนี้ไม่ได้ กรุณาแจ้งเจ้าหน้าที่เพื่อช่วยตรวจสอบข้อมูลและขั้นตอนการตรวจ",
     ),
     "identity_rejected": (
         "ไม่สามารถยืนยันผู้รับบริการได้",
@@ -80,7 +80,7 @@ TEXT = {
     "Identity mismatch": "ยืนยันบุคคลไม่สำเร็จ",
     "Identity mismatch: does not match registered user": "บุคคลไม่ตรงกับผู้ลงทะเบียน (Identity mismatch: does not match registered user)",
     "Comparison inconclusive": "ยังสรุปผลการเปรียบเทียบไม่ได้",
-    "Seek medical attention immediately": "อาจเข้าข่ายสัญญาณเตือน — ควรรับการประเมินฉุกเฉิน",
+    "Seek medical attention immediately": "ค่าหลังนวดเปลี่ยนมากกว่าระดับที่กำหนด — แจ้งเจ้าหน้าที่ทันที",
     "Delta measured; threshold unconfigured": "คำนวณการเปลี่ยนแปลงแล้ว ยังไม่ได้กำหนดเกณฑ์ทางคลินิก",
     "Below delta threshold; symptoms still need care": "ต่ำกว่าเกณฑ์ แต่อาการผิดปกติยังต้องได้รับการดูแล",
     "Research rule exceeded; seek medical attention for symptoms": "พบการเปลี่ยนแปลงเกินเกณฑ์ทดลอง — อาจเข้าข่ายและควรรับการประเมิน",
@@ -88,13 +88,14 @@ TEXT = {
     "Research comparison incomplete": "ยังไม่สามารถสรุปผลได้",
     "Model, camera, resolution or capture station changed.": "ข้อมูลอ้างอิงไม่ตรงกับการตรวจครั้งนี้ กรุณาใช้กล้อง จุดตรวจ และการตั้งค่าเดิม หรือบันทึก baseline ใหม่",
     "A baseline already exists for this visit; use a recheck or a new visit reference.": "มีข้อมูลก่อนนวดของรหัสครั้งนี้อยู่แล้ว กรุณาใช้การตรวจซ้ำหรือสร้างรหัสครั้งใหม่",
-    "Baseline is expired or future-dated.": "ข้อมูลก่อนนวดหมดอายุหรือเวลาไม่ถูกต้อง กรุณาบันทึก baseline ใหม่",
+    "Baseline is expired or future-dated.": ("ข้อมูลก่อนนวดหมดอายุหรือเวลาไม่ถูกต้อง หากขณะนี้ไม่มีอาการผิดปกติ ให้เลือก ‘ก่อนนวด’ "
+                                               "แล้วบันทึกข้อมูลใหม่ด้วยรหัสผู้รับบริการและรหัสครั้งเดิม หากมีอาการอยู่ ให้แจ้งเจ้าหน้าที่และอย่าบันทึก baseline ใหม่เพื่อให้ตรวจผ่าน"),
     "The baseline has no complete arm angles; contact staff to collect a new baseline": "ข้อมูลก่อนนวดไม่มีค่ามุมแขนครบ กรุณาให้เจ้าหน้าที่บันทึก baseline ใหม่",
     "Preview only": "ตัวอย่างหน้าจอเท่านั้น",
     "Simulated summary for interface development.": "ผลจำลองสำหรับพัฒนาหน้าจอ",
     "No screening was performed.": "ไม่มีการตรวจจริง",
     "Preview data is never saved.": "ไม่บันทึกข้อมูลจากโหมดตัวอย่าง",
-    "Relax your face and look at the camera": "ผ่อนคลายใบหน้าและมองตรงไปที่กล้อง",
+    "Relax your face and look at the camera": "ผ่อนคลายใบหน้า ลืมตาตามธรรมชาติ และมองตรงไปที่กล้อง",
     "Face the camera to calibrate": "มองตรงไปที่กล้องเพื่อเก็บข้อมูลอ้างอิง",
     "Step into view so the camera can see you": "กรุณาเข้ามาอยู่ในกรอบภาพ ให้กล้องเห็นคุณชัดเจน",
     "Keep only one person in the camera view": "กรุณาให้มีผู้รับบริการเพียงหนึ่งคนในภาพ",
@@ -113,6 +114,7 @@ TEXT = {
     "Not enough valid samples were collected": "เก็บตัวอย่างที่ใช้วัดได้ไม่เพียงพอ กรุณาติดต่อเจ้าหน้าที่",
     "Incomplete required face or arm measurements": "ข้อมูลใบหน้าหรือแขนที่จำเป็นยังไม่ครบ กรุณาติดต่อเจ้าหน้าที่",
     "Both projected arm angles are required": "ยังวัดมุมแขนทั้งสองข้างไม่ได้ กรุณากางแขนออกด้านข้าง",
+    "Resting eye opening is too small to measure closure.": "วัดค่าลืมตาอ้างอิงไม่ได้ กรุณาเริ่มเก็บข้อมูลใหม่ โดยลืมตาตามธรรมชาติในขั้นตอนใบหน้าผ่อนคลาย",
     "The baseline has no complete arm angles; contact staff to collect a new baseline": "ข้อมูลก่อนนวดไม่มีค่ามุมแขนครบ กรุณาให้เจ้าหน้าที่บันทึกข้อมูลก่อนนวดใหม่",
     "Hold both arms raised": "ยกแขนทั้งสองข้างค้างไว้",
     "Smile as wide as you can and hold": "ยิ้มให้กว้างเท่าที่ทำได้ แล้วค้างไว้",
@@ -135,7 +137,6 @@ TEXT = {
     "Saved numeric measurements; baseline identity embedding is stored separately. No images or video saved.": "บันทึกค่าตัวเลขแล้ว เวกเตอร์ยืนยันบุคคลจัดเก็บแยกต่างหาก ไม่บันทึกภาพหรือวิดีโอ",
     "No complete feature record was saved.": "ยังไม่ได้บันทึกข้อมูลที่ครบถ้วน",
     "This is a reference measurement, not medical clearance for massage.": "ข้อมูลนี้เป็นค่าอ้างอิง ไม่ใช่การรับรองความปลอดภัยในการนวด",
-    "Rechecks require a customer-reported abnormal symptom.": "ตรวจซ้ำได้เมื่อผู้รับบริการแจ้งอาการผิดปกติ กรุณายืนยันในช่องอาการ",
     "Confirm the same camera/station and instructed posture; keep your head facing forward.": "กรุณายืนยันกล้องและจุดตรวจเดิม ทำตามท่าที่กำหนด และมองตรง",
     "Enter a customer ID and a visit reference (1-128 characters each).": "กรุณากรอกรหัสผู้รับบริการและรหัสครั้งรับบริการ (ช่องละ 1–128 ตัวอักษร)",
     "No baseline": "ยังไม่พบข้อมูลก่อนนวดสำหรับรหัสนี้ กรุณาบันทึกข้อมูลก่อนนวดก่อน",
@@ -194,29 +195,46 @@ def customer_assessment(assessment, comparison):
     status = customer_result_status(assessment, comparison)
     if status in CUSTOMER_RESULTS:
         title, body = CUSTOMER_RESULTS[status]
+        symptoms_reported = isinstance(comparison, dict) and comparison.get("symptoms_reported") is True
+        if status == "baseline_saved" and isinstance(comparison, dict) and comparison.get("baseline_replaced"):
+            title = "อัปเดตข้อมูลก่อนนวดแล้ว"
+            body = ("แทนที่ข้อมูลก่อนนวดชุดเดิมที่ใช้เปรียบเทียบไม่ได้แล้ว\n\n"
+                    "ขั้นตอนต่อไป: สามารถใช้รหัสผู้รับบริการและรหัสครั้งเดิมในการตรวจซ้ำได้\n\n"
+                    "ระบบเก็บข้อมูลชุดเดิมไว้ในประวัติ และจะไม่ใช้ผลตรวจซ้ำเก่ามาเปรียบเทียบกับ baseline ชุดใหม่นี้")
         if status == "acquisition_failed" and isinstance(comparison, dict):
             body += display_text(comparison.get("reason", "ไม่พบสาเหตุที่วัดได้ครบ"))
             body += ("\n\nกดปุ่ม ‘เก็บข้อมูลใหม่อีกครั้ง’ เพื่อเริ่มตั้งแต่ขั้นตอนแรก "
                      "ใช้รหัสผู้รับบริการและรหัสครั้งเดิมได้\nปรับท่าหรือมุมกล้องตามสาเหตุก่อนเริ่มใหม่")
             if comparison.get("alert") or comparison.get("prior_alert"):
-                title = "เก็บข้อมูลไม่ครบ · มีสัญญาณเตือนระหว่างตรวจ"
-                body = "แจ้งเจ้าหน้าที่ทันที ไม่ต้องรอเก็บข้อมูลใหม่ให้ครบ\n\n" + body + "\n\n" + CARE_TH
+                title = "เก็บข้อมูลไม่ครบ · พบค่าที่เปลี่ยนมากระหว่างตรวจ"
+                body = "ระบบพบค่าที่เปลี่ยนจากก่อนนวดมากระหว่างตรวจ กรุณาแจ้งเจ้าหน้าที่ทันที ไม่ต้องรอเก็บข้อมูลใหม่ให้ครบ\n\n" + body + "\n\n" + CARE_TH
         if status == "save_failed" and isinstance(comparison, dict) and comparison.get("save_reason"):
             body += "รายละเอียดสำหรับเจ้าหน้าที่: " + display_text(comparison["save_reason"])
             original = comparison.get("measurement_result")
             if original in ("delta_alert", "research_alert"):
-                body += "\n\nผลการวัดมีสัญญาณเตือน แต่ยังไม่มีการบันทึกผลสำเร็จ กรุณาแจ้งเจ้าหน้าที่ทันที"
+                body += "\n\nผลการวัดพบค่าหลังนวดเปลี่ยนมากกว่าระดับที่กำหนด แต่ยังบันทึกผลไม่สำเร็จ กรุณาแจ้งเจ้าหน้าที่ทันที"
         if status == "research_alert" and isinstance(comparison, dict):
             # Name only regions explicitly flagged by the research OR-rule.
             # The combined deployment score does not identify a triggering region.
             measured = comparison.get("research_measurement") or {}
             regions = []
             if measured.get("face_alert") is True:
-                regions.append("ความสมมาตรของใบหน้า")
+                regions.append("ความไม่สมมาตรของใบหน้า")
             if measured.get("arm_alert") is True:
                 regions.append("การเคลื่อนไหวแขน")
-            if regions:
-                body = body.replace("ค่าที่วัดได้เปลี่ยน", "ค่า" + "และ".join(regions) + "เปลี่ยน")
+            region_text = "และ".join(regions) if regions else "ค่าจากใบหน้าและแขน"
+            details = {"neutral_mouth_ratio": "มุมปากขณะผ่อนคลาย", "neutral_brow_ratio": "แนวคิ้วขณะผ่อนคลาย",
+                       "neutral_eyelid_ratio": "การลืมตาขณะผ่อนคลาย", "smile_mouth_ratio": "มุมปากขณะยิ้ม",
+                       "closed_eyelid_ratio": "ความต่างของการหลับตาซ้าย–ขวา"}
+            affected = [details[key] for key in measured.get("face_trigger_features", ()) if key in details]
+            detail_text = "รายการที่เปลี่ยน: " + ", ".join(affected) + "\n\n" if affected else ""
+            body = (f"สิ่งที่พบ: ระบบวัดพบว่า{region_text}หลังนวดเพิ่มขึ้นจากก่อนนวดมากกว่าระดับทดลอง\n\n"
+                    + detail_text +
+                    "สิ่งที่ควรทำ: แจ้งเจ้าหน้าที่ทันทีเพื่อช่วยประเมินอาการร่วมกัน "
+                    "ผลจากกล้องนี้ไม่ใช่การวินิจฉัยโรค\n\n" + CARE_TH)
+        if symptoms_reported and status not in ("research_alert", "delta_alert") and CARE_TH not in body:
+            body += ("\n\nคุณระบุว่ามีอาการผิดปกติ กรุณาบอกอาการแก่เจ้าหน้าที่ แม้ค่าที่วัดจะไม่เกินเกณฑ์"
+                     "หรือระบบประเมินไม่ได้\n\n" + CARE_TH)
         return title, body
     title = display_text(assessment.get("level", "ยังไม่มีผล"))
     reasons = "\n".join(display_text(reason) for reason in assessment.get("reasons", ()))

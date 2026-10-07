@@ -55,7 +55,12 @@ class FeatureStore:
         with closing(sqlite3.connect(self.path)) as db, db:
             db.execute("CREATE TABLE IF NOT EXISTS baselines (subject TEXT, visit TEXT, created REAL, record TEXT, PRIMARY KEY(subject, visit))")
             db.execute("CREATE TABLE IF NOT EXISTS rechecks (id INTEGER PRIMARY KEY, subject TEXT, visit TEXT, created REAL, record TEXT, comparison TEXT)")
-            # 2026-09-11: additive migration; never reinterpret or overwrite old rows.
+            # Replacing an unusable baseline keeps the previous generation for
+            # audit while removing it from active comparisons.
+            db.execute("CREATE TABLE IF NOT EXISTS baseline_history (id INTEGER PRIMARY KEY, subject TEXT, visit TEXT, archived REAL, created REAL, record TEXT, identity_embedding TEXT, identity_model TEXT)")
+            db.execute("CREATE TABLE IF NOT EXISTS recheck_history (id INTEGER PRIMARY KEY, subject TEXT, visit TEXT, archived REAL, created REAL, record TEXT, comparison TEXT)")
+            # Additive migrations preserve existing rows. Unusable baselines may
+            # later be archived explicitly before an active replacement.
             columns = {row[1] for row in db.execute("PRAGMA table_info(baselines)")}
             for column in ("identity_embedding", "identity_model"):
                 if column not in columns:
@@ -80,16 +85,34 @@ class FeatureStore:
         identity = identity_payload(json.loads(row[2]), row[3]) if row[2] is not None else None
         return {"created": row[0], "record": validate_record(json.loads(row[1])), "identity": identity}
 
-    def save_baseline(self, keys, record, identity=None):
+    def save_baseline(self, keys, record, identity=None, replace=False):
         self._validate_keys(keys)
         payload = json.dumps(validate_record(record), allow_nan=False)
         identity = identity_payload(**identity) if identity is not None else None
+        created = time.time()
+        embedding = json.dumps(identity["embedding"], allow_nan=False) if identity else None
+        model = identity["model"] if identity else None
         try:
             with closing(sqlite3.connect(self.path)) as db, db:
-                db.execute("INSERT INTO baselines(subject, visit, created, record, identity_embedding, identity_model) VALUES (?, ?, ?, ?, ?, ?)",
-                           (*keys, time.time(), payload,
-                            json.dumps(identity["embedding"], allow_nan=False) if identity else None,
-                            identity["model"] if identity else None))
+                if replace:
+                    previous = db.execute(
+                        "SELECT created, record, identity_embedding, identity_model FROM baselines WHERE subject=? AND visit=?",
+                        keys).fetchone()
+                    if previous is None:
+                        raise ValueError("No baseline exists to replace.")
+                    db.execute(
+                        "INSERT INTO baseline_history(subject, visit, archived, created, record, identity_embedding, identity_model) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                        (*keys, created, *previous))
+                    db.execute(
+                        "INSERT INTO recheck_history(subject, visit, archived, created, record, comparison) SELECT subject, visit, ?, created, record, comparison FROM rechecks WHERE subject=? AND visit=?",
+                        (created, *keys))
+                    db.execute("DELETE FROM rechecks WHERE subject=? AND visit=?", keys)
+                    db.execute(
+                        "UPDATE baselines SET created=?, record=?, identity_embedding=?, identity_model=? WHERE subject=? AND visit=?",
+                        (created, payload, embedding, model, *keys))
+                else:
+                    db.execute("INSERT INTO baselines(subject, visit, created, record, identity_embedding, identity_model) VALUES (?, ?, ?, ?, ?, ?)",
+                               (*keys, created, payload, embedding, model))
         except sqlite3.IntegrityError as exc:
             raise ValueError("A baseline already exists for this visit; it cannot be overwritten.") from exc
 
@@ -97,6 +120,9 @@ class FeatureStore:
         self._validate_keys(keys)
         # Store only allowlisted numeric deltas and decision provenance.
         safe = {key: comparison.get(key) for key in ("status", "threshold", "policy_id")}
+        if type(comparison.get("symptoms_reported")) is not bool:
+            raise ValueError("Comparison must record whether symptoms were reported.")
+        safe["symptoms_reported"] = comparison["symptoms_reported"]
         if safe["status"] not in ("delta_alert", "threshold_unconfigured", "below_threshold", "research_alert", "research_below_placeholder", "research_incomplete"):
             raise ValueError("Invalid comparison status.")
         if safe["threshold"] is not None:
@@ -112,8 +138,8 @@ class FeatureStore:
             safe["research_only"] = True
             research = comparison["research_measurement"]
             safe["research_measurement"] = numeric_map(
-                {k: research[k] for k in ("face_delta_threshold", "arm_angle_delta_threshold_deg")},
-                ("face_delta_threshold", "arm_angle_delta_threshold_deg"))
+                {k: research[k] for k in ("face_delta_threshold", "arm_angle_delta_threshold_deg", "face_asymmetry_increase")},
+                ("face_delta_threshold", "arm_angle_delta_threshold_deg", "face_asymmetry_increase"))
             if research["arm_angle_delta_deg"] is not None:
                 safe["research_measurement"].update(numeric_map({"arm_angle_delta_deg": research["arm_angle_delta_deg"]}, ("arm_angle_delta_deg",)))
         with closing(sqlite3.connect(self.path)) as db, db:
@@ -131,3 +157,5 @@ class FeatureStore:
             db.execute("PRAGMA secure_delete=ON")
             db.execute("DELETE FROM rechecks WHERE subject=?", (subject,))
             db.execute("DELETE FROM baselines WHERE subject=?", (subject,))
+            db.execute("DELETE FROM recheck_history WHERE subject=?", (subject,))
+            db.execute("DELETE FROM baseline_history WHERE subject=?", (subject,))

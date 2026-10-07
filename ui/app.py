@@ -84,9 +84,12 @@ class Dashboard:
             entry.grid(row=1, column=column, sticky="ew", padx=(0, 16), pady=(4, 8))
             visit.columnconfigure(column, weight=1)
             self.visit_controls.append(entry)
-        tk.Checkbutton(visit, text="ผู้รับบริการแจ้งว่ามีอาการผิดปกติ", variable=self.symptoms_reported,
+        self.symptom_check = tk.Checkbutton(visit, text="มีอาการผิดปกติ (ถ้ามี กรุณาเลือกเพื่อแสดงคำแนะนำฉุกเฉิน)", variable=self.symptoms_reported,
                        command=self.symptom_changed, bg=t["surface"], fg=t["text"], selectcolor=t["background"],
-                       activebackground=t["surface"], activeforeground=t["text"], font=(t["font"], 10)).grid(row=2, column=0, columnspan=2, sticky="w")
+                       activebackground=t["surface"], activeforeground=t["text"], font=(t["font"], 10))
+        self.symptom_check.grid(row=2, column=0, columnspan=2, sticky="w")
+        self.visit_controls.append(self.symptom_check)
+        self.update_symptom_visibility()
         self.setup_check = tk.Checkbutton(visit, text="ยืนยันกล้องและจุดตรวจเดิม ทำตามท่าที่กำหนด และมองตรง",
                        variable=self.setup_confirmed, bg=t["surface"], fg=t["text"], selectcolor=t["background"],
                        activebackground=t["surface"], activeforeground=t["text"], font=(t["font"], 10))
@@ -187,6 +190,7 @@ class Dashboard:
         if mode not in MODES or not can_change_mode(self.snapshot):
             return
         self.visit_mode.set(mode)
+        self.update_symptom_visibility()
         self.setup_confirmed.set(False)
         # Keep IDs for the same visit, and preserve symptom reports/care notices.
         self.command("stop")
@@ -196,6 +200,12 @@ class Dashboard:
                              "save_status": "", "command_error": "", "elapsed": 0}
             self.render(self.snapshot)
         self.start_button.configure(text=MODES[mode][3])
+
+    def update_symptom_visibility(self):
+        if self.visit_mode.get() == "recheck":
+            self.symptom_check.grid()
+        else:
+            self.symptom_check.grid_remove()
 
     def set_ready(self, ready):
         for control in (self.start_button, self.stop_button, self.debug_button):
@@ -232,6 +242,7 @@ class Dashboard:
         self.user_id.set("")
         self.visit_id.set("")
         self.visit_mode.set("baseline")
+        self.update_symptom_visibility()
         self.start_button.configure(text=MODES["baseline"][3])
         self.symptoms_reported.set(False)
         self.setup_confirmed.set(False)
@@ -249,7 +260,8 @@ class Dashboard:
 
     def start_visit(self):
         request = {"mode": self.visit_mode.get(), "user_id": self.user_id.get(), "visit_id": self.visit_id.get(),
-                   "symptoms_reported": self.symptoms_reported.get(), "setup_confirmed": self.setup_confirmed.get()}
+                   "symptoms_reported": self.visit_mode.get() == "recheck" and self.symptoms_reported.get(),
+                   "setup_confirmed": self.setup_confirmed.get()}
         if self.worker and self.snapshot and self.snapshot.get("status") == "ready":
             self.worker.send({"action": "start", "request": request})
 
@@ -437,7 +449,7 @@ class Dashboard:
             level = assessment.get("level", "") if assessment else ""
             customer_title, customer_body = customer_assessment(assessment or {}, comparison)
             if not assessment:
-                customer_body = "แจ้งเตือนระหว่างตรวจ\n" + customer_body
+                customer_body = "พบค่าที่เปลี่ยนมากระหว่างตรวจ\n" + customer_body
             result_status = customer_result_status(assessment or {}, comparison)
             color = t["danger"] if level == "Seek medical attention immediately" or comparison.get("alert") else (
                 t["accent"] if result_status == "baseline_saved" else t["warning"])

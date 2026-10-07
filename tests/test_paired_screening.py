@@ -1,8 +1,10 @@
 """Synthetic engineering fixtures only; these are NOT clinical validation data."""
 
 import importlib.util
+from contextlib import closing
 import json
 import math
+import sqlite3
 from pathlib import Path
 import tempfile
 import unittest
@@ -168,10 +170,33 @@ class VisitTests(unittest.TestCase):
             self.workflow.begin(request("recheck", visit="different"))
 
     def test_symptom_and_setup_gates(self):
-        for data in (dict(request("recheck"), symptoms_reported=False), dict(request(), setup_confirmed=False),
-                     dict(request(), symptoms_reported=True), dict(request(), user_id="")):
+        for data in (dict(request(), setup_confirmed=False), dict(request(), symptoms_reported=True),
+                     dict(request(), user_id="")):
             with self.assertRaises(ValueError):
                 self.workflow.begin(data)
+
+    def test_routine_recheck_without_reported_symptoms_is_recorded_truthfully(self):
+        self.baseline()
+        self.workflow.begin(dict(request("recheck"), symptoms_reported=False))
+        self.workflow.accept_identity(EMBEDDING, IDENTITY_MODEL)
+        result = self.workflow.finish(record(.1)["features"], record()["setup"])
+        self.assertEqual(result["status"], "threshold_unconfigured")
+        self.assertFalse(result["symptoms_reported"])
+        self.assertEqual(result["care_message"], "")
+        output = Path(self.temp.name) / "routine.jsonl"
+        export_pairs(self.store.path, output)
+        self.assertFalse(json.loads(output.read_text())["symptoms_reported"])
+
+    def test_symptomatic_policy_is_not_reused_for_routine_monitoring(self):
+        self.policy_path.write_text(json.dumps(approved_test_policy()), encoding="utf-8")
+        self.baseline()
+        self.workflow.begin(dict(request("recheck"), symptoms_reported=False))
+        self.workflow.accept_identity(EMBEDDING, IDENTITY_MODEL)
+        result = self.workflow.finish(record(.3)["features"], record()["setup"])
+        self.assertEqual(result["status"], "threshold_unconfigured")
+        self.assertIsNone(result["threshold"])
+        self.assertIsNone(result["policy_id"])
+        self.assertIn("only for symptom-reported", result["reason"])
 
     def test_expired_and_changed_camera_baselines_are_inconclusive(self):
         self.baseline()
@@ -182,6 +207,42 @@ class VisitTests(unittest.TestCase):
         changed = VisitWorkflow(self.store, context, self.policy_path)
         with self.assertRaisesRegex(ValueError, "changed"):
             changed.begin(request("recheck"))
+
+    def test_changed_measurement_pipeline_requires_fresh_baseline(self):
+        self.baseline()
+        context = dict(record()["context"], pipeline="b" * 64)
+        changed = VisitWorkflow(self.store, context, self.policy_path)
+        with self.assertRaisesRegex(ValueError, "changed"):
+            changed.begin(request("recheck"))
+        changed.begin(request())
+        self.assertTrue(changed.replace_baseline)
+        changed.accept_identity(EMBEDDING, IDENTITY_MODEL)
+        changed.finish(record()["features"], record()["setup"])
+        changed.begin(dict(request("recheck"), symptoms_reported=False))
+        changed.accept_identity(EMBEDDING, IDENTITY_MODEL)
+        result = changed.finish(record()["features"], record()["setup"])
+        self.assertEqual(result["measurement"]["score"], 0)
+
+    def test_expired_baseline_can_be_replaced_without_mixing_old_rechecks(self):
+        self.baseline()
+        self.workflow.begin(request("recheck"))
+        self.workflow.accept_identity(EMBEDDING, IDENTITY_MODEL)
+        self.workflow.finish(record(.2)["features"], record()["setup"])
+        with closing(sqlite3.connect(self.store.path)) as db, db:
+            db.execute("UPDATE baselines SET created=0")
+
+        self.workflow.begin(request())
+        self.assertTrue(self.workflow.replace_baseline)
+        self.workflow.accept_identity(EMBEDDING, IDENTITY_MODEL)
+        result = self.workflow.finish(record(.4)["features"], record()["setup"])
+        self.assertTrue(result["baseline_replaced"])
+        current = self.store.baseline(self.store.keys("0801234567", "visit-001"))
+        self.assertAlmostEqual(current["record"]["features"]["neutral_mouth_ratio"], .4)
+        with closing(sqlite3.connect(self.store.path)) as db:
+            self.assertEqual(db.execute("SELECT count(*) FROM baselines").fetchone()[0], 1)
+            self.assertEqual(db.execute("SELECT count(*) FROM rechecks").fetchone()[0], 0)
+            self.assertEqual(db.execute("SELECT count(*) FROM baseline_history").fetchone()[0], 1)
+            self.assertEqual(db.execute("SELECT count(*) FROM recheck_history").fetchone()[0], 1)
 
     def test_pose_mismatch_and_missing_data_cannot_produce_low_delta(self):
         self.baseline()

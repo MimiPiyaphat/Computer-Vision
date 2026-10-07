@@ -62,13 +62,24 @@ class ThaiPresentationTests(unittest.TestCase):
                 self.assertIn('ติดต่อเจ้าหน้าที่', title)
                 self.assertNotIn('กรุณาตรวจใหม่', body)
                 self.assertNotIn('เรียบร้อย', title + body)
-                self.assertIn(CARE_TH, body)
+                self.assertNotIn(CARE_TH, body)
+                _, symptomatic_body = customer_assessment(
+                    {'level': 'Comparison inconclusive'},
+                    {'status': status, 'symptoms_reported': True})
+                self.assertIn(CARE_TH, symptomatic_body)
 
     def test_customer_alert_uses_non_diagnostic_wording(self):
         title, body = customer_assessment({'level': 'Research rule exceeded'},
                                           {'status': 'research_alert', 'alert': True})
+        self.assertIn('ค่าหลังนวดเปลี่ยน', title)
         self.assertIn('แจ้งเจ้าหน้าที่ทันที', title)
         self.assertIn('ไม่ใช่การวินิจฉัย', body)
+
+    def test_replaced_baseline_explains_that_same_ids_can_be_reused(self):
+        title, body = customer_assessment({}, {'status': 'baseline_saved', 'baseline_replaced': True})
+        self.assertEqual(title, 'อัปเดตข้อมูลก่อนนวดแล้ว')
+        self.assertIn('รหัสผู้รับบริการและรหัสครั้งเดิม', body)
+        self.assertIn('ประวัติ', body)
 
     def test_retry_copy_preserves_timeout_reason_and_prior_alert(self):
         result = {'status': 'acquisition_failed', 'reason': 'Both wrists are not visible'}
@@ -77,18 +88,18 @@ class ThaiPresentationTests(unittest.TestCase):
         self.assertIn('ยังไม่เห็นข้อมือทั้งสองข้าง', body)
         self.assertIn('ขั้นตอนแรก', body)
         title, body = customer_assessment({}, dict(result, alert=True))
-        self.assertIn('สัญญาณเตือน', title)
-        self.assertTrue(body.startswith('แจ้งเจ้าหน้าที่ทันที'))
+        self.assertIn('ค่าที่เปลี่ยนมาก', title)
+        self.assertTrue(body.startswith('ระบบพบค่าที่เปลี่ยน'))
 
     def test_research_alert_names_only_flagged_regions(self):
-        for face, arm, expected in ((True, False, 'ค่าความสมมาตรของใบหน้าเปลี่ยน'),
-                                    (False, True, 'ค่าการเคลื่อนไหวแขนเปลี่ยน'),
-                                    (True, True, 'ค่าความสมมาตรของใบหน้าและการเคลื่อนไหวแขนเปลี่ยน')):
+        for face, arm, expected in ((True, False, 'ความไม่สมมาตรของใบหน้าหลังนวดเพิ่มขึ้น'),
+                                    (False, True, 'การเคลื่อนไหวแขนหลังนวดเพิ่มขึ้น'),
+                                    (True, True, 'ความไม่สมมาตรของใบหน้าและการเคลื่อนไหวแขนหลังนวดเพิ่มขึ้น')):
             with self.subTest(face=face, arm=arm):
                 _, body = customer_assessment({}, {'status': 'research_alert', 'alert': True,
                     'research_measurement': {'face_alert': face, 'arm_alert': arm}})
                 self.assertIn(expected, body)
-                self.assertIn('ไม่ต้องรอให้ตรวจครบ', body)
+                self.assertIn('แจ้งเจ้าหน้าที่ทันที', body)
         _, body = customer_assessment({}, {'status': 'delta_alert', 'alert': True})
         self.assertNotIn('ค่าความสมมาตรของใบหน้าเปลี่ยน', body)
 
@@ -100,7 +111,10 @@ class ThaiPresentationTests(unittest.TestCase):
         for status in ('research_below_placeholder', 'below_threshold'):
             _, body = customer_assessment({}, {'status': status})
             self.assertIn('ไม่สามารถยืนยันว่าไม่มีโรค', body)
-            self.assertIn('แจ้งอาการผิดปกติ', body)
+            self.assertIn('ตรวจติดตามหลังนวดเสร็จแล้ว', body)
+            self.assertNotIn('คุณระบุว่ามีอาการผิดปกติ', body)
+            _, symptomatic_body = customer_assessment({}, {'status': status, 'symptoms_reported': True})
+            self.assertIn('คุณระบุว่ามีอาการผิดปกติ', symptomatic_body)
 
     def test_mode_lock_covers_loading_capture_and_identity_pause(self):
         for state in ('neutral_capture', 'mouth_test', 'arm_test', 'identity_check'):
@@ -201,7 +215,7 @@ class ModeInteractionTests(unittest.TestCase):
                     self.assertIn('ขั้นตอนถัดไป: ' + STEPS[step_index + 1][1],
                                   dashboard.detail.configure.call_args.kwargs['text'])
                 self.assertIn('แจ้งเจ้าหน้าที่ทันที', dashboard.result_title.configure.call_args.kwargs['text'])
-                self.assertIn('แจ้งเตือนระหว่างตรวจ', dashboard.set_result_text.call_args.args[0])
+                self.assertIn('พบค่าที่เปลี่ยนมากระหว่างตรวจ', dashboard.set_result_text.call_args.args[0])
         dashboard.root.bell.assert_called_once()
         dashboard.progress.pack_forget.assert_not_called()
         type(dashboard).render(dashboard, {'status': 'ready', 'state': 'idle',
@@ -223,6 +237,7 @@ class ModeInteractionTests(unittest.TestCase):
         dashboard.user_id = Mock()
         dashboard.visit_id = Mock()
         dashboard.symptoms_reported = Mock()
+        dashboard.symptom_check = Mock()
         dashboard.symptom_notice_latched = True
         dashboard.command = Mock()
         dashboard.render = Mock()
@@ -261,6 +276,22 @@ class ModeInteractionTests(unittest.TestCase):
         dashboard.worker.send.assert_called_once_with({'action': 'start', 'request': {
             'mode': 'recheck', 'user_id': 'member', 'visit_id': 'visit',
             'symptoms_reported': False, 'setup_confirmed': True}})
+
+    def test_baseline_hides_symptom_field_and_ignores_retained_recheck_value(self):
+        dashboard = self.dashboard()
+        dashboard.worker = Mock()
+        dashboard.visit_mode.get.return_value = 'baseline'
+        dashboard.symptoms_reported.get.return_value = True
+        dashboard.update_symptom_visibility()
+        dashboard.symptom_check.grid_remove.assert_called_once()
+        dashboard.start_visit()
+        self.assertFalse(dashboard.worker.send.call_args.args[0]['request']['symptoms_reported'])
+        self.assertTrue(dashboard.symptom_notice_latched)
+        dashboard.visit_mode.get.return_value = 'recheck'
+        dashboard.update_symptom_visibility()
+        dashboard.symptom_check.grid.assert_called_once()
+        dashboard.start_visit()
+        self.assertTrue(dashboard.worker.send.call_args.args[0]['request']['symptoms_reported'])
 
 
 if __name__ == '__main__':

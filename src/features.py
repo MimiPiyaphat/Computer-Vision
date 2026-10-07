@@ -104,6 +104,26 @@ def aggregate(samples, keys):
     return {key: median(sample[key] for sample in samples) for key in keys}
 
 
+def closure_asymmetry(samples, neutral_samples):
+    """Measure left/right closure against the captured resting eye opening.
+
+    Dividing by the tiny opening of a closed eye amplifies landmark noise.
+    EAR uses eye-corner width, and the neutral reference stays fixed during
+    closure. An eye that stays open remains measurable; closure is not a gate.
+    """
+    neutral = aggregate(neutral_samples, ("left_ear", "right_ear"))
+    reference = max(neutral.values())
+    if not math.isfinite(reference) or reference <= 1e-6:
+        raise ValueError("Resting eye opening is too small to measure closure.")
+    values = []
+    for sample in samples:
+        left, right = sample["left_ear"], sample["right_ear"]
+        if not all(math.isfinite(v) and v >= 0 for v in (left, right)):
+            raise ValueError("Invalid eye aperture measurement.")
+        values.append({"closure": abs(left - right) / reference})
+    return aggregate(values, ("closure",))["closure"]
+
+
 def delta_features(before, after, partial=False):
     numeric_map(before, FEATURE_KEYS)
     numeric_map(after, FEATURE_KEYS, complete=not partial)

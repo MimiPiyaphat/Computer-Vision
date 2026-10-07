@@ -15,7 +15,7 @@ from config import (
     NEUTRAL_CAPTURE_SEC,
     CAPTURE_STAGE_TIMEOUT_SEC,
 )
-from src.features import aggregate, FACE_SETUP_KEYS
+from src.features import aggregate, closure_asymmetry, FACE_SETUP_KEYS
 from src.protocol import check_head_pose
 from src.acquisition import AcquisitionError, MESSAGES, require_complete
 
@@ -209,8 +209,17 @@ class ScreeningFlow:
             # close an eye must remain measurable rather than stall the test.
             if elapsed >= EYE_CLOSURE_HOLD_SEC and len(self._geometry["closure"]) >= 5:
                 samples = self._geometry["closure"]
-                values = aggregate(samples[len(samples) // 3:], ("eyelid_ratio",))
-                self.features.update({"closed_" + key: value for key, value in values.items()})
+                try:
+                    self.features["closed_eyelid_ratio"] = closure_asymmetry(
+                        samples[len(samples) // 3:], self._geometry["neutral"])
+                except ValueError:
+                    # An unusable reference is missing data, never a zero score.
+                    self.failure = {"status": "acquisition_failed", "alert": False,
+                                    "reason_code": "eye_reference_unavailable",
+                                    "reason": "Resting eye opening is too small to measure closure.",
+                                    "stage": self.state}
+                    self._go_to(STATE_SUMMARY)
+                    return {"state": self.state, "instruction": self.failure["reason"], "elapsed": 0, "extra": self.results}
                 self._go_to(STATE_EYE_TEST)
                 return {"state": self.state, "instruction": "Blink both eyes naturally several times", "elapsed": 0.0, "extra": {}}
             return {

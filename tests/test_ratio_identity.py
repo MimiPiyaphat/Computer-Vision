@@ -12,7 +12,7 @@ from unittest.mock import Mock, patch
 from config import IDENTITY_REACQUIRE_MATCH_FRAMES, IDENTITY_REJECT_MISMATCH_FRAMES
 from src.face_identity import IdentityMismatch, MISMATCH_MESSAGE
 from src.feature_store import FeatureStore
-from src.features import asymmetry_ratio, face_geometry
+from src.features import asymmetry_ratio, closure_asymmetry, face_geometry
 from src.protocol import check_setup
 from src.session import ScreeningSession
 from src.visit_workflow import VisitWorkflow
@@ -22,6 +22,18 @@ from export_feature_pairs import export_pairs
 
 
 class RatioTests(unittest.TestCase):
+    def test_closed_eye_noise_uses_fixed_resting_reference(self):
+        neutral = [{'left_ear': .3, 'right_ear': .3}] * 5
+        before = [{'left_ear': .01, 'right_ear': .02}] * 5
+        after = [{'left_ear': .02, 'right_ear': .02}] * 5
+        # The old near-zero denominator turns this tiny jitter into a .5 delta.
+        self.assertAlmostEqual(asymmetry_ratio(.01, .02, 30), .5)
+        self.assertLess(abs(closure_asymmetry(before, neutral) - closure_asymmetry(after, neutral)), .04)
+        one_open = [{'left_ear': .3, 'right_ear': .01}] * 5
+        self.assertGreater(closure_asymmetry(one_open, neutral), .9)
+        with self.assertRaisesRegex(ValueError, 'Resting eye'):
+            closure_asymmetry(before, [{'left_ear': 0, 'right_ear': 0}] * 5)
+
     def test_formula_scale_sides_and_zero_cases(self):
         for left, right, expected in ((2, 4, .5), (4, 2, .5), (0, 0, 0), (0, 2, 1), (2, 2, 0)):
             self.assertAlmostEqual(asymmetry_ratio(left, right, 12), expected)

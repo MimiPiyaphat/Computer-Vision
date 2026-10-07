@@ -198,7 +198,8 @@ class ScreeningSession:
             from src.protocol import CARE_MESSAGE
             if isinstance(self.flow.failure, dict):
                 self.comparison = {"status": "acquisition_failed", "reason": self.flow.failure["reason"], "alert": False,
-                                   "reason_code": self.flow.failure["reason_code"]}
+                                   "reason_code": self.flow.failure["reason_code"],
+                                   "symptoms_reported": self.workflow.request.get("symptoms_reported") is True}
                 if self._latched_alert:
                     self.comparison["prior_alert"] = self._latched_alert
                     self.comparison["alert"] = True
@@ -214,7 +215,8 @@ class ScreeningSession:
                                        "save_reason": str(exc), "measurement_result": measured.get("status")}
                     self.save_status = "บันทึกข้อมูลไม่สำเร็จ"
                 except (ValueError, OSError, sqlite3.Error) as exc:
-                    self.comparison = {"status": "inconclusive", "reason": str(exc), "alert": False}
+                    self.comparison = {"status": "inconclusive", "reason": str(exc), "alert": False,
+                                       "symptoms_reported": self.workflow.request.get("symptoms_reported") is True}
                     self.save_status = "บันทึกข้อมูลไม่สำเร็จ" if isinstance(exc, (OSError, sqlite3.Error)) else "ยังไม่สามารถประเมินผลได้"
             result = (self.comparison if self.comparison.get("status") in ("acquisition_failed", "save_failed")
                       else self._latched_alert or self.comparison)
@@ -231,14 +233,15 @@ class ScreeningSession:
             if result.get("research_only"):
                 m = result["research_measurement"]
                 angle = m["arm_angle_delta_deg"]
-                reasons.append(f"Face delta {result['measurement']['face_delta']:.4f} / rule {m['face_delta_threshold']:.4f}")
+                reasons.append(f"Face asymmetry increase {m['face_asymmetry_increase']:.4f} / rule {m['face_delta_threshold']:.4f}")
                 reasons.append(f"2D arm-angle delta: {angle:.1f} degrees / rule {m['arm_angle_delta_threshold_deg']:.1f}" if angle is not None else "2D arm angle unavailable; forearm pronation is not measured.")
             elif result.get("measurement"):
                 m = result["measurement"]
                 reasons.append(f"Face delta {m['face_delta']:.4f} + arm delta {m['arm_delta']:.4f} = {m['score']:.4f}")
+            urgent = self.workflow.request.get("symptoms_reported") is True or result.get("alert") is True
             self.assessment = {"level": labels.get(result["status"], result["status"]), "reasons": reasons,
-                               "disclaimer": CARE_MESSAGE if self.workflow.request["mode"] == "recheck" else
-                               "This is a reference measurement, not medical clearance for massage."}
+                               "disclaimer": CARE_MESSAGE if urgent else
+                               "This comparison is a monitoring aid, not a diagnosis or medical clearance for massage."}
         visible_comparison = (self.comparison if isinstance(self.comparison, dict) and
                               self.comparison.get("status") in ("acquisition_failed", "save_failed")
                               else self._latched_alert or self.comparison)
