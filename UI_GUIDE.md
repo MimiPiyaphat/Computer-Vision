@@ -57,6 +57,54 @@ feature store and separate identity embedding columns.
 Frames and video are not saved. **New customer** ends the session and clears the
 form and its latched care notice. Theme reload preserves these session fields.
 
+## Customer instructions and outcomes
+
+During acquisition, the current-step card always shows the action supplied by
+the capture engine (including identity/visibility pauses). A latched early alert
+appears immediately in the result card and care footer; it never replaces the
+action. The result asks for staff assistance without waiting for capture to end.
+The progress bar counts down the current acquisition stage and is hidden at
+summary, since completing capture does not mean a normal result.
+
+Both visit modes show a numbered current step (for example, “หลังนวด · ขั้นตอนที่
+3 / 7 · ยิ้ม”), the live action, and the next step. The step list marks passed,
+current, and waiting stages. Identity confirmation retains the acquisition step
+with a pause label. Start errors show an unstarted state and direct customers to
+the result card for the reason instead of filling the action area with diagnostics.
+
+Customer result titles and bodies are defined in `ui/thai.py`. Each explains
+what the result means and the next action:
+
+| Backend status | Customer meaning |
+| --- | --- |
+| `baseline_saved` | Before-massage reference saved; this is not a risk assessment. |
+| `research_alert`, `delta_alert` | Warning; notify staff immediately for medical assessment. |
+| `research_below_placeholder`, `below_threshold` | Change did not exceed the applicable rule; still report symptoms. |
+| `research_incomplete` | Comparison data incomplete; staff should review capture. |
+| `inconclusive` | Assessment unavailable; staff should review the data/workflow. |
+| `threshold_unconfigured` | System not configured to assess the comparison; contact staff. |
+| `identity_rejected` | Identity could not be confirmed; contact staff. |
+| `acquisition_failed` | Capture deadline reached before required measurements were complete; the result includes the specific reason. |
+| `save_failed` | Measurements were available but persistence failed; show “บันทึกข้อมูลไม่สำเร็จ” and contact staff. |
+
+After an incomplete capture, the existing start button becomes “เก็บข้อมูลใหม่อีกครั้ง”.
+It starts a fresh capture at step 1 with the current mode, customer and visit IDs;
+the failed attempt was not saved. Any warning found during that attempt remains
+explained in the result card and care footer; customers need not wait for a retry
+to seek assistance.
+
+Research alerts identify face and/or arm measurements only when the backend's
+corresponding rule flags are explicitly true. A combined deployment score does
+not establish which region triggered it. Numerical thresholds and raw technical
+errors are not substituted for customer-facing result explanations. Preview
+continues to label simulated outcomes. Restart the app after Python copy/layout
+edits; F5 only reloads theme tokens.
+
+The arm step gives concrete live guidance such as “ยังไม่เห็นข้อมือทั้งสองข้าง”
+and “กรุณากางแขนออกด้านข้าง”. Every acquisition stage has a 45-second wall-clock
+deadline (`CAPTURE_STAGE_TIMEOUT_SEC`); pauses for identity confirmation do not
+reset that deadline.
+
 ## Work on the UI without hardware
 
 ```powershell

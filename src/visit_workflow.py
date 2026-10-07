@@ -1,11 +1,13 @@
 """Identity-gated pre/post workflow. No delta can override a symptom report."""
 
 import time
+import sqlite3
 from config import BASELINE_MAX_AGE_HOURS, DELTA_POLICY_PATH, IDENTITY_COSINE_THRESHOLD
 from src.features import SCHEMA, delta_features, numeric_map, FEATURE_KEYS, SETUP_KEYS
 from src.protocol import CARE_MESSAGE, check_setup, load_policy
 from src.research import load_parameters, compare_research
 from src.face_identity import identity_payload, cosine_similarity, IdentityMismatch, MISMATCH_MESSAGE
+from src.acquisition import AcquisitionError, SaveFailure, require_complete
 
 
 class VisitWorkflow:
@@ -46,6 +48,8 @@ class VisitWorkflow:
                 raise ValueError("Model, camera, resolution or capture station changed. Comparison is inconclusive. " + CARE_MESSAGE)
             if baseline["identity"] is None:
                 raise ValueError("Baseline has no identity embedding. Capture a new baseline under a new visit reference. " + CARE_MESSAGE)
+            if self.research and len(baseline["record"].get("research_angles", {})) != 2:
+                raise AcquisitionError("baseline_angles_missing")
         else:
             try:
                 self.store.baseline(keys)
@@ -64,7 +68,7 @@ class VisitWorkflow:
         self.request = {"mode": request["mode"], "symptoms_reported": request.get("symptoms_reported") is True}
         self.keys, self.baseline = keys, baseline
 
-    def accept_identity(self, embedding, model):
+    def accept_identity(self, embedding, model, latch_mismatch=True):
         """Gate every live capture frame; mismatch stays rejected until begin().
 
         2026-09-11: enrollment remains separate from asymmetry vectors. Baseline
@@ -80,12 +84,18 @@ class VisitWorkflow:
         if reference is not None:
             self.identity_similarity = cosine_similarity(reference["embedding"], current["embedding"])
             if reference["model"] != model or self.identity_similarity < IDENTITY_COSINE_THRESHOLD:
-                self.identity_rejected = True
+                if latch_mismatch:
+                    self.identity_rejected = True
                 raise IdentityMismatch(MISMATCH_MESSAGE)
         else:
             self.identity = current
         self.identity_verified = True
         return self.identity_similarity
+
+    def reject_identity(self):
+        """Latch a mismatch only after the session confirms repeated failures."""
+        self.identity_verified = False
+        self.identity_rejected = True
 
     def require_identity(self):
         if self.identity_rejected:
@@ -127,6 +137,7 @@ class VisitWorkflow:
         if self.request is None:
             raise ValueError("No visit acquisition is active.")
         self.require_identity()
+        require_complete(features, setup, research_angles if self.research else None)
         record = {"schema": SCHEMA, "features": numeric_map(features, FEATURE_KEYS),
                   "setup": numeric_map(setup, SETUP_KEYS), "context": dict(self.context)}
         if self.research:
@@ -134,10 +145,16 @@ class VisitWorkflow:
         if self.request["mode"] == "baseline":
             from src.protocol import check_head_pose
             check_head_pose(setup)
-            self.store.save_baseline(self.keys, record, self.identity)
+            try:
+                self.store.save_baseline(self.keys, record, self.identity)
+            except (OSError, sqlite3.Error) as exc:
+                raise SaveFailure(exc) from exc
             return {"status": "baseline_saved", "alert": False, "reason": "Baseline measurements and separate face identity embedding saved for this customer and visit." +
                     (" Research angle measurement unavailable. Capture a new baseline under a new visit reference with a visible sideways arm hold before comparing angles."
                      if self.research and len(record["research_angles"]) != 2 else "")}
         result = self.compare(features, setup, research_angles=research_angles)
-        self.store.save_recheck(self.keys, record, result)
+        try:
+            self.store.save_recheck(self.keys, record, result)
+        except (OSError, sqlite3.Error) as exc:
+            raise SaveFailure(exc, comparison=result) from exc
         return result

@@ -9,6 +9,13 @@ This is not a medical device or clearance for massage. Reported stroke symptoms
 need urgent medical attention; do not wait for a camera result. The demo rules
 and performance goals are unvalidated.
 
+The draft intended use is limited to assisting trained staff in comparing a
+symptomatic recheck with the same person's compatible baseline and showing a
+referral warning when changes may warrant medical assessment. It does not
+diagnose or rule out stroke, screen asymptomatic populations, or authorize
+massage. See [intended use and prohibited uses](validation/INTENDED_USE_TH.md)
+and the [production readiness gates](validation/PRODUCTION_READINESS_TH.md).
+
 ## How to run
 
 Use **64-bit Python 3.12 with Tkinter**, a webcam and Windows PowerShell. Run the
@@ -23,11 +30,9 @@ git clone --branch ThanaTester https://github.com/MimiPiyaphat/Computer-Vision.g
 cd Computer-Vision
 ```
 
-Then run the setup commands below from your clone's directory. The `cd` path is
-an example for the existing local workspace; adjust it for a different location.
+Then run the setup commands below from your clone's directory.
 
 ```powershell
-cd C:\CV-Pro\Computer-Vision
 py -3.12 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
 .\.venv\Scripts\python.exe prepare_identity_model.py
@@ -44,6 +49,8 @@ committed to Git.
 Face Mesh uses assets bundled with MediaPipe. `prepare_identity_model.py` downloads
 FaceNet weights once into `models/`; camera startup then uses that local file.
 YOLO uses `yolov8n-pose.pt`, downloading it on first use if missing.
+Ultralytics settings and its persistent cache default to the project's ignored
+`data/ultralytics/` directory. An explicit `YOLO_CONFIG_DIR` takes precedence.
 
 For later runs:
 
@@ -136,6 +143,10 @@ holding only the newest frame/result, so slow rendering does not accumulate
 stale video. Tkinter polls approximately every 33 ms and is the only thread that
 updates widgets. Actual FPS depends on inference and hardware, not that interval.
 Identity is checked before every acquired frame, including arm frames.
+The identity gate and face stages share one fresh Face Mesh observation per
+frame. A missing face pauses acquisition without reusing previous landmarks.
+The lighting gate compares pixels inside the facial mesh hull, excluding the
+background. This remains an engineering quality check, not exposure calibration.
 
 Invalid form commands leave the camera connected and display an error. Camera or
 model failures stop the worker and attempt resource cleanup. Disconnect/close
@@ -201,6 +212,18 @@ baseline under a new visit reference; never bypass fingerprint checks.
   Python runtime can run pure tests but does not include this desktop toolkit.
 
 ## Changelog
+
+### 2026-10-07 — capture and dataset reliability
+
+- Reuse the current identity-gated Face Mesh observation in face stages and
+  measure lighting within the facial region.
+- Keep default Ultralytics settings/cache under local ignored `data/`.
+- Select the 30-clip rehabilitation subset across exercise/status/source-split
+  groups with a fixed seed; preserve existing outputs and publish complete sets.
+- Select rehabilitation checkpoints on subject-disjoint validation people from
+  Train; evaluate Test only after selection and report confusion matrices.
+- These acquisition changes update the pipeline fingerprint. Existing visit
+  records remain intact; capture a fresh baseline with a new visit reference.
 
 ### 2026-09-12 — Thai visit UI
 

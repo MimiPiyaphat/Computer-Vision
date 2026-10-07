@@ -30,6 +30,8 @@ YOLO_IMAGE_SIZE = 640
 ARM_KEYPOINT_CONF_THRESHOLD = 0.3
 ARM_HOLD_DURATION_SEC = 10.0
 ARM_INITIAL_CHECK_SEC = 2.0
+# Wall-clock limit per acquisition stage, including visibility/identity pauses.
+CAPTURE_STAGE_TIMEOUT_SEC = 45.0
 # Minimum resolvable attempted lift; an acquisition-quality floor, not a drift score.
 ARM_INITIAL_LIFT_MIN_PX = 15.0
 
@@ -43,6 +45,9 @@ HEAD_POSE_MAX_DEGREES = 18.0
 IDENTITY_COSINE_THRESHOLD = 0.6
 IDENTITY_MODEL_PATH = "models/20180402-114759-vggface2.pt"
 IDENTITY_CPU_THREADS = 2
+# Debounce transient blur/crop errors when a face leaves and re-enters frame.
+IDENTITY_REACQUIRE_MATCH_FRAMES = 3
+IDENTITY_REJECT_MISMATCH_FRAMES = 5
 # Engineering acquisition checks, NOT clinically validated alert thresholds.
 SETUP_TOLERANCES = {
     "body_roll": 8.0, "body_scale": 0.05, "body_x": 0.08, "body_y": 0.08,

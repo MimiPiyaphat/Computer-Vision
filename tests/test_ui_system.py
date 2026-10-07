@@ -53,6 +53,29 @@ class PreviewTests(unittest.TestCase):
 
 
 class SessionTests(unittest.TestCase):
+    def test_retry_after_timeout_restarts_capture_with_same_visit(self):
+        from src.screening_flow import ScreeningFlow
+        for mode in ("baseline", "recheck"):
+            with self.subTest(mode=mode):
+                session = ScreeningSession()
+                session.flow = ScreeningFlow(Mock(), Mock())
+                session.flow.state = "summary"
+                session.flow.failure = {"reason_code": "wrists_missing"}
+                session.flow.features = {"neutral_mouth_ratio": .2}
+                session.assessment = {"level": "เก็บข้อมูลไม่ครบ · ติดต่อเจ้าหน้าที่"}
+                session.comparison = {"status": "acquisition_failed"}
+                session.workflow = Mock()
+                request = {"mode": mode, "user_id": "same-customer", "visit_id": "same-visit",
+                           "setup_confirmed": True, "symptoms_reported": mode == "recheck"}
+                session.start(request)
+                session.workflow.begin.assert_called_once_with(request)
+                self.assertEqual(session.flow.state, "quality_gate")
+                self.assertIsNone(session.flow.failure)
+                self.assertEqual(session.flow.features, {})
+                self.assertIsNone(session.assessment)
+                self.assertIsNone(session.comparison)
+                session.workflow.finish.assert_not_called()
+
     def make_session(self):
         session = ScreeningSession()
         session.cap = Mock()
@@ -165,10 +188,16 @@ class FlowRegressionTests(unittest.TestCase):
         module = importlib.util.module_from_spec(spec)
         with patch.dict("sys.modules", {"src.face_analytics": Mock()}):
             spec.loader.exec_module(module)
+        from src.features import FEATURE_KEYS, SETUP_KEYS
         arm = Mock()
-        arm.analyze.return_value = {"test_complete": True}
+        arm.analyze.return_value = {"test_complete": True,
+                                    "normalized_features": {key: 0.0 for key in FEATURE_KEYS[5:]},
+                                    "capture_setup": {key: 0.0 for key in SETUP_KEYS[6:]},
+                                    "research_angles": {}}
         flow = module.ScreeningFlow(Mock(), arm)
         flow.results = {"eye": {"ratio": 0}, "mouth": {"ratio": 1}}
+        flow.features = {key: 0.0 for key in FEATURE_KEYS[:5]}
+        flow.setup = {key: 0.0 for key in SETUP_KEYS[:6]}
         flow.state = module.STATE_ARM_TEST
         snapshot = flow.update(None)
         self.assertEqual(snapshot["state"], "summary")

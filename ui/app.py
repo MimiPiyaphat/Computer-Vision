@@ -7,7 +7,8 @@ from tkinter.scrolledtext import ScrolledText
 from config import CAMERA_INDEX
 from ui.components import Card, VideoPanel, button, label
 from ui.content import STEPS
-from ui.thai import SAFETY_TH, CARE_TH, display_text, configure_fonts
+from ui.thai import (SAFETY_TH, CARE_TH, customer_assessment, customer_result_status,
+                     STAFF_REVIEW_STATUSES, display_text, configure_fonts)
 from ui.visit_panel import VisitModePanel
 from ui.visit_state import MODES, can_change_mode
 from ui.theme import load_theme
@@ -133,24 +134,26 @@ class Dashboard:
             stage_grid.columnconfigure(column, weight=1, uniform="stage")
         self.stage_labels = {}
         for index, (state, title, _, _) in enumerate(STEPS):
-            item = label(stage_grid, f"{index + 1:02d}   {title}", t, muted=True, size=10)
+            item = label(stage_grid, f"{index + 1:02d}   {title}", t, muted=True, size=10, wraplength=185)
             item.grid(row=index // 2, column=index % 2, sticky="w", pady=2)
             self.stage_labels[state] = item
         current = Card(right, t, "ขั้นตอนปัจจุบัน")
         current.configure(padx=12, pady=12)
         current.pack(fill="x", pady=(0, 12))
+        self.current_step = label(current, "เตรียมเริ่มตรวจ", t, bold=True, wraplength=340)
+        self.current_step.pack(fill="x", pady=(0, 8))
         self.instruction = label(current, "เชื่อมต่อกล้องเพื่อเริ่มต้น", t, size=14, bold=True, wraplength=340)
         self.instruction.pack(fill="x")
         self.progress = ttk.Progressbar(current, maximum=100)
         self.progress.pack(fill="x", pady=12)
         self.detail = label(current, "จับเวลาเมื่อเห็นจุดอ้างอิงที่จำเป็นครบ", t, muted=True, wraplength=340)
         self.detail.pack(fill="x")
-        result = Card(right, t, "ผลการบันทึก / ตรวจซ้ำ")
+        result = Card(right, t, "ผลของคุณ / สิ่งที่ควรทำ")
         result.configure(padx=12, pady=12)
         result.pack(fill="both", expand=True)
         self.result_title = label(result, "ยังไม่มีผล", t, bold=True, wraplength=340)
         self.result_title.pack(fill="x")
-        self.result_body = ScrolledText(result, height=4, width=28, wrap="word", relief="flat",
+        self.result_body = ScrolledText(result, height=7, width=28, wrap="word", relief="flat",
                                        bg=t["surface"], fg=t["muted"],
                                        font=(t["font"], t["font_size"]), borderwidth=0)
         self.result_body.pack(fill="both", expand=True, pady=(8, 0))
@@ -345,6 +348,7 @@ class Dashboard:
                        "disconnected": "ยังไม่เชื่อมต่อ · กล้องปิดอยู่"}.get(status, data.get("message", "ไม่สามารถใช้กล้องได้"))
             self.connection.configure(text=message, fg=t["danger"] if status == "error" else t["muted"], wraplength=560)
             self.video.render(message="ไม่สามารถใช้กล้องได้" if status == "error" else None)
+            self.current_step.configure(text="เตรียมเริ่มตรวจ", fg=t["muted"])
             self.instruction.configure(text="เชื่อมต่อกล้องเพื่อเริ่มต้น" if status != "error" else "เชื่อมต่อใหม่เพื่อลองอีกครั้ง")
             self.progress["value"] = 0
             self.detail.configure(text="จับเวลาเมื่อเห็นจุดอ้างอิงที่จำเป็นครบ")
@@ -356,6 +360,23 @@ class Dashboard:
         self.connection.configure(text=("กำลังแสดงตัวอย่าง · ข้อมูลจำลอง" if self.preview else f"เชื่อมต่อกล้องแล้ว · {data.get('fps', 0):.0f} FPS"), fg=t["muted"])
         self.video.render(data.get("frame"))
         state = data.get("state", "idle")
+        # Identity checks pause acquisition without changing its numbered step.
+        stage_state = data.get("acquisition_state", state) if state == "identity_check" else state
+        stage_index = next((i for i, step in enumerate(STEPS) if step[0] == stage_state), None)
+        mode_title = "หลังนวด" if (data.get("visit_mode") or self.visit_mode.get()) == "recheck" else "ก่อนนวด"
+        step_heading = (f"{mode_title} · ขั้นตอนที่ {stage_index + 1} / {len(STEPS)} · {STEPS[stage_index][1]}"
+                        if stage_index is not None else f"{mode_title} · เตรียมเริ่มตรวจ")
+        if state == "identity_check":
+            step_heading += " · พักเพื่อยืนยันบุคคล"
+        elif state == "identity_rejected":
+            step_heading = f"{mode_title} · หยุดการตรวจเพื่อยืนยันบุคคล"
+        if data.get("command_error"):
+            step_heading = f"{mode_title} · ยังเริ่มตรวจไม่ได้"
+        self.current_step.configure(text=step_heading, fg=t["accent"] if stage_index is not None else t["muted"])
+        if state == "summary":
+            self.progress.pack_forget()  # A full green bar could be read as a normal result.
+        else:
+            self.progress.pack(fill="x", pady=12, before=self.detail)
         self.instruction.configure(text=MODES[self.visit_mode.get()][1] if state == "idle" else display_text(data.get("instruction", "")))
         self.start_button.configure(text="เริ่มขั้นตอนใหม่" if state not in ("idle", "summary", "identity_rejected") else MODES[self.visit_mode.get()][3])
         active = state not in ("idle", "summary", "identity_rejected")
@@ -367,33 +388,87 @@ class Dashboard:
         duration = next((step[3] for step in STEPS if step[0] == state), 0)
         elapsed = data.get("elapsed", 0)
         self.progress["value"] = min(100, elapsed / duration * 100) if duration else (100 if state == "summary" else 0)
-        for key, item in self.stage_labels.items():
-            item.configure(fg=t["accent"] if key == state else t["muted"])
+        for index, (key, title, _, _) in enumerate(STEPS):
+            item = self.stage_labels.get(key)
+            if item is None:
+                continue
+            # A failed summary must not mark every measurement as completed.
+            passed = stage_index is not None and index < stage_index and state != "summary"
+            marker = "กำลังทำ" if key == stage_state else "ผ่านแล้ว" if passed else "รอ"
+            if key == stage_state and state == "identity_check":
+                marker = "พัก"
+            if state == "summary":
+                marker = "สิ้นสุด" if key == state else ""
+            item.configure(text=f"{index + 1:02d}  {title}" + (f" · {marker}" if marker else ""),
+                           fg=t["accent"] if key == stage_state else t["muted"])
         extra = data.get("extra", {})
-        detail = f"{elapsed:.1f} / {duration:g} วินาที" if duration else "ทำตามคำแนะนำบนหน้าจอ"
+        stage = next((step for step in STEPS if step[0] == state), None)
+        detail = (f"{stage[1]} · เหลืออีก {max(0, duration - elapsed):.1f} วินาที"
+                  if duration else "ทำตามคำแนะนำบนหน้าจอ")
         if extra.get("detected") is False or extra.get("pose_found") is False:
             detail += " · กำลังรอจุดอ้างอิง"
+        if extra.get("capture_paused"):
+            detail += " · หยุดจับเวลาไว้จนกว่าจะเห็นจุดอ้างอิงครบ"
+        if data.get("timeout_remaining") is not None and active:
+            detail += f"\nเวลาสูงสุดของขั้นตอนนี้ {data['timeout_remaining']:.0f} วินาที"
         if state == "eye_test":
             detail += f"\nกะพริบตา · ซ้าย {extra.get('left', 0)} / ขวา {extra.get('right', 0)}"
+        if state == "identity_check":
+            detail = "พักการเก็บข้อมูลชั่วคราว · ทำตามคำแนะนำเพื่อกลับไปยังขั้นตอนเดิม"
+        elif stage_index is not None and state != "summary":
+            detail += f"\nขั้นตอนถัดไป: {STEPS[stage_index + 1][1]}"
+        elif state == "idle":
+            detail = "กดเริ่มเมื่อพร้อม ระบบจะพาทำทีละขั้นตอนโดยอัตโนมัติ"
         self.detail.configure(text=detail)
         comparison = data.get("comparison") or {}
         if comparison.get("alert"):
-            self.instruction.configure(text="เกินเกณฑ์ทดลองที่ยังไม่ผ่านการรับรอง ผู้มีอาการผิดปกติต้องได้รับการดูแล" if comparison.get("research_only") else
-                                       "ค่าการเปลี่ยนแปลงเกินเกณฑ์ ไปโรงพยาบาลทันที")
+            # Alerts persist in the result card/footer, never over the current
+            # action (including identity pauses and missing-landmark guidance).
             self.update_care_notice(CARE_MESSAGE)
             if not self.alert_notified:
                 self.root.bell()
                 self.alert_notified = True
         if data.get("command_error"):
-            self.instruction.configure(text=display_text(data["command_error"]))
+            self.instruction.configure(text="กรุณาแจ้งเจ้าหน้าที่ · ดูสาเหตุและวิธีแก้ไขในช่องผลด้านล่าง")
+            self.detail.configure(text="ยังไม่ได้เริ่มขั้นตอนการตรวจ")
+            self.progress.pack_forget()
         assessment = data.get("assessment")
-        if assessment:
-            level = assessment["level"]
-            self.result_title.configure(text=display_text(level), fg=t["danger"] if level == "Seek medical attention immediately" or comparison.get("alert") else t["warning"])
-            self.set_result_text("\n".join(display_text(reason) for reason in assessment["reasons"]) + "\n\n" + display_text(assessment["disclaimer"]) + "\n\n" + display_text(data.get("save_status", "")))
+        if assessment or comparison.get("alert"):
+            level = assessment.get("level", "") if assessment else ""
+            customer_title, customer_body = customer_assessment(assessment or {}, comparison)
+            if not assessment:
+                customer_body = "แจ้งเตือนระหว่างตรวจ\n" + customer_body
+            result_status = customer_result_status(assessment or {}, comparison)
+            color = t["danger"] if level == "Seek medical attention immediately" or comparison.get("alert") else (
+                t["accent"] if result_status == "baseline_saved" else t["warning"])
+            self.result_title.configure(text=customer_title, fg=color)
+            self.set_result_text(customer_body)
+            if state == "summary":
+                # Finishing the capture sequence does not guarantee a usable
+                # assessment. Keep the current-step card consistent with it.
+                if not data.get("command_error"):
+                    self.instruction.configure(text="จบขั้นตอนแล้ว · ดูผลและสิ่งที่ควรทำด้านล่าง")
+                needs_review = customer_result_status(assessment, comparison) in STAFF_REVIEW_STATUSES
+                self.progress["value"] = 0 if needs_review else 100
+                self.detail.configure(text="สิ้นสุดขั้นตอนแล้ว · ต้องให้เจ้าหน้าที่ช่วยตรวจสอบ" if needs_review else
+                                      "สิ้นสุดขั้นตอนแล้ว · อ่านรายละเอียดผลด้านล่าง")
+                self.stage_labels["summary"].configure(fg=t["warning"] if needs_review else t["accent"])
+                if result_status == "acquisition_failed" and not data.get("command_error"):
+                    self.start_button.configure(text="เก็บข้อมูลใหม่อีกครั้ง")
+                    self.current_step.configure(text=f"{mode_title} · เก็บข้อมูลไม่ครบ", fg=t["warning"])
+                    self.instruction.configure(text="กด ‘เก็บข้อมูลใหม่อีกครั้ง’ เมื่อพร้อม")
+                    self.detail.configure(text="เริ่มตั้งแต่ขั้นตอนที่ 1 · ใช้รหัสเดิมได้")
+                    if comparison.get("alert") or comparison.get("prior_alert"):
+                        self.instruction.configure(text="แจ้งเจ้าหน้าที่ทันที · ไม่ต้องรอเก็บข้อมูลใหม่ให้ครบ")
         else:
-            self.result_title.configure(text="ยังไม่มีผล", fg=t["text"])
-            self.set_result_text("ทำตามขั้นตอนให้ครบเพื่อดูผลสรุป")
+            if data.get("command_error"):
+                self.result_title.configure(text="เริ่มการตรวจไม่ได้ · กรุณาแก้ไขก่อน", fg=t["warning"])
+                self.set_result_text(display_text(data["command_error"]) +
+                                     "\n\nขั้นตอนต่อไป: แก้ไขข้อมูลหรือการตั้งค่าตามคำแนะนำ แล้วกดเริ่มตรวจอีกครั้ง")
+            else:
+                self.result_title.configure(text="กำลังเก็บข้อมูล" if active else "ยังไม่ได้เริ่มตรวจ", fg=t["text"])
+                self.set_result_text("ทำตามคำแนะนำในช่องขั้นตอนปัจจุบัน ระบบจะแสดงผลเมื่อเก็บข้อมูลเสร็จ" if active else
+                                     "เริ่มบันทึกข้อมูลเพื่อใช้เปรียบเทียบก่อนและหลังนวด")
 
     def close(self):
         self.closing = True

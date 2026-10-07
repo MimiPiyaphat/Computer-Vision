@@ -7,12 +7,18 @@ Only visible, stable shoulder/wrist samples advance the hold timer.
 import time
 import math
 
+from src.runtime import configure_yolo_runtime
+
+configure_yolo_runtime()  # Must precede Ultralytics' import-time settings access.
 from ultralytics import YOLO
 from src.arm_features import ArmFeatures
 from src.projected_arm_angle import ProjectedArmAngle
+from src.acquisition import MESSAGES
 
 from config import (
     ARM_HOLD_DURATION_SEC,
+    ARM_INITIAL_CHECK_SEC,
+    ARM_INITIAL_LIFT_MIN_PX,
     ARM_KEYPOINT_CONF_THRESHOLD,
     YOLO_POSE_MODEL,
     YOLO_CONF_THRESHOLD,
@@ -35,11 +41,12 @@ class ArmPoseAnalyzer:
     """
 
     def __init__(self, model_path=YOLO_POSE_MODEL, conf_threshold=YOLO_CONF_THRESHOLD,
-                 keypoint_conf_threshold=ARM_KEYPOINT_CONF_THRESHOLD):
+                 keypoint_conf_threshold=ARM_KEYPOINT_CONF_THRESHOLD, require_angles=False):
         self._model = YOLO(model_path)
         self._conf_threshold = conf_threshold                    # used for person detection
         self._keypoint_conf_threshold = keypoint_conf_threshold  # used for individual keypoints (wrists)
         self._started = False
+        self.require_angles = require_angles
         self._detected_elapsed_sec = 0.0
         self._last_detected_at = None
         self._last_yolo_results = None
@@ -55,12 +62,15 @@ class ArmPoseAnalyzer:
         self.projected_angle = ProjectedArmAngle()
 
     @staticmethod
-    def _empty_result(elapsed_sec=0.0, test_complete=False, person_found=False):
+    def _empty_result(elapsed_sec=0.0, person_found=False, reason_code="person_missing"):
         return {
             "pose_found": False,
             "person_found": person_found,   # True if a person was detected but wrists weren't visible/confident enough
             "elapsed_sec": round(elapsed_sec, 1),
-            "test_complete": test_complete,
+            "test_complete": False,
+            "reason_code": reason_code,
+            "instruction": MESSAGES[reason_code],
+            "capture_paused": True,
         }
 
     def analyze(self, frame_bgr):
@@ -81,8 +91,8 @@ class ArmPoseAnalyzer:
         if not person_found:
             self._last_detected_at = None
             detected_elapsed = self._detected_elapsed_sec
-            test_complete = detected_elapsed >= ARM_HOLD_DURATION_SEC
-            return self._empty_result(elapsed_sec=detected_elapsed, test_complete=test_complete, person_found=False)
+            reason = "multiple_people" if len(shape) == 3 and shape[0] > 1 else "person_missing"
+            return self._empty_result(elapsed_sec=detected_elapsed, reason_code=reason)
 
         keypoints = results[0].keypoints.xy[0]  # tensor shape (17, 2)
         conf_scores = results[0].keypoints.conf
@@ -111,32 +121,53 @@ class ArmPoseAnalyzer:
         if left_wrist is None or right_wrist is None or any(p is None for p in shoulders.values()):
             self._last_detected_at = None
             detected_elapsed = self._detected_elapsed_sec
-            test_complete = detected_elapsed >= ARM_HOLD_DURATION_SEC
+            reason = ("wrists_missing" if left_wrist is None and right_wrist is None else
+                      "wrist_missing" if left_wrist is None or right_wrist is None else "shoulders_missing")
             # The person is visible, but the required shoulder/wrist set is incomplete.
-            return self._empty_result(elapsed_sec=detected_elapsed, test_complete=test_complete, person_found=True)
+            return self._empty_result(elapsed_sec=detected_elapsed, person_found=True, reason_code=reason)
 
         # Both wrists are visible: accumulate continuous detected hold time.
         now = time.monotonic()
         proposed_elapsed = self._detected_elapsed_sec + (now - self._last_detected_at if self._last_detected_at is not None else 0)
+        span = math.dist(shoulders["left"], shoulders["right"])
+        attempted = self.normalized.base and max(
+            self.normalized.base[s] - self.normalized.highest[s] for s in ("left", "right")) * span >= ARM_INITIAL_LIFT_MIN_PX
+        # Allow a late lift/sideways correction to establish a reference. Do not
+        # consume the hold interval while still waiting for the initial pose.
+        if not attempted or (self.require_angles and len(self.projected_angle.reference) != 2):
+            proposed_elapsed = min(proposed_elapsed, ARM_INITIAL_CHECK_SEC)
         if not self.normalized.observe({"left": left_wrist, "right": right_wrist}, shoulders,
                                        frame_bgr.shape[1], frame_bgr.shape[0], proposed_elapsed):
             self._last_detected_at = None
-            return self._empty_result(elapsed_sec=self._detected_elapsed_sec, person_found=True)
-        if self._last_detected_at is not None:
-            self._detected_elapsed_sec += now - self._last_detected_at
+            return self._empty_result(elapsed_sec=self._detected_elapsed_sec, person_found=True,
+                                      reason_code=self.normalized.reason_code)
+        projected_now = self.projected_angle.angles({"left": left_wrist, "right": right_wrist}, shoulders)
+        if self.require_angles and projected_now is None:
+            self._last_detected_at = None
+            self.projected_angle.current_valid = False
+            return self._empty_result(elapsed_sec=self._detected_elapsed_sec, person_found=True, reason_code="spread_arms")
+        self._detected_elapsed_sec = proposed_elapsed
         self._last_detected_at = now
         detected_elapsed = self._detected_elapsed_sec
         self.projected_angle.observe({"left": left_wrist, "right": right_wrist}, shoulders, detected_elapsed)
-        test_complete = detected_elapsed >= ARM_HOLD_DURATION_SEC
+        vector, angles = self.normalized.vector(), self.projected_angle.vector()
+        test_complete = (detected_elapsed >= ARM_HOLD_DURATION_SEC and vector is not None
+                         and (not self.require_angles or len(angles) == 2))
+        reason = ("spread_arms" if projected_now is None and attempted else
+                  "hold_arms" if vector is not None else
+                  "spread_arms" if self.require_angles else "raise_arms")
 
         return {
             "pose_found": True,
             "person_found": True,
             "elapsed_sec": round(detected_elapsed, 1),
             "test_complete": test_complete,
-            "normalized_features": self.normalized.vector(),
+            "normalized_features": vector,
             "capture_setup": self.normalized.setup,
-            "research_angles": self.projected_angle.vector(),
+            "research_angles": angles,
+            "reason_code": reason,
+            "instruction": MESSAGES[reason],
+            "capture_paused": False,
         }
 
     def draw_debug(self, frame_bgr):
