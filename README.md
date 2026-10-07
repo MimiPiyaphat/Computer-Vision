@@ -223,6 +223,17 @@ settings, so code cleanup can invalidate old baseline comparisons. Select baseli
 with the same customer/visit IDs to archive and replace an incompatible record;
 never bypass fingerprint checks.
 
+## Developer model evaluation
+
+The desktop app includes a developer-only evaluation page. Click **Dev** in the
+header or press `Ctrl+Shift+D`, then enter the configured developer password to
+view the held-out rehabilitation evaluation, accuracy/precision/recall/F1 and
+confusion matrices. This page is for development and demonstration only; the
+current transfer model is trained on rehabilitation exercise-completion labels,
+not stroke-risk labels, and its metrics must not be presented as clinical
+accuracy. The paired before/after screening workflow remains the source of the
+customer-facing result.
+
 ## Troubleshooting
 
 - **Camera unavailable:** close other camera apps and select the correct camera index.

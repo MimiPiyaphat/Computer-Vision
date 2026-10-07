@@ -196,3 +196,13 @@ keeps controls accessible when content exceeds the available height. The result
 box scrolls independently. Capture controls are above the camera view and the
 care notice remains fixed below the scrollable page. The paired workflow uses the ratio delta
 contract, which remains clinically unvalidated.
+
+## Developer evaluation page
+
+Developer metrics are intentionally separated from the customer workflow. Open
+the page with the **Dev** button in the header or `Ctrl+Shift+D` and enter the
+developer password. It shows the transfer-training report, split-level metrics,
+and confusion matrices for the rehabilitation dataset. The page also displays
+the data split and limitation notes so that validation numbers are not mistaken
+for clinical stroke-screening accuracy. Customers do not need this page to run
+a baseline or a post-massage recheck.

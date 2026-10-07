@@ -1,0 +1,6774 @@
+{
+  "schema": "rehab-transfer-report-v1",
+  "created_at": "2026-10-07T08:02:39.988156+00:00",
+  "task": "rehabilitation_exercise_and_completion",
+  "clinical_validation": false,
+  "screening_model_trained": false,
+  "device": "cpu",
+  "seed": 42,
+  "pipeline": "resnet18-imagenet-v1-uniform-rgb160-temporal-v1",
+  "frames": 16,
+  "size": 160,
+  "model_file": "stroke_rehab_transfer.pt",
+  "model_sha256": "5e8b2d9353356424b21410e410fa97143219235da42bc83613dcddce7e569815",
+  "selection_metric": "validation status macro F1, exercise macro F1, then lower loss",
+  "selected_kind": "mlp",
+  "best_epoch": 16,
+  "train": {
+    "exercise": {
+      "labels": [
+        "1_Lifting an Object",
+        "2_Extending the Elbow",
+        "3_Lifting the Wrist",
+        "4_Opening the Hand"
+      ],
+      "samples": 327,
+      "confusion_matrix": [
+        [
+          82,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          87,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          80,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          78
+        ]
+      ],
+      "accuracy": 1.0,
+      "accuracy_wilson_95ci": [
+        0.9883888227479495,
+        1
+      ],
+      "macro_precision": 1.0,
+      "macro_recall": 1.0,
+      "macro_f1": 1.0,
+      "per_class": [
+        {
+          "label": "1_Lifting an Object",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 82,
+          "predicted_count": 82
+        },
+        {
+          "label": "2_Extending the Elbow",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 87,
+          "predicted_count": 87
+        },
+        {
+          "label": "3_Lifting the Wrist",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 80,
+          "predicted_count": 80
+        },
+        {
+          "label": "4_Opening the Hand",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 78,
+          "predicted_count": 78
+        }
+      ],
+      "undefined_division": "zero",
+      "matrix_axes": "rows=actual, columns=predicted"
+    },
+    "status": {
+      "labels": [
+        "Complete",
+        "Incomplete"
+      ],
+      "samples": 327,
+      "confusion_matrix": [
+        [
+          156,
+          4
+        ],
+        [
+          0,
+          167
+        ]
+      ],
+      "accuracy": 0.9877675840978594,
+      "accuracy_wilson_95ci": [
+        0.9689750065222353,
+        0.9952330499199538
+      ],
+      "macro_precision": 0.9883040935672515,
+      "macro_recall": 0.9875,
+      "macro_f1": 0.9877537263126357,
+      "per_class": [
+        {
+          "label": "Complete",
+          "precision": 1.0,
+          "recall": 0.975,
+          "f1": 0.9873417721518987,
+          "support": 160,
+          "predicted_count": 156
+        },
+        {
+          "label": "Incomplete",
+          "precision": 0.9766081871345029,
+          "recall": 1.0,
+          "f1": 0.9881656804733728,
+          "support": 167,
+          "predicted_count": 171
+        }
+      ],
+      "undefined_division": "zero",
+      "matrix_axes": "rows=actual, columns=predicted"
+    },
+    "loss": 0.0368689276628333,
+    "predictions": {
+      "exercise": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3
+      ],
+      "status": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  "validation": {
+    "exercise": {
+      "labels": [
+        "1_Lifting an Object",
+        "2_Extending the Elbow",
+        "3_Lifting the Wrist",
+        "4_Opening the Hand"
+      ],
+      "samples": 84,
+      "confusion_matrix": [
+        [
+          21,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          20,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          20,
+          1
+        ],
+        [
+          0,
+          0,
+          0,
+          22
+        ]
+      ],
+      "accuracy": 0.9880952380952381,
+      "accuracy_wilson_95ci": [
+        0.935604562492286,
+        0.9978954169124508
+      ],
+      "macro_precision": 0.9891304347826086,
+      "macro_recall": 0.9880952380952381,
+      "macro_f1": 0.9883468834688347,
+      "per_class": [
+        {
+          "label": "1_Lifting an Object",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 21,
+          "predicted_count": 21
+        },
+        {
+          "label": "2_Extending the Elbow",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 20,
+          "predicted_count": 20
+        },
+        {
+          "label": "3_Lifting the Wrist",
+          "precision": 1.0,
+          "recall": 0.9523809523809523,
+          "f1": 0.975609756097561,
+          "support": 21,
+          "predicted_count": 20
+        },
+        {
+          "label": "4_Opening the Hand",
+          "precision": 0.9565217391304348,
+          "recall": 1.0,
+          "f1": 0.9777777777777777,
+          "support": 22,
+          "predicted_count": 23
+        }
+      ],
+      "undefined_division": "zero",
+      "matrix_axes": "rows=actual, columns=predicted"
+    },
+    "status": {
+      "labels": [
+        "Complete",
+        "Incomplete"
+      ],
+      "samples": 84,
+      "confusion_matrix": [
+        [
+          38,
+          4
+        ],
+        [
+          0,
+          42
+        ]
+      ],
+      "accuracy": 0.9523809523809523,
+      "accuracy_wilson_95ci": [
+        0.8838668496724167,
+        0.9813282531905099
+      ],
+      "macro_precision": 0.9565217391304348,
+      "macro_recall": 0.9523809523809523,
+      "macro_f1": 0.9522727272727273,
+      "per_class": [
+        {
+          "label": "Complete",
+          "precision": 1.0,
+          "recall": 0.9047619047619048,
+          "f1": 0.9500000000000001,
+          "support": 42,
+          "predicted_count": 38
+        },
+        {
+          "label": "Incomplete",
+          "precision": 0.9130434782608695,
+          "recall": 1.0,
+          "f1": 0.9545454545454545,
+          "support": 42,
+          "predicted_count": 46
+        }
+      ],
+      "undefined_division": "zero",
+      "matrix_axes": "rows=actual, columns=predicted"
+    },
+    "loss": 0.21132557253752435,
+    "predictions": {
+      "exercise": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        3,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3
+      ],
+      "status": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  "test": {
+    "exercise": {
+      "labels": [
+        "1_Lifting an Object",
+        "2_Extending the Elbow",
+        "3_Lifting the Wrist",
+        "4_Opening the Hand"
+      ],
+      "samples": 80,
+      "confusion_matrix": [
+        [
+          0,
+          0,
+          0,
+          20
+        ],
+        [
+          5,
+          14,
+          0,
+          1
+        ],
+        [
+          2,
+          0,
+          0,
+          18
+        ],
+        [
+          3,
+          1,
+          0,
+          16
+        ]
+      ],
+      "accuracy": 0.375,
+      "accuracy_wilson_95ci": [
+        0.27694178701531175,
+        0.48451274536857
+      ],
+      "macro_precision": 0.30606060606060603,
+      "macro_recall": 0.375,
+      "macro_f1": 0.3066666666666667,
+      "per_class": [
+        {
+          "label": "1_Lifting an Object",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 20,
+          "predicted_count": 10
+        },
+        {
+          "label": "2_Extending the Elbow",
+          "precision": 0.9333333333333333,
+          "recall": 0.7,
+          "f1": 0.8,
+          "support": 20,
+          "predicted_count": 15
+        },
+        {
+          "label": "3_Lifting the Wrist",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 20,
+          "predicted_count": 0
+        },
+        {
+          "label": "4_Opening the Hand",
+          "precision": 0.2909090909090909,
+          "recall": 0.8,
+          "f1": 0.4266666666666667,
+          "support": 20,
+          "predicted_count": 55
+        }
+      ],
+      "undefined_division": "zero",
+      "matrix_axes": "rows=actual, columns=predicted"
+    },
+    "status": {
+      "labels": [
+        "Complete",
+        "Incomplete"
+      ],
+      "samples": 80,
+      "confusion_matrix": [
+        [
+          16,
+          24
+        ],
+        [
+          13,
+          27
+        ]
+      ],
+      "accuracy": 0.5375,
+      "accuracy_wilson_95ci": [
+        0.42904357591268794,
+        0.6425200643721475
+      ],
+      "macro_precision": 0.5405679513184585,
+      "macro_recall": 0.5375000000000001,
+      "macro_f1": 0.5285873546743112,
+      "per_class": [
+        {
+          "label": "Complete",
+          "precision": 0.5517241379310345,
+          "recall": 0.4,
+          "f1": 0.463768115942029,
+          "support": 40,
+          "predicted_count": 29
+        },
+        {
+          "label": "Incomplete",
+          "precision": 0.5294117647058824,
+          "recall": 0.675,
+          "f1": 0.5934065934065933,
+          "support": 40,
+          "predicted_count": 51
+        }
+      ],
+      "undefined_division": "zero",
+      "matrix_axes": "rows=actual, columns=predicted"
+    },
+    "loss": 3.191185122728348,
+    "predictions": {
+      "exercise": [
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        1,
+        1,
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        0,
+        1,
+        1,
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        0,
+        0,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        0,
+        0,
+        3,
+        1,
+        3,
+        3,
+        0
+      ],
+      "status": [
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        0
+      ]
+    }
+  },
+  "trials": [
+    {
+      "kind": "linear",
+      "learning_rate": 0.001,
+      "weight_decay": 0.01,
+      "best_epoch": 13,
+      "validation": {
+        "exercise": {
+          "labels": [
+            "1_Lifting an Object",
+            "2_Extending the Elbow",
+            "3_Lifting the Wrist",
+            "4_Opening the Hand"
+          ],
+          "samples": 84,
+          "confusion_matrix": [
+            [
+              21,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              20,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              21,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              22
+            ]
+          ],
+          "accuracy": 1.0,
+          "accuracy_wilson_95ci": [
+            0.95626827158534,
+            0.9999999999999999
+          ],
+          "macro_precision": 1.0,
+          "macro_recall": 1.0,
+          "macro_f1": 1.0,
+          "per_class": [
+            {
+              "label": "1_Lifting an Object",
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "support": 21,
+              "predicted_count": 21
+            },
+            {
+              "label": "2_Extending the Elbow",
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "support": 20,
+              "predicted_count": 20
+            },
+            {
+              "label": "3_Lifting the Wrist",
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "support": 21,
+              "predicted_count": 21
+            },
+            {
+              "label": "4_Opening the Hand",
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "support": 22,
+              "predicted_count": 22
+            }
+          ],
+          "undefined_division": "zero",
+          "matrix_axes": "rows=actual, columns=predicted"
+        },
+        "status": {
+          "labels": [
+            "Complete",
+            "Incomplete"
+          ],
+          "samples": 84,
+          "confusion_matrix": [
+            [
+              40,
+              2
+            ],
+            [
+              9,
+              33
+            ]
+          ],
+          "accuracy": 0.8690476190476191,
+          "accuracy_wilson_95ci": [
+            0.780539270768134,
+            0.9252777868305695
+          ],
+          "macro_precision": 0.8795918367346939,
+          "macro_recall": 0.8690476190476191,
+          "macro_f1": 0.8681318681318682,
+          "per_class": [
+            {
+              "label": "Complete",
+              "precision": 0.8163265306122449,
+              "recall": 0.9523809523809523,
+              "f1": 0.8791208791208791,
+              "support": 42,
+              "predicted_count": 49
+            },
+            {
+              "label": "Incomplete",
+              "precision": 0.9428571428571428,
+              "recall": 0.7857142857142857,
+              "f1": 0.8571428571428571,
+              "support": 42,
+              "predicted_count": 35
+            }
+          ],
+          "undefined_division": "zero",
+          "matrix_axes": "rows=actual, columns=predicted"
+        },
+        "loss": 0.3366474590840794,
+        "predictions": {
+          "exercise": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3
+          ],
+          "status": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            0,
+            1,
+            1,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1
+          ]
+        }
+      },
+      "history": [
+        {
+          "epoch": 1,
+          "train_loss": 1.4057900019741933,
+          "validation_loss": 0.8170014335995629,
+          "validation_status_accuracy": 0.8214285714285714,
+          "validation_status_macro_f1": 0.8183129055515501,
+          "validation_exercise_accuracy": 0.9404761904761905
+        },
+        {
+          "epoch": 2,
+          "train_loss": 0.3892823612197823,
+          "validation_loss": 0.5448515784172785,
+          "validation_status_accuracy": 0.8452380952380952,
+          "validation_status_macro_f1": 0.84253785147801,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 3,
+          "train_loss": 0.21767726959803052,
+          "validation_loss": 0.4739219716617039,
+          "validation_status_accuracy": 0.8333333333333334,
+          "validation_status_macro_f1": 0.8309373202990225,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 4,
+          "train_loss": 0.12834173472831736,
+          "validation_loss": 0.5102942727860951,
+          "validation_status_accuracy": 0.7142857142857143,
+          "validation_status_macro_f1": 0.712820512820513,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 5,
+          "train_loss": 0.10397603401532596,
+          "validation_loss": 0.5016820005008152,
+          "validation_status_accuracy": 0.7261904761904762,
+          "validation_status_macro_f1": 0.7252168966007679,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 6,
+          "train_loss": 0.08357026619232895,
+          "validation_loss": 0.43971499445892515,
+          "validation_status_accuracy": 0.8452380952380952,
+          "validation_status_macro_f1": 0.8434408602150537,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 7,
+          "train_loss": 0.058124240214398146,
+          "validation_loss": 0.41022865580660955,
+          "validation_status_accuracy": 0.8333333333333334,
+          "validation_status_macro_f1": 0.8318077803203662,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 8,
+          "train_loss": 0.05345360457395924,
+          "validation_loss": 0.3956999984525499,
+          "validation_status_accuracy": 0.8214285714285714,
+          "validation_status_macro_f1": 0.8212005108556832,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 9,
+          "train_loss": 0.05154580213926983,
+          "validation_loss": 0.44483476877212524,
+          "validation_status_accuracy": 0.8452380952380952,
+          "validation_status_macro_f1": 0.84253785147801,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 10,
+          "train_loss": 0.043689046681656386,
+          "validation_loss": 0.40098067053726744,
+          "validation_status_accuracy": 0.8333333333333334,
+          "validation_status_macro_f1": 0.8329545454545454,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 11,
+          "train_loss": 0.0393350750139547,
+          "validation_loss": 0.3784925306127185,
+          "validation_status_accuracy": 0.8571428571428571,
+          "validation_status_macro_f1": 0.8558352402745995,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 12,
+          "train_loss": 0.04022579587745375,
+          "validation_loss": 0.4330434100258918,
+          "validation_status_accuracy": 0.8690476190476191,
+          "validation_status_macro_f1": 0.8667627974044702,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 13,
+          "train_loss": 0.03838706032204974,
+          "validation_loss": 0.3366474590840794,
+          "validation_status_accuracy": 0.8690476190476191,
+          "validation_status_macro_f1": 0.8681318681318682,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 14,
+          "train_loss": 0.02476608414852291,
+          "validation_loss": 0.3980131738242649,
+          "validation_status_accuracy": 0.8452380952380952,
+          "validation_status_macro_f1": 0.8434408602150537,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 15,
+          "train_loss": 0.021239527276167448,
+          "validation_loss": 0.3691255013857569,
+          "validation_status_accuracy": 0.8571428571428571,
+          "validation_status_macro_f1": 0.8558352402745995,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 16,
+          "train_loss": 0.0196914770996443,
+          "validation_loss": 0.3671825616842225,
+          "validation_status_accuracy": 0.8571428571428571,
+          "validation_status_macro_f1": 0.8558352402745995,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 17,
+          "train_loss": 0.01861808136310599,
+          "validation_loss": 0.34860561043024063,
+          "validation_status_accuracy": 0.8690476190476191,
+          "validation_status_macro_f1": 0.8681318681318682,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 18,
+          "train_loss": 0.016703376620552227,
+          "validation_loss": 0.3566743009501979,
+          "validation_status_accuracy": 0.8571428571428571,
+          "validation_status_macro_f1": 0.8558352402745995,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 19,
+          "train_loss": 0.01579224787629708,
+          "validation_loss": 0.35215881821655093,
+          "validation_status_accuracy": 0.8690476190476191,
+          "validation_status_macro_f1": 0.8681318681318682,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 20,
+          "train_loss": 0.015339244995835815,
+          "validation_loss": 0.3593414927877131,
+          "validation_status_accuracy": 0.8571428571428571,
+          "validation_status_macro_f1": 0.8558352402745995,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 21,
+          "train_loss": 0.014404389967384324,
+          "validation_loss": 0.36297734259139924,
+          "validation_status_accuracy": 0.8571428571428571,
+          "validation_status_macro_f1": 0.8558352402745995,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 22,
+          "train_loss": 0.013907065563792483,
+          "validation_loss": 0.35839400653328213,
+          "validation_status_accuracy": 0.8571428571428571,
+          "validation_status_macro_f1": 0.8558352402745995,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 23,
+          "train_loss": 0.0134200170844087,
+          "validation_loss": 0.3476683580804439,
+          "validation_status_accuracy": 0.8571428571428571,
+          "validation_status_macro_f1": 0.8558352402745995,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 24,
+          "train_loss": 0.013094350583110837,
+          "validation_loss": 0.35068909557802336,
+          "validation_status_accuracy": 0.8571428571428571,
+          "validation_status_macro_f1": 0.8558352402745995,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 25,
+          "train_loss": 0.012748462546742109,
+          "validation_loss": 0.3497831454234464,
+          "validation_status_accuracy": 0.8571428571428571,
+          "validation_status_macro_f1": 0.8558352402745995,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 26,
+          "train_loss": 0.012355700437127632,
+          "validation_loss": 0.3465121292642185,
+          "validation_status_accuracy": 0.8571428571428571,
+          "validation_status_macro_f1": 0.8558352402745995,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 27,
+          "train_loss": 0.012199531107092852,
+          "validation_loss": 0.34631467504160746,
+          "validation_status_accuracy": 0.8571428571428571,
+          "validation_status_macro_f1": 0.8558352402745995,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 28,
+          "train_loss": 0.012043216100549297,
+          "validation_loss": 0.3523486703634262,
+          "validation_status_accuracy": 0.8571428571428571,
+          "validation_status_macro_f1": 0.8558352402745995,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 29,
+          "train_loss": 0.011992146634135042,
+          "validation_loss": 0.3478829152882099,
+          "validation_status_accuracy": 0.8571428571428571,
+          "validation_status_macro_f1": 0.8558352402745995,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 30,
+          "train_loss": 0.011736270715268927,
+          "validation_loss": 0.34892487188889865,
+          "validation_status_accuracy": 0.8571428571428571,
+          "validation_status_macro_f1": 0.8558352402745995,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 31,
+          "train_loss": 0.011491277388977712,
+          "validation_loss": 0.346769394796519,
+          "validation_status_accuracy": 0.8571428571428571,
+          "validation_status_macro_f1": 0.8558352402745995,
+          "validation_exercise_accuracy": 1.0
+        }
+      ]
+    },
+    {
+      "kind": "mlp",
+      "learning_rate": 0.001,
+      "weight_decay": 0.01,
+      "best_epoch": 16,
+      "validation": {
+        "exercise": {
+          "labels": [
+            "1_Lifting an Object",
+            "2_Extending the Elbow",
+            "3_Lifting the Wrist",
+            "4_Opening the Hand"
+          ],
+          "samples": 84,
+          "confusion_matrix": [
+            [
+              21,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              20,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              20,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              22
+            ]
+          ],
+          "accuracy": 0.9880952380952381,
+          "accuracy_wilson_95ci": [
+            0.935604562492286,
+            0.9978954169124508
+          ],
+          "macro_precision": 0.9891304347826086,
+          "macro_recall": 0.9880952380952381,
+          "macro_f1": 0.9883468834688347,
+          "per_class": [
+            {
+              "label": "1_Lifting an Object",
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "support": 21,
+              "predicted_count": 21
+            },
+            {
+              "label": "2_Extending the Elbow",
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "support": 20,
+              "predicted_count": 20
+            },
+            {
+              "label": "3_Lifting the Wrist",
+              "precision": 1.0,
+              "recall": 0.9523809523809523,
+              "f1": 0.975609756097561,
+              "support": 21,
+              "predicted_count": 20
+            },
+            {
+              "label": "4_Opening the Hand",
+              "precision": 0.9565217391304348,
+              "recall": 1.0,
+              "f1": 0.9777777777777777,
+              "support": 22,
+              "predicted_count": 23
+            }
+          ],
+          "undefined_division": "zero",
+          "matrix_axes": "rows=actual, columns=predicted"
+        },
+        "status": {
+          "labels": [
+            "Complete",
+            "Incomplete"
+          ],
+          "samples": 84,
+          "confusion_matrix": [
+            [
+              38,
+              4
+            ],
+            [
+              0,
+              42
+            ]
+          ],
+          "accuracy": 0.9523809523809523,
+          "accuracy_wilson_95ci": [
+            0.8838668496724167,
+            0.9813282531905099
+          ],
+          "macro_precision": 0.9565217391304348,
+          "macro_recall": 0.9523809523809523,
+          "macro_f1": 0.9522727272727273,
+          "per_class": [
+            {
+              "label": "Complete",
+              "precision": 1.0,
+              "recall": 0.9047619047619048,
+              "f1": 0.9500000000000001,
+              "support": 42,
+              "predicted_count": 38
+            },
+            {
+              "label": "Incomplete",
+              "precision": 0.9130434782608695,
+              "recall": 1.0,
+              "f1": 0.9545454545454545,
+              "support": 42,
+              "predicted_count": 46
+            }
+          ],
+          "undefined_division": "zero",
+          "matrix_axes": "rows=actual, columns=predicted"
+        },
+        "loss": 0.21132557253752435,
+        "predictions": {
+          "exercise": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            3,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3
+          ],
+          "status": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ]
+        }
+      },
+      "history": [
+        {
+          "epoch": 1,
+          "train_loss": 1.3929000695546467,
+          "validation_loss": 0.8672449588775635,
+          "validation_status_accuracy": 0.6785714285714286,
+          "validation_status_macro_f1": 0.6415362731152205,
+          "validation_exercise_accuracy": 0.9880952380952381
+        },
+        {
+          "epoch": 2,
+          "train_loss": 0.6400343680965062,
+          "validation_loss": 0.5579481891223362,
+          "validation_status_accuracy": 0.8571428571428571,
+          "validation_status_macro_f1": 0.8541666666666667,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 3,
+          "train_loss": 0.3937904883050773,
+          "validation_loss": 0.35783818506059195,
+          "validation_status_accuracy": 0.9166666666666666,
+          "validation_status_macro_f1": 0.9166548547129695,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 4,
+          "train_loss": 0.257602058601671,
+          "validation_loss": 0.31463576285612016,
+          "validation_status_accuracy": 0.8809523809523809,
+          "validation_status_macro_f1": 0.8803418803418803,
+          "validation_exercise_accuracy": 0.9880952380952381
+        },
+        {
+          "epoch": 5,
+          "train_loss": 0.18975809790672513,
+          "validation_loss": 0.2918753730399268,
+          "validation_status_accuracy": 0.8928571428571429,
+          "validation_status_macro_f1": 0.89272030651341,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 6,
+          "train_loss": 0.14358848994113618,
+          "validation_loss": 0.270795565985498,
+          "validation_status_accuracy": 0.8809523809523809,
+          "validation_status_macro_f1": 0.8798627002288328,
+          "validation_exercise_accuracy": 0.9880952380952381
+        },
+        {
+          "epoch": 7,
+          "train_loss": 0.14498947549394875,
+          "validation_loss": 0.25976636225268956,
+          "validation_status_accuracy": 0.8571428571428571,
+          "validation_status_macro_f1": 0.8550891316848763,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 8,
+          "train_loss": 0.12110956910917883,
+          "validation_loss": 0.22303100923697153,
+          "validation_status_accuracy": 0.9404761904761905,
+          "validation_status_macro_f1": 0.9404677533664068,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 9,
+          "train_loss": 0.12051430210152168,
+          "validation_loss": 0.2538201553480966,
+          "validation_status_accuracy": 0.9404761904761905,
+          "validation_status_macro_f1": 0.9404677533664068,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 10,
+          "train_loss": 0.08271713121950809,
+          "validation_loss": 0.21877725351424443,
+          "validation_status_accuracy": 0.8928571428571429,
+          "validation_status_macro_f1": 0.8924761769307353,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 11,
+          "train_loss": 0.06958110956332735,
+          "validation_loss": 0.21067999356559344,
+          "validation_status_accuracy": 0.9404761904761905,
+          "validation_status_macro_f1": 0.9404677533664068,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 12,
+          "train_loss": 0.0813688803065443,
+          "validation_loss": 0.25642027067286627,
+          "validation_status_accuracy": 0.8452380952380952,
+          "validation_status_macro_f1": 0.8434408602150537,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 13,
+          "train_loss": 0.06400775052720983,
+          "validation_loss": 0.18731832344617164,
+          "validation_status_accuracy": 0.9166666666666666,
+          "validation_status_macro_f1": 0.9165602383993188,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 14,
+          "train_loss": 0.06548698566888177,
+          "validation_loss": 0.20809274911880493,
+          "validation_status_accuracy": 0.9404761904761905,
+          "validation_status_macro_f1": 0.9404677533664068,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 15,
+          "train_loss": 0.05579437570082485,
+          "validation_loss": 0.25055350008464994,
+          "validation_status_accuracy": 0.8690476190476191,
+          "validation_status_macro_f1": 0.8681318681318682,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 16,
+          "train_loss": 0.04323742711284292,
+          "validation_loss": 0.21132557253752435,
+          "validation_status_accuracy": 0.9523809523809523,
+          "validation_status_macro_f1": 0.9522727272727273,
+          "validation_exercise_accuracy": 0.9880952380952381
+        },
+        {
+          "epoch": 17,
+          "train_loss": 0.05126288542324615,
+          "validation_loss": 0.2230309886591775,
+          "validation_status_accuracy": 0.8690476190476191,
+          "validation_status_macro_f1": 0.8681318681318682,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 18,
+          "train_loss": 0.028484656348744756,
+          "validation_loss": 0.15318916134891056,
+          "validation_status_accuracy": 0.9166666666666666,
+          "validation_status_macro_f1": 0.9165602383993188,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 19,
+          "train_loss": 0.02472151946333388,
+          "validation_loss": 0.23836857612643922,
+          "validation_status_accuracy": 0.8571428571428571,
+          "validation_status_macro_f1": 0.8558352402745995,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 20,
+          "train_loss": 0.02975063372847684,
+          "validation_loss": 0.1762892422931535,
+          "validation_status_accuracy": 0.9285714285714286,
+          "validation_status_macro_f1": 0.9285309132161088,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 21,
+          "train_loss": 0.023681694818290366,
+          "validation_loss": 0.16342039521606194,
+          "validation_status_accuracy": 0.9166666666666666,
+          "validation_status_macro_f1": 0.9165602383993188,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 22,
+          "train_loss": 0.03301579188498517,
+          "validation_loss": 0.18759787481810367,
+          "validation_status_accuracy": 0.9166666666666666,
+          "validation_status_macro_f1": 0.9165602383993188,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 23,
+          "train_loss": 0.03352930110563106,
+          "validation_loss": 0.19964411881353175,
+          "validation_status_accuracy": 0.9404761904761905,
+          "validation_status_macro_f1": 0.9404677533664068,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 24,
+          "train_loss": 0.02660302764206373,
+          "validation_loss": 0.18093285177435195,
+          "validation_status_accuracy": 0.9166666666666666,
+          "validation_status_macro_f1": 0.9165602383993188,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 25,
+          "train_loss": 0.04029133662991567,
+          "validation_loss": 0.15900459388891855,
+          "validation_status_accuracy": 0.9166666666666666,
+          "validation_status_macro_f1": 0.9165602383993188,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 26,
+          "train_loss": 0.022695397665519097,
+          "validation_loss": 0.15388864456188112,
+          "validation_status_accuracy": 0.9285714285714286,
+          "validation_status_macro_f1": 0.9285309132161088,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 27,
+          "train_loss": 0.01468979505770797,
+          "validation_loss": 0.23633626830719767,
+          "validation_status_accuracy": 0.8809523809523809,
+          "validation_status_macro_f1": 0.8803418803418803,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 28,
+          "train_loss": 0.017822969243477243,
+          "validation_loss": 0.19574202588271528,
+          "validation_status_accuracy": 0.9285714285714286,
+          "validation_status_macro_f1": 0.9285309132161088,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 29,
+          "train_loss": 0.017434365933459105,
+          "validation_loss": 0.19321527296588534,
+          "validation_status_accuracy": 0.9285714285714286,
+          "validation_status_macro_f1": 0.9285309132161088,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 30,
+          "train_loss": 0.021664092716666947,
+          "validation_loss": 0.17871049223911195,
+          "validation_status_accuracy": 0.9285714285714286,
+          "validation_status_macro_f1": 0.9285309132161088,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 31,
+          "train_loss": 0.009615772873710056,
+          "validation_loss": 0.21482088940129393,
+          "validation_status_accuracy": 0.9047619047619048,
+          "validation_status_macro_f1": 0.9045454545454545,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 32,
+          "train_loss": 0.015255864708903687,
+          "validation_loss": 0.20406348196168742,
+          "validation_status_accuracy": 0.9285714285714286,
+          "validation_status_macro_f1": 0.9285309132161088,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 33,
+          "train_loss": 0.012423773327506282,
+          "validation_loss": 0.19824839729283536,
+          "validation_status_accuracy": 0.9285714285714286,
+          "validation_status_macro_f1": 0.9285309132161088,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 34,
+          "train_loss": 0.016873605381298683,
+          "validation_loss": 0.19183521948399998,
+          "validation_status_accuracy": 0.9285714285714286,
+          "validation_status_macro_f1": 0.9285309132161088,
+          "validation_exercise_accuracy": 1.0
+        }
+      ]
+    },
+    {
+      "kind": "gru",
+      "learning_rate": 0.0003,
+      "weight_decay": 0.01,
+      "best_epoch": 5,
+      "validation": {
+        "exercise": {
+          "labels": [
+            "1_Lifting an Object",
+            "2_Extending the Elbow",
+            "3_Lifting the Wrist",
+            "4_Opening the Hand"
+          ],
+          "samples": 84,
+          "confusion_matrix": [
+            [
+              21,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              20,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              21,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              22
+            ]
+          ],
+          "accuracy": 1.0,
+          "accuracy_wilson_95ci": [
+            0.95626827158534,
+            0.9999999999999999
+          ],
+          "macro_precision": 1.0,
+          "macro_recall": 1.0,
+          "macro_f1": 1.0,
+          "per_class": [
+            {
+              "label": "1_Lifting an Object",
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "support": 21,
+              "predicted_count": 21
+            },
+            {
+              "label": "2_Extending the Elbow",
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "support": 20,
+              "predicted_count": 20
+            },
+            {
+              "label": "3_Lifting the Wrist",
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "support": 21,
+              "predicted_count": 21
+            },
+            {
+              "label": "4_Opening the Hand",
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "support": 22,
+              "predicted_count": 22
+            }
+          ],
+          "undefined_division": "zero",
+          "matrix_axes": "rows=actual, columns=predicted"
+        },
+        "status": {
+          "labels": [
+            "Complete",
+            "Incomplete"
+          ],
+          "samples": 84,
+          "confusion_matrix": [
+            [
+              27,
+              15
+            ],
+            [
+              13,
+              29
+            ]
+          ],
+          "accuracy": 0.6666666666666666,
+          "accuracy_wilson_95ci": [
+            0.5605282305356535,
+            0.7582278599927931
+          ],
+          "macro_precision": 0.6670454545454545,
+          "macro_recall": 0.6666666666666667,
+          "macro_f1": 0.6664775950085082,
+          "per_class": [
+            {
+              "label": "Complete",
+              "precision": 0.675,
+              "recall": 0.6428571428571429,
+              "f1": 0.6585365853658537,
+              "support": 42,
+              "predicted_count": 40
+            },
+            {
+              "label": "Incomplete",
+              "precision": 0.6590909090909091,
+              "recall": 0.6904761904761905,
+              "f1": 0.6744186046511628,
+              "support": 42,
+              "predicted_count": 44
+            }
+          ],
+          "undefined_division": "zero",
+          "matrix_axes": "rows=actual, columns=predicted"
+        },
+        "loss": 0.8568693626494635,
+        "predictions": {
+          "exercise": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3
+          ],
+          "status": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0,
+            0,
+            1,
+            1,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            0,
+            1,
+            0,
+            1,
+            1,
+            0,
+            1,
+            1
+          ]
+        }
+      },
+      "history": [
+        {
+          "epoch": 1,
+          "train_loss": 1.9216500764957627,
+          "validation_loss": 1.7351030395144509,
+          "validation_status_accuracy": 0.5119047619047619,
+          "validation_status_macro_f1": 0.4910595537165657,
+          "validation_exercise_accuracy": 0.9404761904761905
+        },
+        {
+          "epoch": 2,
+          "train_loss": 1.4671342227072526,
+          "validation_loss": 1.409600360052926,
+          "validation_status_accuracy": 0.6071428571428571,
+          "validation_status_macro_f1": 0.6043956043956045,
+          "validation_exercise_accuracy": 0.9642857142857143
+        },
+        {
+          "epoch": 3,
+          "train_loss": 1.0777716616607222,
+          "validation_loss": 1.1335886319478352,
+          "validation_status_accuracy": 0.6071428571428571,
+          "validation_status_macro_f1": 0.6043956043956045,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 4,
+          "train_loss": 0.8393196607583889,
+          "validation_loss": 0.952969369434175,
+          "validation_status_accuracy": 0.6428571428571429,
+          "validation_status_macro_f1": 0.6420454545454546,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 5,
+          "train_loss": 0.6607160907272899,
+          "validation_loss": 0.8568693626494635,
+          "validation_status_accuracy": 0.6666666666666666,
+          "validation_status_macro_f1": 0.6664775950085082,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 6,
+          "train_loss": 0.5274333232951092,
+          "validation_loss": 0.7761405876704625,
+          "validation_status_accuracy": 0.6190476190476191,
+          "validation_status_macro_f1": 0.6155606407322655,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 7,
+          "train_loss": 0.4037447512514365,
+          "validation_loss": 0.7438336979775202,
+          "validation_status_accuracy": 0.6309523809523809,
+          "validation_status_macro_f1": 0.6296401649836438,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 8,
+          "train_loss": 0.3613373355581126,
+          "validation_loss": 0.7167177228700548,
+          "validation_status_accuracy": 0.6309523809523809,
+          "validation_status_macro_f1": 0.6296401649836438,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 9,
+          "train_loss": 0.2557119145670433,
+          "validation_loss": 0.7068379393645695,
+          "validation_status_accuracy": 0.6190476190476191,
+          "validation_status_macro_f1": 0.6170940170940171,
+          "validation_exercise_accuracy": 0.9880952380952381
+        },
+        {
+          "epoch": 10,
+          "train_loss": 0.19138642653412774,
+          "validation_loss": 0.7527053122009549,
+          "validation_status_accuracy": 0.6547619047619048,
+          "validation_status_macro_f1": 0.6547129695251594,
+          "validation_exercise_accuracy": 0.9880952380952381
+        },
+        {
+          "epoch": 11,
+          "train_loss": 0.17338028231162908,
+          "validation_loss": 0.7704522325879052,
+          "validation_status_accuracy": 0.6547619047619048,
+          "validation_status_macro_f1": 0.6547129695251594,
+          "validation_exercise_accuracy": 0.9880952380952381
+        },
+        {
+          "epoch": 12,
+          "train_loss": 0.12298727290710543,
+          "validation_loss": 0.7632590794847125,
+          "validation_status_accuracy": 0.6547619047619048,
+          "validation_status_macro_f1": 0.6547129695251594,
+          "validation_exercise_accuracy": 0.9761904761904762
+        },
+        {
+          "epoch": 13,
+          "train_loss": 0.11146231572106709,
+          "validation_loss": 0.7563443815424329,
+          "validation_status_accuracy": 0.6309523809523809,
+          "validation_status_macro_f1": 0.6283716283716283,
+          "validation_exercise_accuracy": 1.0
+        },
+        {
+          "epoch": 14,
+          "train_loss": 0.09303840106233545,
+          "validation_loss": 0.7623170046579271,
+          "validation_status_accuracy": 0.6428571428571429,
+          "validation_status_macro_f1": 0.641025641025641,
+          "validation_exercise_accuracy": 0.9761904761904762
+        },
+        {
+          "epoch": 15,
+          "train_loss": 0.07727428060879402,
+          "validation_loss": 0.8389068905796323,
+          "validation_status_accuracy": 0.6428571428571429,
+          "validation_status_macro_f1": 0.6420454545454546,
+          "validation_exercise_accuracy": 0.9523809523809523
+        },
+        {
+          "epoch": 16,
+          "train_loss": 0.06077784467317642,
+          "validation_loss": 0.8598642026384672,
+          "validation_status_accuracy": 0.6428571428571429,
+          "validation_status_macro_f1": 0.6420454545454546,
+          "validation_exercise_accuracy": 0.9166666666666666
+        },
+        {
+          "epoch": 17,
+          "train_loss": 0.05488356190309247,
+          "validation_loss": 0.8868166300512496,
+          "validation_status_accuracy": 0.6428571428571429,
+          "validation_status_macro_f1": 0.641025641025641,
+          "validation_exercise_accuracy": 0.9404761904761905
+        },
+        {
+          "epoch": 18,
+          "train_loss": 0.051170214805581156,
+          "validation_loss": 0.8344797371398835,
+          "validation_status_accuracy": 0.6428571428571429,
+          "validation_status_macro_f1": 0.641025641025641,
+          "validation_exercise_accuracy": 0.9523809523809523
+        },
+        {
+          "epoch": 19,
+          "train_loss": 0.05261372876800711,
+          "validation_loss": 0.8274943746981167,
+          "validation_status_accuracy": 0.6309523809523809,
+          "validation_status_macro_f1": 0.6283716283716283,
+          "validation_exercise_accuracy": 0.9285714285714286
+        },
+        {
+          "epoch": 20,
+          "train_loss": 0.053747967284298086,
+          "validation_loss": 0.8103727758640334,
+          "validation_status_accuracy": 0.6309523809523809,
+          "validation_status_macro_f1": 0.6283716283716283,
+          "validation_exercise_accuracy": 0.9285714285714286
+        },
+        {
+          "epoch": 21,
+          "train_loss": 0.03834513495092363,
+          "validation_loss": 0.8205228756581034,
+          "validation_status_accuracy": 0.6309523809523809,
+          "validation_status_macro_f1": 0.6283716283716283,
+          "validation_exercise_accuracy": 0.9642857142857143
+        },
+        {
+          "epoch": 22,
+          "train_loss": 0.0383702791623475,
+          "validation_loss": 0.8352859715620676,
+          "validation_status_accuracy": 0.6309523809523809,
+          "validation_status_macro_f1": 0.6283716283716283,
+          "validation_exercise_accuracy": 0.9642857142857143
+        },
+        {
+          "epoch": 23,
+          "train_loss": 0.036328777420229136,
+          "validation_loss": 0.8335737185109229,
+          "validation_status_accuracy": 0.6309523809523809,
+          "validation_status_macro_f1": 0.6283716283716283,
+          "validation_exercise_accuracy": 0.9642857142857143
+        }
+      ]
+    }
+  ],
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 1.3929000695546467,
+      "validation_loss": 0.8672449588775635,
+      "validation_status_accuracy": 0.6785714285714286,
+      "validation_status_macro_f1": 0.6415362731152205,
+      "validation_exercise_accuracy": 0.9880952380952381
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.6400343680965062,
+      "validation_loss": 0.5579481891223362,
+      "validation_status_accuracy": 0.8571428571428571,
+      "validation_status_macro_f1": 0.8541666666666667,
+      "validation_exercise_accuracy": 1.0
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.3937904883050773,
+      "validation_loss": 0.35783818506059195,
+      "validation_status_accuracy": 0.9166666666666666,
+      "validation_status_macro_f1": 0.9166548547129695,
+      "validation_exercise_accuracy": 1.0
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.257602058601671,
+      "validation_loss": 0.31463576285612016,
+      "validation_status_accuracy": 0.8809523809523809,
+      "validation_status_macro_f1": 0.8803418803418803,
+      "validation_exercise_accuracy": 0.9880952380952381
+    },
+    {
+      "epoch": 5,
+      "train_loss": 0.18975809790672513,
+      "validation_loss": 0.2918753730399268,
+      "validation_status_accuracy": 0.8928571428571429,
+      "validation_status_macro_f1": 0.89272030651341,
+      "validation_exercise_accuracy": 1.0
+    },
+    {
+      "epoch": 6,
+      "train_loss": 0.14358848994113618,
+      "validation_loss": 0.270795565985498,
+      "validation_status_accuracy": 0.8809523809523809,
+      "validation_status_macro_f1": 0.8798627002288328,
+      "validation_exercise_accuracy": 0.9880952380952381
+    },
+    {
+      "epoch": 7,
+      "train_loss": 0.14498947549394875,
+      "validation_loss": 0.25976636225268956,
+      "validation_status_accuracy": 0.8571428571428571,
+      "validation_status_macro_f1": 0.8550891316848763,
+      "validation_exercise_accuracy": 1.0
+    },
+    {
+      "epoch": 8,
+      "train_loss": 0.12110956910917883,
+      "validation_loss": 0.22303100923697153,
+      "validation_status_accuracy": 0.9404761904761905,
+      "validation_status_macro_f1": 0.9404677533664068,
+      "validation_exercise_accuracy": 1.0
+    },
+    {
+      "epoch": 9,
+      "train_loss": 0.12051430210152168,
+      "validation_loss": 0.2538201553480966,
+      "validation_status_accuracy": 0.9404761904761905,
+      "validation_status_macro_f1": 0.9404677533664068,
+      "validation_exercise_accuracy": 1.0
+    },
+    {
+      "epoch": 10,
+      "train_loss": 0.08271713121950809,
+      "validation_loss": 0.21877725351424443,
+      "validation_status_accuracy": 0.8928571428571429,
+      "validation_status_macro_f1": 0.8924761769307353,
+      "validation_exercise_accuracy": 1.0
+    },
+    {
+      "epoch": 11,
+      "train_loss": 0.06958110956332735,
+      "validation_loss": 0.21067999356559344,
+      "validation_status_accuracy": 0.9404761904761905,
+      "validation_status_macro_f1": 0.9404677533664068,
+      "validation_exercise_accuracy": 1.0
+    },
+    {
+      "epoch": 12,
+      "train_loss": 0.0813688803065443,
+      "validation_loss": 0.25642027067286627,
+      "validation_status_accuracy": 0.8452380952380952,
+      "validation_status_macro_f1": 0.8434408602150537,
+      "validation_exercise_accuracy": 1.0
+    },
+    {
+      "epoch": 13,
+      "train_loss": 0.06400775052720983,
+      "validation_loss": 0.18731832344617164,
+      "validation_status_accuracy": 0.9166666666666666,
+      "validation_status_macro_f1": 0.9165602383993188,
+      "validation_exercise_accuracy": 1.0
+    },
+    {
+      "epoch": 14,
+      "train_loss": 0.06548698566888177,
+      "validation_loss": 0.20809274911880493,
+      "validation_status_accuracy": 0.9404761904761905,
+      "validation_status_macro_f1": 0.9404677533664068,
+      "validation_exercise_accuracy": 1.0
+    },
+    {
+      "epoch": 15,
+      "train_loss": 0.05579437570082485,
+      "validation_loss": 0.25055350008464994,
+      "validation_status_accuracy": 0.8690476190476191,
+      "validation_status_macro_f1": 0.8681318681318682,
+      "validation_exercise_accuracy": 1.0
+    },
+    {
+      "epoch": 16,
+      "train_loss": 0.04323742711284292,
+      "validation_loss": 0.21132557253752435,
+      "validation_status_accuracy": 0.9523809523809523,
+      "validation_status_macro_f1": 0.9522727272727273,
+      "validation_exercise_accuracy": 0.9880952380952381
+    },
+    {
+      "epoch": 17,
+      "train_loss": 0.05126288542324615,
+      "validation_loss": 0.2230309886591775,
+      "validation_status_accuracy": 0.8690476190476191,
+      "validation_status_macro_f1": 0.8681318681318682,
+      "validation_exercise_accuracy": 1.0
+    },
+    {
+      "epoch": 18,
+      "train_loss": 0.028484656348744756,
+      "validation_loss": 0.15318916134891056,
+      "validation_status_accuracy": 0.9166666666666666,
+      "validation_status_macro_f1": 0.9165602383993188,
+      "validation_exercise_accuracy": 1.0
+    },
+    {
+      "epoch": 19,
+      "train_loss": 0.02472151946333388,
+      "validation_loss": 0.23836857612643922,
+      "validation_status_accuracy": 0.8571428571428571,
+      "validation_status_macro_f1": 0.8558352402745995,
+      "validation_exercise_accuracy": 1.0
+    },
+    {
+      "epoch": 20,
+      "train_loss": 0.02975063372847684,
+      "validation_loss": 0.1762892422931535,
+      "validation_status_accuracy": 0.9285714285714286,
+      "validation_status_macro_f1": 0.9285309132161088,
+      "validation_exercise_accuracy": 1.0
+    },
+    {
+      "epoch": 21,
+      "train_loss": 0.023681694818290366,
+      "validation_loss": 0.16342039521606194,
+      "validation_status_accuracy": 0.9166666666666666,
+      "validation_status_macro_f1": 0.9165602383993188,
+      "validation_exercise_accuracy": 1.0
+    },
+    {
+      "epoch": 22,
+      "train_loss": 0.03301579188498517,
+      "validation_loss": 0.18759787481810367,
+      "validation_status_accuracy": 0.9166666666666666,
+      "validation_status_macro_f1": 0.9165602383993188,
+      "validation_exercise_accuracy": 1.0
+    },
+    {
+      "epoch": 23,
+      "train_loss": 0.03352930110563106,
+      "validation_loss": 0.19964411881353175,
+      "validation_status_accuracy": 0.9404761904761905,
+      "validation_status_macro_f1": 0.9404677533664068,
+      "validation_exercise_accuracy": 1.0
+    },
+    {
+      "epoch": 24,
+      "train_loss": 0.02660302764206373,
+      "validation_loss": 0.18093285177435195,
+      "validation_status_accuracy": 0.9166666666666666,
+      "validation_status_macro_f1": 0.9165602383993188,
+      "validation_exercise_accuracy": 1.0
+    },
+    {
+      "epoch": 25,
+      "train_loss": 0.04029133662991567,
+      "validation_loss": 0.15900459388891855,
+      "validation_status_accuracy": 0.9166666666666666,
+      "validation_status_macro_f1": 0.9165602383993188,
+      "validation_exercise_accuracy": 1.0
+    },
+    {
+      "epoch": 26,
+      "train_loss": 0.022695397665519097,
+      "validation_loss": 0.15388864456188112,
+      "validation_status_accuracy": 0.9285714285714286,
+      "validation_status_macro_f1": 0.9285309132161088,
+      "validation_exercise_accuracy": 1.0
+    },
+    {
+      "epoch": 27,
+      "train_loss": 0.01468979505770797,
+      "validation_loss": 0.23633626830719767,
+      "validation_status_accuracy": 0.8809523809523809,
+      "validation_status_macro_f1": 0.8803418803418803,
+      "validation_exercise_accuracy": 1.0
+    },
+    {
+      "epoch": 28,
+      "train_loss": 0.017822969243477243,
+      "validation_loss": 0.19574202588271528,
+      "validation_status_accuracy": 0.9285714285714286,
+      "validation_status_macro_f1": 0.9285309132161088,
+      "validation_exercise_accuracy": 1.0
+    },
+    {
+      "epoch": 29,
+      "train_loss": 0.017434365933459105,
+      "validation_loss": 0.19321527296588534,
+      "validation_status_accuracy": 0.9285714285714286,
+      "validation_status_macro_f1": 0.9285309132161088,
+      "validation_exercise_accuracy": 1.0
+    },
+    {
+      "epoch": 30,
+      "train_loss": 0.021664092716666947,
+      "validation_loss": 0.17871049223911195,
+      "validation_status_accuracy": 0.9285714285714286,
+      "validation_status_macro_f1": 0.9285309132161088,
+      "validation_exercise_accuracy": 1.0
+    },
+    {
+      "epoch": 31,
+      "train_loss": 0.009615772873710056,
+      "validation_loss": 0.21482088940129393,
+      "validation_status_accuracy": 0.9047619047619048,
+      "validation_status_macro_f1": 0.9045454545454545,
+      "validation_exercise_accuracy": 1.0
+    },
+    {
+      "epoch": 32,
+      "train_loss": 0.015255864708903687,
+      "validation_loss": 0.20406348196168742,
+      "validation_status_accuracy": 0.9285714285714286,
+      "validation_status_macro_f1": 0.9285309132161088,
+      "validation_exercise_accuracy": 1.0
+    },
+    {
+      "epoch": 33,
+      "train_loss": 0.012423773327506282,
+      "validation_loss": 0.19824839729283536,
+      "validation_status_accuracy": 0.9285714285714286,
+      "validation_status_macro_f1": 0.9285309132161088,
+      "validation_exercise_accuracy": 1.0
+    },
+    {
+      "epoch": 34,
+      "train_loss": 0.016873605381298683,
+      "validation_loss": 0.19183521948399998,
+      "validation_status_accuracy": 0.9285714285714286,
+      "validation_status_macro_f1": 0.9285309132161088,
+      "validation_exercise_accuracy": 1.0
+    }
+  ],
+  "manifest": {
+    "train": [
+      {
+        "path": "1_Lifting an Object\\Complete\\Train\\01_01_01_01.mp4",
+        "subject": "01",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 8524825
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Train\\01_01_01_02.mp4",
+        "subject": "01",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 8387668
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Train\\01_01_01_03.mp4",
+        "subject": "01",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 7568107
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Train\\01_01_01_04.mp4",
+        "subject": "01",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 8185910
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Train\\01_01_01_05.mp4",
+        "subject": "01",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 9834824
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Train\\01_01_01_06.mp4",
+        "subject": "01",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 8853037
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Train\\01_01_01_07.mp4",
+        "subject": "01",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 9167603
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Train\\01_01_01_08.mp4",
+        "subject": "01",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 7284493
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Train\\01_01_01_09.mp4",
+        "subject": "01",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 8289643
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Train\\01_01_01_10.mp4",
+        "subject": "01",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 9538504
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Train\\02_01_01_01.mp4",
+        "subject": "02",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 2525384
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Train\\02_01_01_02.mp4",
+        "subject": "02",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 2176427
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Train\\02_01_01_03.mp4",
+        "subject": "02",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 2432799
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Train\\02_01_01_04.mp4",
+        "subject": "02",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 2742032
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Train\\02_01_01_05.mp4",
+        "subject": "02",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 2840711
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Train\\02_01_01_06.mp4",
+        "subject": "02",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 2535971
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Train\\02_01_01_07.mp4",
+        "subject": "02",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 2555418
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Train\\02_01_01_08.mp4",
+        "subject": "02",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 1345086
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Train\\02_01_01_09.mp4",
+        "subject": "02",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 2504144
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Train\\02_01_01_10.mp4",
+        "subject": "02",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 2607749
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Train\\03_01_01_01.mp4",
+        "subject": "03",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 2616207
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Train\\03_01_01_02.mp4",
+        "subject": "03",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 2133856
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Train\\03_01_01_03.mp4",
+        "subject": "03",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 2209804
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Train\\03_01_01_04.mp4",
+        "subject": "03",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 2062836
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Train\\03_01_01_05.mp4",
+        "subject": "03",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 2109646
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Train\\03_01_01_06.mp4",
+        "subject": "03",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 2066942
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Train\\03_01_01_07.mp4",
+        "subject": "03",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 2434680
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Train\\03_01_01_08.mp4",
+        "subject": "03",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 1975155
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Train\\03_01_01_09.mp4",
+        "subject": "03",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 2077914
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Train\\03_01_01_10.mp4",
+        "subject": "03",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 2089935
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Train\\03_01_01_11.mp4",
+        "subject": "03",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 2190286
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Train\\05_01_01_01.mp4",
+        "subject": "05",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 2355058
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Train\\05_01_01_02.mp4",
+        "subject": "05",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 2323540
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Train\\05_01_01_03.mp4",
+        "subject": "05",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 2326329
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Train\\05_01_01_04.mp4",
+        "subject": "05",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 2302914
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Train\\05_01_01_05.mp4",
+        "subject": "05",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 2163887
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Train\\05_01_01_06.mp4",
+        "subject": "05",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 2482640
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Train\\05_01_01_07.mp4",
+        "subject": "05",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 2349759
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Train\\05_01_01_08.mp4",
+        "subject": "05",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 2587342
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Train\\05_01_01_09.mp4",
+        "subject": "05",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 2338579
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Train\\05_01_01_10.mp4",
+        "subject": "05",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 2500060
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Train\\01_01_00_01.mp4",
+        "subject": "01",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 7435235
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Train\\01_01_00_02.mp4",
+        "subject": "01",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 6133680
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Train\\01_01_00_03.mp4",
+        "subject": "01",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 7364494
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Train\\01_01_00_04.mp4",
+        "subject": "01",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 7121386
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Train\\01_01_00_05.mp4",
+        "subject": "01",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 6181442
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Train\\01_01_00_06.mp4",
+        "subject": "01",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 7768271
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Train\\01_01_00_07.mp4",
+        "subject": "01",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 8113462
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Train\\01_01_00_08.mp4",
+        "subject": "01",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 8049366
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Train\\01_01_00_09.mp4",
+        "subject": "01",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 6931906
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Train\\01_01_00_10.mp4",
+        "subject": "01",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 7135345
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Train\\02_01_00_01.mp4",
+        "subject": "02",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 2060484
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Train\\02_01_00_02.mp4",
+        "subject": "02",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 1959414
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Train\\02_01_00_03.mp4",
+        "subject": "02",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 2126145
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Train\\02_01_00_04.mp4",
+        "subject": "02",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 2005012
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Train\\02_01_00_05.mp4",
+        "subject": "02",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 2260877
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Train\\02_01_00_06.mp4",
+        "subject": "02",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 2063247
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Train\\02_01_00_07.mp4",
+        "subject": "02",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 2004528
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Train\\02_01_00_08.mp4",
+        "subject": "02",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 2371398
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Train\\02_01_00_09.mp4",
+        "subject": "02",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 2029175
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Train\\02_01_00_10.mp4",
+        "subject": "02",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 2228078
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Train\\02_01_00_11.mp4",
+        "subject": "02",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 1862245
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Train\\02_01_00_12.mp4",
+        "subject": "02",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 2002459
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Train\\03_01_00_01.mp4",
+        "subject": "03",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 1739384
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Train\\03_01_00_02.mp4",
+        "subject": "03",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 1786269
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Train\\03_01_00_03.mp4",
+        "subject": "03",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 1756449
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Train\\03_01_00_04.mp4",
+        "subject": "03",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 2671675
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Train\\03_01_00_05.mp4",
+        "subject": "03",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 2170019
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Train\\03_01_00_06.mp4",
+        "subject": "03",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 2217673
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Train\\03_01_00_07.mp4",
+        "subject": "03",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 2288474
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Train\\03_01_00_08.mp4",
+        "subject": "03",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 2738138
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Train\\05_01_00_01.mp4",
+        "subject": "05",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 2628092
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Train\\05_01_00_02.mp4",
+        "subject": "05",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 1962807
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Train\\05_01_00_03.mp4",
+        "subject": "05",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 1909207
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Train\\05_01_00_04.mp4",
+        "subject": "05",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 1910471
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Train\\05_01_00_05.mp4",
+        "subject": "05",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 1508374
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Train\\05_01_00_06.mp4",
+        "subject": "05",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 1776820
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Train\\05_01_00_07.mp4",
+        "subject": "05",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 1865938
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Train\\05_01_00_08.mp4",
+        "subject": "05",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 1779888
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Train\\05_01_00_09.mp4",
+        "subject": "05",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 1784052
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Train\\05_01_00_10.mp4",
+        "subject": "05",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 1570929
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Train\\05_01_00_11.mp4",
+        "subject": "05",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 1512225
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Train\\01_02_01_01.mp4",
+        "subject": "01",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 8457229
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Train\\01_02_01_02.mp4",
+        "subject": "01",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 6189419
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Train\\01_02_01_03.mp4",
+        "subject": "01",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 5412411
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Train\\01_02_01_04.mp4",
+        "subject": "01",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 6439298
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Train\\01_02_01_05.mp4",
+        "subject": "01",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 6391228
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Train\\01_02_01_06.mp4",
+        "subject": "01",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 5490677
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Train\\01_02_01_07.mp4",
+        "subject": "01",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 5740789
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Train\\01_02_01_08.mp4",
+        "subject": "01",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 5608451
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Train\\01_02_01_09.mp4",
+        "subject": "01",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 5955110
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Train\\02_02_01_01.mp4",
+        "subject": "02",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 1934331
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Train\\02_02_01_02.mp4",
+        "subject": "02",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 1776247
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Train\\02_02_01_03.mp4",
+        "subject": "02",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 1356282
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Train\\02_02_01_04.mp4",
+        "subject": "02",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 1353728
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Train\\02_02_01_05.mp4",
+        "subject": "02",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 1612403
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Train\\02_02_01_06.mp4",
+        "subject": "02",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 1408529
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Train\\02_02_01_07.mp4",
+        "subject": "02",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 1377184
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Train\\02_02_01_08.mp4",
+        "subject": "02",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 1416220
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Train\\02_02_01_09.mp4",
+        "subject": "02",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 1561158
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Train\\02_02_01_10.mp4",
+        "subject": "02",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 1097215
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Train\\03_02_01_01.mp4",
+        "subject": "03",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 849910
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Train\\03_02_01_02.mp4",
+        "subject": "03",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 1887140
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Train\\03_02_01_03.mp4",
+        "subject": "03",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 1680949
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Train\\03_02_01_04.mp4",
+        "subject": "03",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 1892677
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Train\\03_02_01_05.mp4",
+        "subject": "03",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 1507042
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Train\\03_02_01_06.mp4",
+        "subject": "03",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 2138993
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Train\\03_02_01_07.mp4",
+        "subject": "03",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 1854190
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Train\\03_02_01_08.mp4",
+        "subject": "03",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 1991071
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Train\\03_02_01_09.mp4",
+        "subject": "03",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 1516735
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Train\\03_02_01_10.mp4",
+        "subject": "03",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 1588824
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Train\\03_02_01_11.mp4",
+        "subject": "03",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 1807499
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Train\\05_02_01_01.mp4",
+        "subject": "05",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 1693006
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Train\\05_02_01_02.mp4",
+        "subject": "05",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 1417694
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Train\\05_02_01_03.mp4",
+        "subject": "05",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 1435767
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Train\\05_02_01_04.mp4",
+        "subject": "05",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 1440029
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Train\\05_02_01_05.mp4",
+        "subject": "05",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 1233091
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Train\\05_02_01_06.mp4",
+        "subject": "05",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 1525468
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Train\\05_02_01_07.mp4",
+        "subject": "05",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 1449928
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Train\\05_02_01_08.mp4",
+        "subject": "05",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 1535395
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Train\\05_02_01_09.mp4",
+        "subject": "05",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 1439135
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Train\\05_02_01_10.mp4",
+        "subject": "05",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 1525128
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\01_02_00_01.mp4",
+        "subject": "01",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 6443088
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\01_02_00_02.mp4",
+        "subject": "01",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 6654112
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\01_02_00_03.mp4",
+        "subject": "01",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 6477118
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\01_02_00_04.mp4",
+        "subject": "01",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 8222240
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\01_02_00_05.mp4",
+        "subject": "01",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 8067124
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\01_02_00_06.mp4",
+        "subject": "01",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 8453824
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\01_02_00_07.mp4",
+        "subject": "01",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 9486029
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\01_02_00_08.mp4",
+        "subject": "01",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 6738911
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\01_02_00_09.mp4",
+        "subject": "01",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 7046722
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\01_02_00_10.mp4",
+        "subject": "01",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 5741901
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\01_02_00_11.mp4",
+        "subject": "01",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 6392212
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\01_02_00_12.mp4",
+        "subject": "01",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 6731271
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\02_02_00_01.mp4",
+        "subject": "02",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 1335576
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\02_02_00_02.mp4",
+        "subject": "02",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 1347595
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\02_02_00_03.mp4",
+        "subject": "02",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 1192517
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\02_02_00_04.mp4",
+        "subject": "02",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 1190535
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\02_02_00_05.mp4",
+        "subject": "02",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 1187978
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\02_02_00_06.mp4",
+        "subject": "02",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 1074651
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\02_02_00_07.mp4",
+        "subject": "02",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 1101106
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\02_02_00_08.mp4",
+        "subject": "02",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 1314957
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\02_02_00_09.mp4",
+        "subject": "02",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 1539543
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\02_02_00_10.mp4",
+        "subject": "02",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 1413837
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\02_02_00_11.mp4",
+        "subject": "02",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 1207728
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\02_02_00_12.mp4",
+        "subject": "02",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 1498999
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\02_02_00_13.mp4",
+        "subject": "02",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 1381331
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\02_02_00_14.mp4",
+        "subject": "02",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 1138565
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\03_02_00_01.mp4",
+        "subject": "03",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 1740061
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\03_02_00_02.mp4",
+        "subject": "03",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 1157200
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\03_02_00_03.mp4",
+        "subject": "03",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 1105512
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\03_02_00_04.mp4",
+        "subject": "03",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 1756575
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\03_02_00_05.mp4",
+        "subject": "03",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 1671277
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\03_02_00_06.mp4",
+        "subject": "03",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 1697224
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\03_02_00_07.mp4",
+        "subject": "03",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 2246842
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\03_02_00_08.mp4",
+        "subject": "03",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 1212512
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\03_02_00_09.mp4",
+        "subject": "03",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 1855613
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\03_02_00_10.mp4",
+        "subject": "03",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 1743003
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\03_02_00_11.mp4",
+        "subject": "03",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 1603973
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\05_02_00_01.mp4",
+        "subject": "05",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 1457370
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\05_02_00_02.mp4",
+        "subject": "05",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 1471049
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\05_02_00_03.mp4",
+        "subject": "05",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 1608655
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\05_02_00_04.mp4",
+        "subject": "05",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 1580647
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\05_02_00_05.mp4",
+        "subject": "05",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 1533601
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\05_02_00_06.mp4",
+        "subject": "05",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 1535282
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\05_02_00_07.mp4",
+        "subject": "05",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 1528268
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\05_02_00_08.mp4",
+        "subject": "05",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 1708249
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\05_02_00_09.mp4",
+        "subject": "05",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 1756584
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\05_02_00_10.mp4",
+        "subject": "05",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 1623899
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Train\\02_03_01_01.mp4",
+        "subject": "02",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 1824572
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Train\\02_03_01_02.mp4",
+        "subject": "02",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 1680304
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Train\\02_03_01_03.mp4",
+        "subject": "02",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 1364983
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Train\\02_03_01_04.mp4",
+        "subject": "02",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 1605590
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Train\\02_03_01_05.mp4",
+        "subject": "02",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 1855197
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Train\\02_03_01_06.mp4",
+        "subject": "02",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 1575194
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Train\\02_03_01_07.mp4",
+        "subject": "02",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 1736547
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Train\\02_03_01_08.mp4",
+        "subject": "02",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 1795227
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Train\\02_03_01_09.mp4",
+        "subject": "02",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 1910357
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Train\\02_03_01_10.mp4",
+        "subject": "02",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 1941376
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Train\\03_03_01_01.mp4",
+        "subject": "03",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 1179989
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Train\\03_03_01_02.mp4",
+        "subject": "03",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 979894
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Train\\03_03_01_03.mp4",
+        "subject": "03",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 888856
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Train\\03_03_01_04.mp4",
+        "subject": "03",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 1176286
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Train\\03_03_01_05.mp4",
+        "subject": "03",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 1385391
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Train\\03_03_01_06.mp4",
+        "subject": "03",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 1220386
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Train\\03_03_01_07.mp4",
+        "subject": "03",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 1033388
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Train\\03_03_01_08.mp4",
+        "subject": "03",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 1244371
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Train\\03_03_01_09.mp4",
+        "subject": "03",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 1352616
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Train\\03_03_01_10.mp4",
+        "subject": "03",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 1107008
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Train\\05_03_01_01.mp4",
+        "subject": "05",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 1939457
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Train\\05_03_01_02.mp4",
+        "subject": "05",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 1751750
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Train\\05_03_01_03.mp4",
+        "subject": "05",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 1776787
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Train\\05_03_01_04.mp4",
+        "subject": "05",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 1680544
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Train\\05_03_01_05.mp4",
+        "subject": "05",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 1567472
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Train\\05_03_01_06.mp4",
+        "subject": "05",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 1782684
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Train\\05_03_01_07.mp4",
+        "subject": "05",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 1906564
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Train\\05_03_01_08.mp4",
+        "subject": "05",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 1796408
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Train\\05_03_01_09.mp4",
+        "subject": "05",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 1846807
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Train\\05_03_01_10.mp4",
+        "subject": "05",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 1873673
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Train\\06_03_01_01.mp4",
+        "subject": "06",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 2946670
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Train\\06_03_01_02.mp4",
+        "subject": "06",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 3838197
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Train\\06_03_01_03.mp4",
+        "subject": "06",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 4171576
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Train\\06_03_01_04.mp4",
+        "subject": "06",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 3252107
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Train\\06_03_01_05.mp4",
+        "subject": "06",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 3099604
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Train\\06_03_01_06.mp4",
+        "subject": "06",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 3311783
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Train\\06_03_01_07.mp4",
+        "subject": "06",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 3126570
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Train\\06_03_01_08.mp4",
+        "subject": "06",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 3874372
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Train\\06_03_01_09.mp4",
+        "subject": "06",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 4322727
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Train\\06_03_01_10.mp4",
+        "subject": "06",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 4081293
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Train\\02_03_00_01.mp4",
+        "subject": "02",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 1718531
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Train\\02_03_00_02.mp4",
+        "subject": "02",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 2084342
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Train\\02_03_00_03.mp4",
+        "subject": "02",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 1633392
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Train\\02_03_00_04.mp4",
+        "subject": "02",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 1680247
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Train\\02_03_00_05.mp4",
+        "subject": "02",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 1237147
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Train\\02_03_00_06.mp4",
+        "subject": "02",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 1053467
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Train\\02_03_00_07.mp4",
+        "subject": "02",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 1102545
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Train\\02_03_00_08.mp4",
+        "subject": "02",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 936419
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Train\\02_03_00_09.mp4",
+        "subject": "02",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 970808
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Train\\02_03_00_10.mp4",
+        "subject": "02",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 972437
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Train\\03_03_00_01.mp4",
+        "subject": "03",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 1501693
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Train\\03_03_00_02.mp4",
+        "subject": "03",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 1084769
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Train\\03_03_00_03.mp4",
+        "subject": "03",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 1301227
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Train\\03_03_00_04.mp4",
+        "subject": "03",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 1082670
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Train\\03_03_00_05.mp4",
+        "subject": "03",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 1109174
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Train\\05_03_00_01.mp4",
+        "subject": "05",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 1950778
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Train\\05_03_00_02.mp4",
+        "subject": "05",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 1830173
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Train\\05_03_00_03.mp4",
+        "subject": "05",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 1843591
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Train\\05_03_00_04.mp4",
+        "subject": "05",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 1899221
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Train\\05_03_00_05.mp4",
+        "subject": "05",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 2043678
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Train\\05_03_00_06.mp4",
+        "subject": "05",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 1752788
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Train\\05_03_00_07.mp4",
+        "subject": "05",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 1721609
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Train\\05_03_00_08.mp4",
+        "subject": "05",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 1769610
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Train\\05_03_00_09.mp4",
+        "subject": "05",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 1813001
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Train\\05_03_00_10.mp4",
+        "subject": "05",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 1839259
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Train\\06_03_00_01.mp4",
+        "subject": "06",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 4404416
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Train\\06_03_00_02.mp4",
+        "subject": "06",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 4680754
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Train\\06_03_00_03.mp4",
+        "subject": "06",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 7273313
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Train\\06_03_00_04.mp4",
+        "subject": "06",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 6664694
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Train\\06_03_00_05.mp4",
+        "subject": "06",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 5500443
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Train\\06_03_00_06.mp4",
+        "subject": "06",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 5612259
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Train\\06_03_00_07.mp4",
+        "subject": "06",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 5282149
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Train\\06_03_00_08.mp4",
+        "subject": "06",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 4997556
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Train\\06_03_00_09.mp4",
+        "subject": "06",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 5179968
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Train\\06_03_00_10.mp4",
+        "subject": "06",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 5970131
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Train\\06_03_00_11.mp4",
+        "subject": "06",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 5474566
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Train\\06_03_00_12.mp4",
+        "subject": "06",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 5474643
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Train\\06_03_00_13.mp4",
+        "subject": "06",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 5953196
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Train\\06_03_00_14.mp4",
+        "subject": "06",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 5452243
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Train\\06_03_00_15.mp4",
+        "subject": "06",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 4622696
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Train\\02_04_01_01.mp4",
+        "subject": "02",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 1966417
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Train\\02_04_01_02.mp4",
+        "subject": "02",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 1721028
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Train\\02_04_01_03.mp4",
+        "subject": "02",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 1644313
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Train\\02_04_01_04.mp4",
+        "subject": "02",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 1785674
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Train\\02_04_01_05.mp4",
+        "subject": "02",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 1517467
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Train\\02_04_01_06.mp4",
+        "subject": "02",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 1457855
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Train\\02_04_01_07.mp4",
+        "subject": "02",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 1592341
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Train\\02_04_01_08.mp4",
+        "subject": "02",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 1334216
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Train\\02_04_01_09.mp4",
+        "subject": "02",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 1549206
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Train\\02_04_01_10.mp4",
+        "subject": "02",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 1593421
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Train\\03_04_01_01.mp4",
+        "subject": "03",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 3654057
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Train\\03_04_01_02.mp4",
+        "subject": "03",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 3301165
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Train\\03_04_01_03.mp4",
+        "subject": "03",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 4432435
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Train\\03_04_01_04.mp4",
+        "subject": "03",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 5031474
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Train\\03_04_01_05.mp4",
+        "subject": "03",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 4494730
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Train\\03_04_01_06.mp4",
+        "subject": "03",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 4893690
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Train\\03_04_01_07.mp4",
+        "subject": "03",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 5691188
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Train\\03_04_01_08.mp4",
+        "subject": "03",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 4472163
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Train\\03_04_01_09.mp4",
+        "subject": "03",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 5358856
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Train\\05_04_01_01.mp4",
+        "subject": "05",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 1782156
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Train\\05_04_01_02.mp4",
+        "subject": "05",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 1788799
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Train\\05_04_01_03.mp4",
+        "subject": "05",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 1820171
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Train\\05_04_01_04.mp4",
+        "subject": "05",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 1765716
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Train\\05_04_01_05.mp4",
+        "subject": "05",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 1881944
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Train\\05_04_01_06.mp4",
+        "subject": "05",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 1794031
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Train\\05_04_01_07.mp4",
+        "subject": "05",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 1823876
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Train\\05_04_01_08.mp4",
+        "subject": "05",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 1688054
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Train\\05_04_01_09.mp4",
+        "subject": "05",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 1701196
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Train\\05_04_01_10.mp4",
+        "subject": "05",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 1660296
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Train\\06_04_01_01.mp4",
+        "subject": "06",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 2654165
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Train\\06_04_01_02.mp4",
+        "subject": "06",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 5926258
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Train\\06_04_01_03.mp4",
+        "subject": "06",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 5631175
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Train\\06_04_01_04.mp4",
+        "subject": "06",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 5487546
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Train\\06_04_01_05.mp4",
+        "subject": "06",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 4961597
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Train\\06_04_01_06.mp4",
+        "subject": "06",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 5739996
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Train\\06_04_01_07.mp4",
+        "subject": "06",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 5819301
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Train\\06_04_01_08.mp4",
+        "subject": "06",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 6588682
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Train\\06_04_01_09.mp4",
+        "subject": "06",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 4587927
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Train\\06_04_01_10.mp4",
+        "subject": "06",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 6141283
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Train\\01_04_00_01.mp4",
+        "subject": "01",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 5112951
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Train\\01_04_00_02.mp4",
+        "subject": "01",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 4995887
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Train\\01_04_00_03.mp4",
+        "subject": "01",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 5633209
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Train\\01_04_00_04.mp4",
+        "subject": "01",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 5148986
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Train\\01_04_00_05.mp4",
+        "subject": "01",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 4926445
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Train\\01_04_00_06.mp4",
+        "subject": "01",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 5654301
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Train\\01_04_00_07.mp4",
+        "subject": "01",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 4934551
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Train\\01_04_00_08.mp4",
+        "subject": "01",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 5285705
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Train\\01_04_00_09.mp4",
+        "subject": "01",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 5355358
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Train\\01_04_00_10.mp4",
+        "subject": "01",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 5820372
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Train\\02_04_00_01.mp4",
+        "subject": "02",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 1860705
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Train\\02_04_00_02.mp4",
+        "subject": "02",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 1797128
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Train\\02_04_00_03.mp4",
+        "subject": "02",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 1508762
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Train\\02_04_00_04.mp4",
+        "subject": "02",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 1427980
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Train\\02_04_00_05.mp4",
+        "subject": "02",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 1526676
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Train\\02_04_00_06.mp4",
+        "subject": "02",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 1484334
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Train\\02_04_00_07.mp4",
+        "subject": "02",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 1931203
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Train\\02_04_00_08.mp4",
+        "subject": "02",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 1694938
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Train\\02_04_00_09.mp4",
+        "subject": "02",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 1787631
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Train\\02_04_00_10.mp4",
+        "subject": "02",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 1852230
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Train\\05_04_00_01.mp4",
+        "subject": "05",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 1579828
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Train\\05_04_00_02.mp4",
+        "subject": "05",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 1645455
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Train\\05_04_00_03.mp4",
+        "subject": "05",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 1712894
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Train\\05_04_00_04.mp4",
+        "subject": "05",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 1752008
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Train\\05_04_00_05.mp4",
+        "subject": "05",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 1740889
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Train\\05_04_00_06.mp4",
+        "subject": "05",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 1748776
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Train\\05_04_00_07.mp4",
+        "subject": "05",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 1693201
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Train\\05_04_00_08.mp4",
+        "subject": "05",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 1769573
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Train\\05_04_00_09.mp4",
+        "subject": "05",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 1697557
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Train\\05_04_00_10.mp4",
+        "subject": "05",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 1693388
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Train\\06_04_00_01.mp4",
+        "subject": "06",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 5382946
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Train\\06_04_00_02.mp4",
+        "subject": "06",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 5851728
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Train\\06_04_00_03.mp4",
+        "subject": "06",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 5992562
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Train\\06_04_00_04.mp4",
+        "subject": "06",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 4850916
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Train\\06_04_00_05.mp4",
+        "subject": "06",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 4864112
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Train\\06_04_00_06.mp4",
+        "subject": "06",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 5435824
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Train\\06_04_00_07.mp4",
+        "subject": "06",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 6022412
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Train\\06_04_00_08.mp4",
+        "subject": "06",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 5021395
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Train\\06_04_00_09.mp4",
+        "subject": "06",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 6332451
+      }
+    ],
+    "validation": [
+      {
+        "path": "1_Lifting an Object\\Complete\\Train\\04_01_01_01.mp4",
+        "subject": "04",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 1631019
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Train\\04_01_01_02.mp4",
+        "subject": "04",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 2392320
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Train\\04_01_01_03.mp4",
+        "subject": "04",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 2236574
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Train\\04_01_01_04.mp4",
+        "subject": "04",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 2302397
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Train\\04_01_01_05.mp4",
+        "subject": "04",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 2300159
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Train\\04_01_01_06.mp4",
+        "subject": "04",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 2127216
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Train\\04_01_01_07.mp4",
+        "subject": "04",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 2073496
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Train\\04_01_01_08.mp4",
+        "subject": "04",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 2088328
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Train\\04_01_01_09.mp4",
+        "subject": "04",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 1914947
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Train\\04_01_01_10.mp4",
+        "subject": "04",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 1880359
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Train\\04_01_01_11.mp4",
+        "subject": "04",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 1853481
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Train\\04_01_00_01.mp4",
+        "subject": "04",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 2205105
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Train\\04_01_00_02.mp4",
+        "subject": "04",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 2222379
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Train\\04_01_00_03.mp4",
+        "subject": "04",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 1932533
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Train\\04_01_00_04.mp4",
+        "subject": "04",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 1876428
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Train\\04_01_00_05.mp4",
+        "subject": "04",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 2152749
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Train\\04_01_00_06.mp4",
+        "subject": "04",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 1941364
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Train\\04_01_00_07.mp4",
+        "subject": "04",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 1988625
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Train\\04_01_00_08.mp4",
+        "subject": "04",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 1881589
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Train\\04_01_00_09.mp4",
+        "subject": "04",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 2059981
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Train\\04_01_00_10.mp4",
+        "subject": "04",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 2123140
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Train\\04_02_00_01.mp4",
+        "subject": "04",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 1258385
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Train\\04_02_00_02.mp4",
+        "subject": "04",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 1177015
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Train\\04_02_00_03.mp4",
+        "subject": "04",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 1239613
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Train\\04_02_00_04.mp4",
+        "subject": "04",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 1223647
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Train\\04_02_00_05.mp4",
+        "subject": "04",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 1133125
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Train\\04_02_00_06.mp4",
+        "subject": "04",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 1302056
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Train\\04_02_00_07.mp4",
+        "subject": "04",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 1223046
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Train\\04_02_00_08.mp4",
+        "subject": "04",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 1421343
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Train\\04_02_00_09.mp4",
+        "subject": "04",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 1236808
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Train\\04_02_00_10.mp4",
+        "subject": "04",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 1519001
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\04_02_00_01.mp4",
+        "subject": "04",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 1116751
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\04_02_00_02.mp4",
+        "subject": "04",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 1233740
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\04_02_00_03.mp4",
+        "subject": "04",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 1464348
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\04_02_00_04.mp4",
+        "subject": "04",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 1291621
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\04_02_00_05.mp4",
+        "subject": "04",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 1298033
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\04_02_00_06.mp4",
+        "subject": "04",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 1189548
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\04_02_00_07.mp4",
+        "subject": "04",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 1274159
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\04_02_00_08.mp4",
+        "subject": "04",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 1326345
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\04_02_00_09.mp4",
+        "subject": "04",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 1493757
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Train\\04_02_00_10.mp4",
+        "subject": "04",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 1532559
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Train\\04_03_01_01.mp4",
+        "subject": "04",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 2604676
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Train\\04_03_01_02.mp4",
+        "subject": "04",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 2034967
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Train\\04_03_01_03.mp4",
+        "subject": "04",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 2080293
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Train\\04_03_01_04.mp4",
+        "subject": "04",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 2655763
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Train\\04_03_01_05.mp4",
+        "subject": "04",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 2240163
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Train\\04_03_01_06.mp4",
+        "subject": "04",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 1970469
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Train\\04_03_01_07.mp4",
+        "subject": "04",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 1897627
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Train\\04_03_01_08.mp4",
+        "subject": "04",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 1878117
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Train\\04_03_01_09.mp4",
+        "subject": "04",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 1820122
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Train\\04_03_01_10.mp4",
+        "subject": "04",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 1849318
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Train\\04_03_00_01.mp4",
+        "subject": "04",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 2228147
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Train\\04_03_00_02.mp4",
+        "subject": "04",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 1828891
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Train\\04_03_00_03.mp4",
+        "subject": "04",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 2137853
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Train\\04_03_00_04.mp4",
+        "subject": "04",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 2345722
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Train\\04_03_00_05.mp4",
+        "subject": "04",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 2875182
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Train\\04_03_00_06.mp4",
+        "subject": "04",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 1716203
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Train\\04_03_00_07.mp4",
+        "subject": "04",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 2072009
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Train\\04_03_00_08.mp4",
+        "subject": "04",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 1828728
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Train\\04_03_00_09.mp4",
+        "subject": "04",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 1764881
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Train\\04_03_00_10.mp4",
+        "subject": "04",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 1826370
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Train\\04_03_00_11.mp4",
+        "subject": "04",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 1716677
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Train\\04_04_01_01.mp4",
+        "subject": "04",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 984855
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Train\\04_04_01_02.mp4",
+        "subject": "04",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 1089534
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Train\\04_04_01_03.mp4",
+        "subject": "04",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 1933537
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Train\\04_04_01_04.mp4",
+        "subject": "04",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 1429674
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Train\\04_04_01_05.mp4",
+        "subject": "04",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 1641480
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Train\\04_04_01_06.mp4",
+        "subject": "04",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 1701754
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Train\\04_04_01_07.mp4",
+        "subject": "04",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 1279872
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Train\\04_04_01_08.mp4",
+        "subject": "04",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 1625987
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Train\\04_04_01_09.mp4",
+        "subject": "04",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 1668494
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Train\\04_04_01_10.mp4",
+        "subject": "04",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 1580317
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Train\\04_04_01_11.mp4",
+        "subject": "04",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 4905244
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Train\\04_04_00_01.mp4",
+        "subject": "04",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 2094271
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Train\\04_04_00_02.mp4",
+        "subject": "04",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 1628469
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Train\\04_04_00_03.mp4",
+        "subject": "04",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 1819452
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Train\\04_04_00_04.mp4",
+        "subject": "04",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 1926767
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Train\\04_04_00_05.mp4",
+        "subject": "04",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 1850990
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Train\\04_04_00_06.mp4",
+        "subject": "04",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 1504379
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Train\\04_04_00_07.mp4",
+        "subject": "04",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 2188410
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Train\\04_04_00_08.mp4",
+        "subject": "04",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 2034549
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Train\\04_04_00_09.mp4",
+        "subject": "04",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 2124747
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Train\\04_04_00_10.mp4",
+        "subject": "04",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 1964237
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Train\\04_04_00_11.mp4",
+        "subject": "04",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 1217532
+      }
+    ],
+    "test": [
+      {
+        "path": "1_Lifting an Object\\Complete\\Test\\07_01_01_01.mp4",
+        "subject": "07",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 1575062
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Test\\07_01_01_02.mp4",
+        "subject": "07",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 1682485
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Test\\07_01_01_03.mp4",
+        "subject": "07",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 1727396
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Test\\07_01_01_04.mp4",
+        "subject": "07",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 1526689
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Test\\07_01_01_05.mp4",
+        "subject": "07",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 1700351
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Test\\07_01_01_06.mp4",
+        "subject": "07",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 1801645
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Test\\07_01_01_07.mp4",
+        "subject": "07",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 2070789
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Test\\07_01_01_08.mp4",
+        "subject": "07",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 2087792
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Test\\07_01_01_09.mp4",
+        "subject": "07",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 2166700
+      },
+      {
+        "path": "1_Lifting an Object\\Complete\\Test\\07_01_01_10.mp4",
+        "subject": "07",
+        "exercise": 0,
+        "status": 0,
+        "bytes": 2032630
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Test\\07_01_00_01.mp4",
+        "subject": "07",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 1273719
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Test\\07_01_00_02.mp4",
+        "subject": "07",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 1178820
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Test\\07_01_00_03.mp4",
+        "subject": "07",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 1385471
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Test\\07_01_00_04.mp4",
+        "subject": "07",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 1533942
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Test\\07_01_00_05.mp4",
+        "subject": "07",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 1431295
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Test\\07_01_00_06.mp4",
+        "subject": "07",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 1345534
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Test\\07_01_00_07.mp4",
+        "subject": "07",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 1553156
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Test\\07_01_00_08.mp4",
+        "subject": "07",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 121029
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Test\\07_01_00_09.mp4",
+        "subject": "07",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 1563634
+      },
+      {
+        "path": "1_Lifting an Object\\Incomplete\\Test\\07_01_00_10.mp4",
+        "subject": "07",
+        "exercise": 0,
+        "status": 1,
+        "bytes": 1477332
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Test\\08_02_01_01.mp4",
+        "subject": "08",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 1131232
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Test\\08_02_01_02.mp4",
+        "subject": "08",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 1202781
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Test\\08_02_01_03.mp4",
+        "subject": "08",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 1087871
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Test\\08_02_01_04.mp4",
+        "subject": "08",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 1007261
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Test\\08_02_01_05.mp4",
+        "subject": "08",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 1010911
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Test\\08_02_01_06.mp4",
+        "subject": "08",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 837837
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Test\\08_02_01_07.mp4",
+        "subject": "08",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 821422
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Test\\08_02_01_08.mp4",
+        "subject": "08",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 1040194
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Test\\08_02_01_09.mp4",
+        "subject": "08",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 941968
+      },
+      {
+        "path": "2_Extending the Elbow\\Complete\\Test\\08_02_01_10.mp4",
+        "subject": "08",
+        "exercise": 1,
+        "status": 0,
+        "bytes": 841716
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Test\\08_02_00_01.mp4",
+        "subject": "08",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 1026384
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Test\\08_02_00_02.mp4",
+        "subject": "08",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 889650
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Test\\08_02_00_03.mp4",
+        "subject": "08",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 825531
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Test\\08_02_00_04.mp4",
+        "subject": "08",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 784466
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Test\\08_02_00_05.mp4",
+        "subject": "08",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 910692
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Test\\08_02_00_06.mp4",
+        "subject": "08",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 975234
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Test\\08_02_00_07.mp4",
+        "subject": "08",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 825097
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Test\\08_02_00_08.mp4",
+        "subject": "08",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 836940
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Test\\08_02_00_09.mp4",
+        "subject": "08",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 824255
+      },
+      {
+        "path": "2_Extending the Elbow\\Incomplete\\Test\\08_02_00_10.mp4",
+        "subject": "08",
+        "exercise": 1,
+        "status": 1,
+        "bytes": 973308
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Test\\10_03_01_01.mp4",
+        "subject": "10",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 1265133
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Test\\10_03_01_02.mp4",
+        "subject": "10",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 1330638
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Test\\10_03_01_03.mp4",
+        "subject": "10",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 1387857
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Test\\10_03_01_04.mp4",
+        "subject": "10",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 1382162
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Test\\10_03_01_05.mp4",
+        "subject": "10",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 1353145
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Test\\10_03_01_06.mp4",
+        "subject": "10",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 1238985
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Test\\10_03_01_07.mp4",
+        "subject": "10",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 1280608
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Test\\10_03_01_08.mp4",
+        "subject": "10",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 1494318
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Test\\10_03_01_09.mp4",
+        "subject": "10",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 1534407
+      },
+      {
+        "path": "3_Lifting the Wrist\\Complete\\Test\\10_03_01_10.mp4",
+        "subject": "10",
+        "exercise": 2,
+        "status": 0,
+        "bytes": 1529932
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Test\\10_03_00_01.mp4",
+        "subject": "10",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 1447578
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Test\\10_03_00_02.mp4",
+        "subject": "10",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 1331417
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Test\\10_03_00_03.mp4",
+        "subject": "10",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 1126117
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Test\\10_03_00_04.mp4",
+        "subject": "10",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 1458915
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Test\\10_03_00_05.mp4",
+        "subject": "10",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 1380641
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Test\\10_03_00_06.mp4",
+        "subject": "10",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 1161260
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Test\\10_03_00_07.mp4",
+        "subject": "10",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 1365990
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Test\\10_03_00_08.mp4",
+        "subject": "10",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 1298436
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Test\\10_03_00_09.mp4",
+        "subject": "10",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 1258609
+      },
+      {
+        "path": "3_Lifting the Wrist\\Incomplete\\Test\\10_03_00_10.mp4",
+        "subject": "10",
+        "exercise": 2,
+        "status": 1,
+        "bytes": 1363748
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Test\\09_04_01_01.mp4",
+        "subject": "09",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 1159463
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Test\\09_04_01_02.mp4",
+        "subject": "09",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 1123427
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Test\\09_04_01_03.mp4",
+        "subject": "09",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 1035404
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Test\\09_04_01_04.mp4",
+        "subject": "09",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 1026438
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Test\\09_04_01_05.mp4",
+        "subject": "09",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 1187944
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Test\\09_04_01_06.mp4",
+        "subject": "09",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 1060090
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Test\\09_04_01_07.mp4",
+        "subject": "09",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 1018929
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Test\\09_04_01_08.mp4",
+        "subject": "09",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 978141
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Test\\09_04_01_09.mp4",
+        "subject": "09",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 966289
+      },
+      {
+        "path": "4_Opening the Hand\\Complete\\Test\\09_04_01_10.mp4",
+        "subject": "09",
+        "exercise": 3,
+        "status": 0,
+        "bytes": 1109318
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Test\\09_04_00_01.mp4",
+        "subject": "09",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 802211
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Test\\09_04_00_02.mp4",
+        "subject": "09",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 889685
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Test\\09_04_00_03.mp4",
+        "subject": "09",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 897259
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Test\\09_04_00_04.mp4",
+        "subject": "09",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 1436453
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Test\\09_04_00_05.mp4",
+        "subject": "09",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 1244408
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Test\\09_04_00_06.mp4",
+        "subject": "09",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 886314
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Test\\09_04_00_07.mp4",
+        "subject": "09",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 896657
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Test\\09_04_00_08.mp4",
+        "subject": "09",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 1023972
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Test\\09_04_00_09.mp4",
+        "subject": "09",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 1006375
+      },
+      {
+        "path": "4_Opening the Hand\\Incomplete\\Test\\09_04_00_10.mp4",
+        "subject": "09",
+        "exercise": 3,
+        "status": 1,
+        "bytes": 932754
+      }
+    ]
+  },
+  "subjects": {
+    "train": [
+      "01",
+      "02",
+      "03",
+      "05",
+      "06"
+    ],
+    "validation": [
+      "04"
+    ],
+    "test": [
+      "07",
+      "08",
+      "09",
+      "10"
+    ]
+  },
+  "limitations": [
+    "Volunteer rehabilitation labels, not stroke outcomes.",
+    "One validation subject and four test subjects; generalization remains uncertain.",
+    "Wilson intervals are clip-level and ignore within-person correlation.",
+    "Test was not used for this run selection; legacy experiments previously observed this source test split."
+  ]
+}

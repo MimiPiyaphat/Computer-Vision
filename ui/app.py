@@ -33,12 +33,16 @@ class Dashboard:
         self.setup_confirmed = tk.BooleanVar(value=False)
         self.symptom_notice_latched = False
         self.alert_notified = False
+        from src.dev_access import DevAccess
+        self.dev_access = DevAccess()
+        self.dev_window = None
         self.theme = configure_fonts(root, load_theme())
         root.title("StrokeVision | บันทึกก่อนนวดและตรวจซ้ำ" + (" [ตัวอย่างหน้าจอ]" if preview else ""))
         root.geometry("1280x1000")
         root.minsize(1080, 900)
         root.protocol("WM_DELETE_WINDOW", self.close)
         root.bind("<F5>", lambda _: self.reload_theme())
+        root.bind("<Control-Shift-D>", lambda _: self.open_dev())
         root.bind("<MouseWheel>", self.scroll_page)
         self.build()
         self.poll()
@@ -62,6 +66,7 @@ class Dashboard:
         label(header, "StrokeVision", t, size=24, bold=True).pack(side="left")
         label(header, "  /  บันทึกก่อนนวดและตรวจซ้ำ", t, muted=True).pack(side="left")
         button(header, "โหลดธีมใหม่ · F5", self.reload_theme, t).pack(side="right")
+        button(header, "Dev", self.open_dev, t).pack(side="right", padx=8)
         button(header, "ผู้รับบริการใหม่", self.new_customer, t).pack(side="right", padx=8)
         label(self.container, "ตัวอย่างหน้าจอ · ใช้ข้อมูลจำลองเท่านั้น" if self.preview else
               "บันทึกและเปรียบเทียบการเปลี่ยนแปลงของใบหน้าและแขน", t, muted=True).pack(anchor="w", pady=(0, 16))
@@ -179,6 +184,13 @@ class Dashboard:
         if self.research:
             self.research_banner.configure(wraplength=max(200, width - 2 * self.theme["spacing"]))
 
+    def open_dev(self):
+        if self.dev_window and self.dev_window.window.winfo_exists():
+            self.dev_window.window.lift()
+            return
+        from ui.dev_dashboard import DevDashboard
+        self.dev_window = DevDashboard(self.root, self.theme, self.dev_access)
+
     def scroll_page(self, event):
         # The result text box keeps its own wheel scrolling and text selection.
         if isinstance(event.widget, tk.Text):
@@ -226,6 +238,8 @@ class Dashboard:
         self.update_care_notice()
 
     def new_customer(self):
+        if self.dev_window and self.dev_window.window.winfo_exists():
+            self.dev_window.close()
         # Explicitly end the previous customer's session before clearing its
         # latched care notice and editable identity fields.
         if self.worker and self.worker.thread.is_alive():
@@ -484,6 +498,8 @@ class Dashboard:
 
     def close(self):
         self.closing = True
+        if self.dev_window and self.dev_window.window.winfo_exists():
+            self.dev_window.close()
         if self.worker:
             self.worker.close()
             if self.worker.thread.is_alive():
