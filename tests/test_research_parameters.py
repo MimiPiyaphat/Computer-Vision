@@ -38,6 +38,17 @@ def rows():
 
 
 class ResearchRuleTests(unittest.TestCase):
+    def test_decreased_asymmetry_does_not_trigger_increase_alert(self):
+        before = dict(vector(), closed_eyelid_ratio=.4039047472657582)
+        after = dict(vector(), closed_eyelid_ratio=.3025060863792893)
+        result = compare_research(before, after, angles(), angles(), load_parameters())
+        self.assertGreater(result['measurement']['face_delta'], .1)
+        self.assertEqual(result['research_measurement']['face_asymmetry_increase'], 0)
+        self.assertEqual(result['status'], 'research_below_placeholder')
+        reversed_result = compare_research(after, before, angles(), angles(), load_parameters())
+        self.assertTrue(reversed_result['alert'])
+        self.assertEqual(reversed_result['research_measurement']['face_trigger_features'], ['closed_eyelid_ratio'])
+
     def test_actual_or_rule_evaluator_checks_floor_and_counts_failed_acquisition(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "pairs.jsonl"

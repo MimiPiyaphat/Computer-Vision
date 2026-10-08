@@ -15,7 +15,6 @@ def matrix_canvas_height(metrics):
     """Fit the matrix exactly instead of hiding the class table below it."""
     return 56 + 42 * len(metrics['labels'])
 
-
 class DevDashboard:
     def __init__(self, parent, theme, access):
         self.theme, self.access = theme, access
@@ -47,7 +46,6 @@ class DevDashboard:
             if self.replay.window.winfo_exists():
                 self.replay.close()
             self.replay = None
-
     def login(self):
         if self.lock_timer is not None:
             self.window.after_cancel(self.lock_timer)

@@ -9,9 +9,10 @@ from types import SimpleNamespace
 import unittest
 from unittest.mock import Mock, patch
 
+from config import IDENTITY_REACQUIRE_MATCH_FRAMES, IDENTITY_REJECT_MISMATCH_FRAMES
 from src.face_identity import IdentityMismatch, MISMATCH_MESSAGE
 from src.feature_store import FeatureStore
-from src.features import asymmetry_ratio, face_geometry
+from src.features import asymmetry_ratio, closure_asymmetry, face_geometry
 from src.protocol import check_setup
 from src.session import ScreeningSession
 from src.visit_workflow import VisitWorkflow
@@ -21,6 +22,18 @@ from export_feature_pairs import export_pairs
 
 
 class RatioTests(unittest.TestCase):
+    def test_closed_eye_noise_uses_fixed_resting_reference(self):
+        neutral = [{'left_ear': .3, 'right_ear': .3}] * 5
+        before = [{'left_ear': .01, 'right_ear': .02}] * 5
+        after = [{'left_ear': .02, 'right_ear': .02}] * 5
+        # The old near-zero denominator turns this tiny jitter into a .5 delta.
+        self.assertAlmostEqual(asymmetry_ratio(.01, .02, 30), .5)
+        self.assertLess(abs(closure_asymmetry(before, neutral) - closure_asymmetry(after, neutral)), .04)
+        one_open = [{'left_ear': .3, 'right_ear': .01}] * 5
+        self.assertGreater(closure_asymmetry(one_open, neutral), .9)
+        with self.assertRaisesRegex(ValueError, 'Resting eye'):
+            closure_asymmetry(before, [{'left_ear': 0, 'right_ear': 0}] * 5)
+
     def test_formula_scale_sides_and_zero_cases(self):
         for left, right, expected in ((2, 4, .5), (4, 2, .5), (0, 0, 0), (0, 2, 1), (2, 2, 0)):
             self.assertAlmostEqual(asymmetry_ratio(left, right, 12), expected)
@@ -166,10 +179,12 @@ class IdentityTests(unittest.TestCase):
     def test_camera_mismatch_displays_exact_warning_and_never_updates_flow(self):
         session, cv = self.session([0., 1.] + [0.] * 510)
         with patch.dict('sys.modules', {'cv2': cv}), patch.object(self.flow, 'compare') as compare:
-            first = session.read()
-            second = session.read()
-        self.assertEqual(first['instruction'], MISMATCH_MESSAGE)
-        self.assertEqual(second['state'], 'identity_rejected')
+            pending = [session.read() for _ in range(IDENTITY_REJECT_MISMATCH_FRAMES - 1)]
+            rejected = session.read()
+        self.assertTrue(all(item['state'] == 'identity_check' for item in pending))
+        self.assertTrue(all('hold still' in item['instruction'] for item in pending))
+        self.assertEqual(rejected['instruction'], MISMATCH_MESSAGE)
+        self.assertEqual(rejected['state'], 'identity_rejected')
         session.flow.update.assert_not_called()
         compare.assert_not_called()
 
@@ -183,6 +198,21 @@ class IdentityTests(unittest.TestCase):
         session.identity_model.embed.assert_not_called()
         session.flow.update.assert_not_called()
         self.assertIsNone(session.flow._last_detected_at)
+
+    def test_same_person_reacquires_after_leaving_frame(self):
+        session, cv = self.session(EMBEDDING)
+        session.face._observe.side_effect = [None] + [object()] * IDENTITY_REACQUIRE_MATCH_FRAMES
+        session.flow.update.return_value = {"state": "neutral_capture", "elapsed": 0, "extra": {}}
+        with patch.dict('sys.modules', {'cv2': cv}):
+            missing = session.read()
+            pending = [session.read() for _ in range(IDENTITY_REACQUIRE_MATCH_FRAMES - 1)]
+            resumed = session.read()
+        self.assertEqual(missing['state'], 'identity_check')
+        self.assertTrue(all(item['state'] == 'identity_check' for item in pending))
+        self.assertEqual(resumed['state'], 'neutral_capture')
+        self.assertFalse(self.flow.identity_rejected)
+        self.assertTrue(self.flow.identity_verified)
+        session.flow.update.assert_called_once()
 
 
 if __name__ == '__main__':

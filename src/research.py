@@ -49,7 +49,10 @@ def compare_research(before, after, before_angles, after_angles, parameters, par
         validate_arm_function(before_arm_function)
     arm_function = validate_arm_function(after_arm_function) if after_arm_function is not None else None
     face_available = any(key in after for key in FACE_KEYS)
-    face_alert = face_available and measurement["face_delta"] > parameters["face_delta_threshold"]
+    # Keep absolute differences for auditing, but a decrease in measured
+    # asymmetry must not be labelled an increase requiring attention.
+    face_increase = max([0.0] + [measurement["deltas"][key] for key in FACE_KEYS if key in after])
+    face_alert = face_available and face_increase > parameters["face_delta_threshold"]
     arm_function_alert = arm_function is not None and arm_function["status"] != "normal"
     arm_alert = arm_function_alert or (arm_delta is not None and arm_delta > parameters["arm_angle_delta_threshold_deg"])
     # A directly observed raise-and-hold outcome can complete the arm portion
@@ -65,7 +68,10 @@ def compare_research(before, after, before_angles, after_angles, parameters, par
         "reason": "Unvalidated university demo: " + ("a provisional rule was exceeded." if alert else
                   "rules were not exceeded; this cannot exclude disease." if complete else
                   "one or more measurements are unavailable; this is inconclusive."),
-        "research_measurement": {"arm_angle_delta_deg": arm_delta, "angle_deltas": angle_deltas,
+        "research_measurement": {"face_asymmetry_increase": face_increase,
+                                 "face_trigger_features": [key for key in FACE_KEYS if key in after and
+                                                           measurement["deltas"][key] > parameters["face_delta_threshold"]],
+                                 "arm_angle_delta_deg": arm_delta, "angle_deltas": angle_deltas,
                                  "face_delta_threshold": parameters["face_delta_threshold"],
                                  "arm_angle_delta_threshold_deg": parameters["arm_angle_delta_threshold_deg"],
                                  "face_alert": bool(face_alert), "arm_alert": bool(arm_alert),

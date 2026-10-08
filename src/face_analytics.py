@@ -42,25 +42,35 @@ class FaceAnalyzer:
         self.latest_features = values
         return values
 
-    def check_quality(self, frame_bgr):
-        if self._observe(frame_bgr) is None:
+    def check_quality(self, frame_bgr, *, observed=False):
+        observation = self.latest_features if observed else self._observe(frame_bgr)
+        if observation is None:
             return {"ok": False, "reason": "Keep exactly one complete face visible, close enough to the camera."}
         gray = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2GRAY)
-        midpoint = gray.shape[1] // 2
-        difference = abs(float(np.mean(gray[:, :midpoint])) - float(np.mean(gray[:, midpoint:])))
+        height, width = gray.shape
+        # Compare only pixels inside the facial mesh hull, excluding background.
+        points = np.array([(p.x * width, p.y * height) for p in self._last_landmarks[:468]], dtype=np.int32)
+        mask = np.zeros_like(gray)
+        cv2.fillConvexPoly(mask, cv2.convexHull(points), 1)
+        midpoint = int(observation["face_x"] * width)
+        left = gray[:, :midpoint][mask[:, :midpoint] != 0]
+        right = gray[:, midpoint:][mask[:, midpoint:] != 0]
+        if not left.size or not right.size:
+            return {"ok": False, "reason": "Keep exactly one complete face visible, close enough to the camera."}
+        difference = abs(float(np.mean(left)) - float(np.mean(right)))
         if difference > QUALITY_MAX_BRIGHTNESS_DIFF:
             return {"ok": False, "reason": "Improve uneven lighting before continuing."}
         return {"ok": True, "reason": ""}
 
-    def capture_neutral(self, frame_bgr):
-        observation = self._observe(frame_bgr)
+    def capture_neutral(self, frame_bgr, *, observed=False):
+        observation = self.latest_features if observed else self._observe(frame_bgr)
         return (observation["left_ear"], observation["right_ear"]) if observation else None
 
     def set_neutral_baseline(self, samples):
         self._neutral_ear = tuple(float(v) for v in np.median(samples, axis=0)) if samples else None
 
-    def measure_eyes(self, frame_bgr):
-        observation = self._observe(frame_bgr)
+    def measure_eyes(self, frame_bgr, *, observed=False):
+        observation = self.latest_features if observed else self._observe(frame_bgr)
         if observation is None:
             return None
         left, right = observation["left_ear"], observation["right_ear"]

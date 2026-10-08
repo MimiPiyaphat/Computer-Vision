@@ -1,0 +1,29 @@
+{
+  "device": "cpu",
+  "train_samples": 120,
+  "test_samples": 32,
+  "history": [
+    {
+      "exercise_accuracy": 0.25,
+      "status_accuracy": 0.5,
+      "samples": 32,
+      "epoch": 1,
+      "train_loss": 2.088121086359024
+    },
+    {
+      "exercise_accuracy": 0.25,
+      "status_accuracy": 0.5,
+      "samples": 32,
+      "epoch": 2,
+      "train_loss": 2.0861253142356873
+    },
+    {
+      "exercise_accuracy": 0.25,
+      "status_accuracy": 0.5,
+      "samples": 32,
+      "epoch": 3,
+      "train_loss": 2.079131096601486
+    }
+  ],
+  "warning": "Volunteer rehabilitation dataset; not a clinical stroke diagnosis model."
+}

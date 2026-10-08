@@ -12,6 +12,11 @@ No labeled customer data or clinically approved cutoff has been supplied. The
 application therefore leaves its delta threshold **unconfigured**. Unit tests
 use synthetic geometry and scores solely to verify software behavior.
 
+The collection workflow, draft Thai consent language, blinded adjudication CSV,
+label merge tool and subject-level splitter are in
+[`validation/study`](study/COLLECTION_PROTOCOL_TH.md). These materials are study
+scaffolding and require institutional/clinical review before participant use.
+
 ## Intended population and endpoint
 
 The recheck is initiated only after a customer reports an abnormal symptom.

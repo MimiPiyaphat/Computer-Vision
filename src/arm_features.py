@@ -33,13 +33,17 @@ class ArmFeatures:
         self.raised_ever = {"left": False, "right": False}
         self._raised_started_at = None
         self.max_hold_sec = 0.0
+        self.reason_code = None
 
     def observe(self, wrists, shoulders, width, height, elapsed):
+        self.reason_code = None
         if any(point is None for point in (*wrists.values(), *shoulders.values())):
+            self.reason_code = "wrists_missing"
             return False
         left, right = shoulders["left"], shoulders["right"]
         span = math.dist(left, right)
         if span < 20:
+            self.reason_code = "body_small"
             return False
         setup = {"body_roll": math.degrees(math.atan2(right[1] - left[1], abs(right[0] - left[0]))),
                  "body_scale": span / width, "body_x": (left[0] + right[0]) / (2 * width),
@@ -48,6 +52,7 @@ class ArmFeatures:
         if self.setup is None:
             self.setup = setup
         if any(abs(setup[k] - self.setup[k]) > SETUP_TOLERANCES[k] for k in setup):
+            self.reason_code = "body_moved"
             return False
 
         raised = {side: position[side] <= ARM_RAISED_WRIST_MAX_SHOULDER_SPANS for side in position}

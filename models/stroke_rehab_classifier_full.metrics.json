@@ -1,0 +1,94 @@
+{
+  "device": "cpu",
+  "train_samples": 411,
+  "test_samples": 80,
+  "best_epoch": 10,
+  "best_status_accuracy": 0.6875,
+  "history": [
+    {
+      "exercise_accuracy": 0.25,
+      "status_accuracy": 0.5,
+      "samples": 80,
+      "epoch": 1,
+      "train_loss": 2.081048470277053
+    },
+    {
+      "exercise_accuracy": 0.25,
+      "status_accuracy": 0.5,
+      "samples": 80,
+      "epoch": 2,
+      "train_loss": 2.0797054951007548
+    },
+    {
+      "exercise_accuracy": 0.2375,
+      "status_accuracy": 0.5,
+      "samples": 80,
+      "epoch": 3,
+      "train_loss": 2.0797594510591946
+    },
+    {
+      "exercise_accuracy": 0.25,
+      "status_accuracy": 0.5,
+      "samples": 80,
+      "epoch": 4,
+      "train_loss": 2.0769744102771464
+    },
+    {
+      "exercise_accuracy": 0.275,
+      "status_accuracy": 0.5125,
+      "samples": 80,
+      "epoch": 5,
+      "train_loss": 2.0687882533440223
+    },
+    {
+      "exercise_accuracy": 0.275,
+      "status_accuracy": 0.525,
+      "samples": 80,
+      "epoch": 6,
+      "train_loss": 2.0491026181441088
+    },
+    {
+      "exercise_accuracy": 0.25,
+      "status_accuracy": 0.5125,
+      "samples": 80,
+      "epoch": 7,
+      "train_loss": 1.9872581683672392
+    },
+    {
+      "exercise_accuracy": 0.25,
+      "status_accuracy": 0.6625,
+      "samples": 80,
+      "epoch": 8,
+      "train_loss": 1.7939119522388165
+    },
+    {
+      "exercise_accuracy": 0.25,
+      "status_accuracy": 0.6625,
+      "samples": 80,
+      "epoch": 9,
+      "train_loss": 1.5155254235634437
+    },
+    {
+      "exercise_accuracy": 0.25,
+      "status_accuracy": 0.6875,
+      "samples": 80,
+      "epoch": 10,
+      "train_loss": 1.4246246631328876
+    },
+    {
+      "exercise_accuracy": 0.275,
+      "status_accuracy": 0.65,
+      "samples": 80,
+      "epoch": 11,
+      "train_loss": 1.2962507101205678
+    },
+    {
+      "exercise_accuracy": 0.2625,
+      "status_accuracy": 0.6375,
+      "samples": 80,
+      "epoch": 12,
+      "train_loss": 1.2421636306322539
+    }
+  ],
+  "warning": "Volunteer rehabilitation dataset; not a clinical stroke diagnosis model."
+}

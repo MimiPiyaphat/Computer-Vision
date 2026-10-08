@@ -31,7 +31,6 @@ class DevAccess:
                 self.failed = 0
             raise PermissionError('รหัสผ่านไม่ถูกต้อง')
         self.failed = 0
-
     @staticmethod
     def _read_report(path, schema):
         # No report is read before password verification succeeds.

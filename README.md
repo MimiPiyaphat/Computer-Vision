@@ -1,13 +1,34 @@
 # StrokeVision AI
 
+## ภาพรวมโครงการ (Project overview)
+
+โครงงานมหาวิทยาลัยด้าน Computer Vision สำหรับเปรียบเทียบการเคลื่อนไหวของใบหน้า
+และแขนก่อน–หลังการนวด โดยใช้กล้องเว็บแคมและหน้าจอภาษาไทย
+มีโหมด **ก่อนนวด · Baseline** และ **หลังนวด · Recheck** พร้อมตรวจสอบว่าเป็นบุคคลเดิม
+ด้วย FaceNet ก่อนเปรียบเทียบ ใช้ MediaPipe Face Mesh วัดอัตราส่วนภายในใบหน้า
+และ YOLOv8-Pose วัดการเคลื่อนไหวของแขน เก็บเฉพาะคุณลักษณะและเวกเตอร์ยืนยันตัวตน
+ไม่บันทึกภาพหรือวิดีโอของผู้ใช้งาน
+
+ระบบนี้เป็นต้นแบบเพื่อการศึกษา ยังไม่ได้ผ่านการรับรองทางคลินิก
+ไม่ใช้วินิจฉัยโรคหรือยืนยันความปลอดภัยในการนวด
+ดูวิธีติดตั้งและใช้งานในหัวข้อ **How to run** ด้านล่าง
+
 A local university research prototype that captures pre-massage measurements
-and compares them with a symptom-triggered recheck. The desktop UI contains the
+and compares them with a routine or symptom-reported post-massage recheck. The desktop UI contains the
 camera window; UI components, acquisition, identity checks and validation tools
 are separate modules.
 
 This is not a medical device or clearance for massage. Reported stroke symptoms
 need urgent medical attention; do not wait for a camera result. The demo rules
 and performance goals are unvalidated.
+
+The draft intended use is limited to assisting trained staff in tracking
+within-person changes after massage against the same person's compatible baseline.
+A recheck may be recorded with or without reported symptoms; the symptom field
+only adds urgent safety guidance. Routine tracking is not a validated medical-risk
+screen for people without symptoms. The system does not diagnose or rule out stroke
+or authorize massage. See [intended use and prohibited uses](validation/INTENDED_USE_TH.md)
+and the [production readiness gates](validation/PRODUCTION_READINESS_TH.md).
 
 ## How to run
 
@@ -23,11 +44,9 @@ git clone --branch main https://github.com/MimiPiyaphat/Computer-Vision.git
 cd Computer-Vision
 ```
 
-Then run the setup commands below from your clone's directory. The `cd` path is
-an example for the existing local workspace; adjust it for a different location.
+Then run the setup commands below from your clone's directory.
 
 ```powershell
-cd C:\CV-Pro\Computer-Vision
 py -3.12 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
 .\.venv\Scripts\python.exe prepare_identity_model.py
@@ -44,6 +63,8 @@ committed to Git.
 Face Mesh uses assets bundled with MediaPipe. `prepare_identity_model.py` downloads
 FaceNet weights once into `models/`; camera startup then uses that local file.
 YOLO uses `yolov8n-pose.pt`, downloading it on first use if missing.
+Ultralytics settings and its persistent cache default to the project's ignored
+`data/ultralytics/` directory. An explicit `YOLO_CONFIG_DIR` takes precedence.
 
 For later runs:
 
@@ -93,6 +114,22 @@ has no verified clinical outcomes and has source-family overlap across its
 published train/validation/test splits. Its mAP, precision and recall can therefore
 be optimistic and must not be described as medical diagnostic accuracy.
 
+The v3 research rule checks **increases** in facial asymmetry; absolute changes
+are still retained for audit, but decreases alone do not trigger the face rule.
+The eye-closure feature uses the left/right EAR difference divided by the resting
+eye opening, rather than dividing by a nearly closed eye. The 0.10 threshold is
+still an unfitted engineering placeholder; this correction is not model training.
+Restart the app and collect a fresh baseline before the next paired demonstration.
+The capture signature rejects older baselines measured with the previous formula;
+the replacement workflow archives them rather than reinterpreting old values.
+
+No labelled before/after stroke-risk training set is included. The rehabilitation
+classifier under `datasets/stroke_rehab` predicts exercise completion and does
+not drive the dashboard result. Training it cannot calibrate this face rule.
+Risk-model training needs independently labelled paired captures from the current
+pipeline, repeat captures to measure variability, and separate subjects for tuning
+and evaluation. The application does not currently estimate stroke probability.
+
 ## Camera workflow
 
 The arm step now records a direct functional outcome in addition to the
@@ -105,8 +142,11 @@ timer instead of being treated as weakness.
 The dedicated mode panel has **ก่อนนวด · Baseline** and **หลังนวด · Recheck**
 buttons. Switching retains the customer/visit IDs, resets setup confirmation and
 clears the displayed result. During capture, stop before switching modes. Choosing
-Recheck does not automatically assert that symptoms were reported; confirm the
-actual report in the checkbox. Existing care notices remain visible.
+Recheck does not automatically assert that symptoms were reported. The optional
+symptom checkbox must reflect the customer's actual report; when checked, urgent
+care guidance appears immediately. Existing care notices remain visible.
+The symptom checkbox appears only in **หลังนวด · Recheck**. Before-massage capture
+records a reference without requiring symptom selection.
 
 Thai text is rendered directly in the desktop widgets using **Leelawadee UI**
 (available on this Windows computer). Change `font` in `ui/theme.json` and press
@@ -120,8 +160,9 @@ remain in their original language for troubleshooting.
 2. Click **Connect camera**, wait for model loading, then **Start visit step**.
 3. Follow quality check, neutral face, smile, gentle eye closure, blink and arm
    lift/hold. Keep one complete face visible, including during the arm hold.
-4. For a customer-reported abnormal symptom, select **recheck** using the same
-   customer/visit IDs and check the symptom-report box. The care notice appears
+4. After massage, select **recheck** using the same customer/visit IDs whether or
+   not the customer reports symptoms. Check the symptom-report box only when an
+   abnormal symptom is actually reported; urgent care guidance then appears
    immediately, even if acquisition cannot proceed.
 5. Identity must match before measurements and deltas proceed. Missing faces
    pause capture; interrupted arm holds restart from arms down. A mismatch shows
@@ -129,8 +170,10 @@ remain in their original language for troubleshooting.
 
 Use **Stop** to discard the current acquisition, **Disconnect** to release models
 and camera, and **New customer** to end the session and clear its form and notices.
-Baselines are immutable per visit and expire for comparison after 12 hours by
-default. Expiry does not delete stored records.
+Baselines expire for comparison after 12 hours by default. When a baseline is
+expired or incompatible, select **baseline** with the same customer/visit IDs to
+capture a replacement. SQLite archives the previous baseline and its rechecks;
+only the new generation remains active for future comparisons.
 
 ## Measurements and identity
 
@@ -166,6 +209,10 @@ holding only the newest frame/result, so slow rendering does not accumulate
 stale video. Tkinter polls approximately every 33 ms and is the only thread that
 updates widgets. Actual FPS depends on inference and hardware, not that interval.
 Identity is checked before every acquired frame, including arm frames.
+The identity gate and face stages share one fresh Face Mesh observation per
+frame. A missing face pauses acquisition without reusing previous landmarks.
+The lighting gate compares pixels inside the facial mesh hull, excluding the
+background. This remains an engineering quality check, not exposure calibration.
 
 Invalid form commands leave the camera connected and display an error. Camera or
 model failures stop the worker and attempt resource cleanup. Disconnect/close
@@ -215,8 +262,20 @@ not establish clinical accuracy, recognition accuracy or camera FPS.
 
 See [UI_GUIDE.md](UI_GUIDE.md) for the UI workflow. Reconnect after code/config
 changes; F5 reloads only the theme. Pipeline fingerprints include source and
-settings, so code cleanup can invalidate old baseline comparisons. Capture a new
-baseline under a new visit reference; never bypass fingerprint checks.
+settings, so code cleanup can invalidate old baseline comparisons. Select baseline
+with the same customer/visit IDs to archive and replace an incompatible record;
+never bypass fingerprint checks.
+
+## Developer model evaluation
+
+The desktop app includes a developer-only evaluation page. Click **Dev** in the
+header or press `Ctrl+Shift+D`, then enter the configured developer password to
+view the held-out rehabilitation evaluation, accuracy/precision/recall/F1 and
+confusion matrices. This page is for development and demonstration only; the
+current transfer model is trained on rehabilitation exercise-completion labels,
+not stroke-risk labels, and its metrics must not be presented as clinical
+accuracy. The paired before/after screening workflow remains the source of the
+customer-facing result.
 
 ## Troubleshooting
 
@@ -231,6 +290,23 @@ baseline under a new visit reference; never bypass fingerprint checks.
   Python runtime can run pure tests but does not include this desktop toolkit.
 
 ## Changelog
+
+### 2026-10-07 — branch documentation merge
+
+- Reconciled the Thai project overview from `main` with the current prototype's
+  models and limitations, retaining the complete setup and workflow instructions.
+
+### 2026-10-07 — capture and dataset reliability
+
+- Reuse the current identity-gated Face Mesh observation in face stages and
+  measure lighting within the facial region.
+- Keep default Ultralytics settings/cache under local ignored `data/`.
+- Select the 30-clip rehabilitation subset across exercise/status/source-split
+  groups with a fixed seed; preserve existing outputs and publish complete sets.
+- Select rehabilitation checkpoints on subject-disjoint validation people from
+  Train; evaluate Test only after selection and report confusion matrices.
+- These acquisition changes update the pipeline fingerprint. Existing visit
+  records remain intact in history when a fresh baseline replaces them.
 
 ### 2026-09-12 — Thai visit UI
 

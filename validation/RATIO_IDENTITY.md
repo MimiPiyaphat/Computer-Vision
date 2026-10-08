@@ -1,5 +1,14 @@
 # Ratio measurements and identity verification — 2026-09-11
 
+Update 2026-10-07: the eye-closure stage now uses the median absolute left/right
+EAR difference divided by the larger median resting EAR from the neutral stage.
+This avoids dividing by a near-zero closed-eye aperture. The research face rule
+now checks the maximum **positive increase** in asymmetry; absolute deltas remain
+available for audit. The sections below describe the original v2 geometry; the
+closure-stage aggregation and research decision rule are superseded by this
+update. A new capture signature requires a fresh baseline. Neither this correction
+nor the retained 0.10 placeholder establishes clinical performance.
+
 This change replaces the v1 signed facial differences with regional asymmetry
 ratios and adds one-to-one face verification to the paired camera workflow.
 The previous implementation already removed translation and scale from geometry;

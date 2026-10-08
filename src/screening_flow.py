@@ -13,9 +13,11 @@ from config import (
     EYE_CLOSURE_HOLD_SEC,
     EXPRESSION_HOLD_SEC,
     NEUTRAL_CAPTURE_SEC,
+    CAPTURE_STAGE_TIMEOUT_SEC,
 )
-from src.features import aggregate, FACE_SETUP_KEYS
+from src.features import aggregate, closure_asymmetry, FACE_SETUP_KEYS
 from src.protocol import check_head_pose
+from src.acquisition import AcquisitionError, MESSAGES, require_complete
 
 STATE_IDLE = "idle"
 STATE_QUALITY_GATE = "quality_gate"
@@ -30,10 +32,14 @@ STATE_SUMMARY = "summary"
 class ScreeningFlow:
     """Coordinate the individual face and arm analyzers without CV details."""
 
-    def __init__(self, face_analyzer, arm_analyzer):
+    def __init__(self, face_analyzer, arm_analyzer, require_angles=False):
         self.face_analyzer = face_analyzer
         self.arm_analyzer = arm_analyzer
         self.state = STATE_IDLE
+        self.require_angles = require_angles
+        self.failure = None
+        self._stage_started_at = None
+        self._reason_code = "insufficient_samples"
         self._active_elapsed = 0.0
         self._last_detected_at = None
         self.results = {}
@@ -48,6 +54,7 @@ class ScreeningFlow:
 
     def start(self):
         """Start a fresh screening round."""
+        self.failure = None
         self.results = {}
         self._neutral_samples = []
         self._blink_counts = {"left": 0, "right": 0}
@@ -76,6 +83,8 @@ class ScreeningFlow:
 
     def _go_to(self, state):
         self.state = state
+        self._stage_started_at = time.monotonic()
+        self._reason_code = "insufficient_samples"
         self._active_elapsed = 0.0
         self._last_detected_at = None
 
@@ -106,20 +115,57 @@ class ScreeningFlow:
                 self._blink_counts[side] += 1
             self._eye_was_closed[side] = closed
 
-    def update(self, frame_bgr):
-        """Advance the flow by one video frame and return UI-ready state."""
+    def update(self, frame_bgr, *, face_observed=False):
+        timeout = self.check_timeout()
+        if timeout is not None:
+            return timeout
+        ui = self._update(frame_bgr, face_observed=face_observed)
+        extra = ui.get("extra", {})
+        if self.is_active():
+            self._reason_code = extra.get("reason_code") or (
+                "face_unavailable" if extra.get("detected") is False else "insufficient_samples")
+            if self.state == STATE_QUALITY_GATE:
+                self._reason_code = "lighting" if "lighting" in ui["instruction"].lower() else "face_unavailable"
+            ui["timeout_remaining"] = max(0, CAPTURE_STAGE_TIMEOUT_SEC - (time.monotonic() - self._stage_started_at))
+        return ui
+
+    def check_timeout(self, reason_code=None):
+        """Wall-clock deadline also applies when identity pauses acquisition."""
+        if not self.is_active():
+            return None
+        now = time.monotonic()
+        if self._stage_started_at is None:
+            self._stage_started_at = now
+        if reason_code:
+            self._reason_code = reason_code
+        if now - self._stage_started_at < CAPTURE_STAGE_TIMEOUT_SEC:
+            return None
+        code = self._reason_code
+        # A valid current pose alone does not mean enough samples were captured.
+        if code == "hold_arms":
+            code = "insufficient_samples"
+        self.failure = {"status": "acquisition_failed", "alert": False, "reason_code": code,
+                        "reason": MESSAGES[code], "stage": self.state, "timed_out": True}
+        self._go_to(STATE_SUMMARY)
+        return {"state": self.state, "instruction": MESSAGES[code], "elapsed": 0, "extra": self.results}
+
+    def _update(self, frame_bgr, *, face_observed=False):
+        """Advance one frame; reuse observation only after this frame's identity gate.
+
+        Standalone callers leave face_observed=False to acquire fresh landmarks.
+        """
         if self.state == STATE_IDLE:
             return {"state": self.state, "instruction": "Start a visit step to begin", "elapsed": 0.0, "extra": {}}
 
         if self.state == STATE_QUALITY_GATE:
-            quality = self.face_analyzer.check_quality(frame_bgr)
+            quality = self.face_analyzer.check_quality(frame_bgr, observed=face_observed)
             if quality["ok"]:
                 self._go_to(STATE_NEUTRAL_CAPTURE)
                 return {"state": self.state, "instruction": "Relax your face and look at the camera", "elapsed": 0.0, "extra": {}}
             return {"state": self.state, "instruction": quality["reason"], "elapsed": 0.0, "extra": quality}
 
         if self.state == STATE_NEUTRAL_CAPTURE:
-            sample = self.face_analyzer.capture_neutral(frame_bgr)
+            sample = self.face_analyzer.capture_neutral(frame_bgr, observed=face_observed)
             if sample is not None and not self._capture_features("neutral"):
                 sample = None
             elapsed = self._record_detected_time(sample is not None)
@@ -140,7 +186,7 @@ class ScreeningFlow:
             }
 
         if self.state == STATE_MOUTH_TEST:
-            observation = self.face_analyzer._observe(frame_bgr)
+            observation = self.face_analyzer.latest_features if face_observed else self.face_analyzer._observe(frame_bgr)
             detected = observation is not None and self._capture_features("smile")
             elapsed = self._record_detected_time(detected)
             if elapsed >= EXPRESSION_HOLD_SEC and len(self._geometry["smile"]) >= 5:
@@ -158,15 +204,24 @@ class ScreeningFlow:
             }
 
         if self.state == STATE_EYE_CLOSURE:
-            eyes = self.face_analyzer.measure_eyes(frame_bgr)
+            eyes = self.face_analyzer.measure_eyes(frame_bgr, observed=face_observed)
             detected = eyes is not None and self._capture_features("closure")
             elapsed = self._record_detected_time(detected)
             # Detection, not successful closure, advances time: inability to
             # close an eye must remain measurable rather than stall the test.
             if elapsed >= EYE_CLOSURE_HOLD_SEC and len(self._geometry["closure"]) >= 5:
                 samples = self._geometry["closure"]
-                values = aggregate(samples[len(samples) // 3:], ("eyelid_ratio",))
-                self.features.update({"closed_" + key: value for key, value in values.items()})
+                try:
+                    self.features["closed_eyelid_ratio"] = closure_asymmetry(
+                        samples[len(samples) // 3:], self._geometry["neutral"])
+                except ValueError:
+                    # An unusable reference is missing data, never a zero score.
+                    self.failure = {"status": "acquisition_failed", "alert": False,
+                                    "reason_code": "eye_reference_unavailable",
+                                    "reason": "Resting eye opening is too small to measure closure.",
+                                    "stage": self.state}
+                    self._go_to(STATE_SUMMARY)
+                    return {"state": self.state, "instruction": self.failure["reason"], "elapsed": 0, "extra": self.results}
                 self._go_to(STATE_EYE_TEST)
                 return {"state": self.state, "instruction": "Blink both eyes naturally several times", "elapsed": 0.0, "extra": {}}
             return {
@@ -177,7 +232,7 @@ class ScreeningFlow:
             }
 
         if self.state == STATE_EYE_TEST:
-            eyes = self.face_analyzer.measure_eyes(frame_bgr)
+            eyes = self.face_analyzer.measure_eyes(frame_bgr, observed=face_observed)
             detected = eyes is not None
             elapsed = self._record_detected_time(detected)
             if eyes:
@@ -207,20 +262,29 @@ class ScreeningFlow:
                 self.features.update(arm["normalized_features"])
                 self.setup.update(arm["capture_setup"])
             if arm["test_complete"]:
-                self.results["arm"] = arm
-                self._go_to(STATE_SUMMARY)
-                return {"state": self.state, "instruction": "Screening complete", "elapsed": 0.0, "extra": self.results}
-            if arm["pose_found"]:
+                try:
+                    require_complete(self.features, self.setup,
+                                     self.research_angles if self.require_angles else None,
+                                     self.arm_function or None)
+                except AcquisitionError as exc:
+                    arm = {**arm, "reason_code": exc.reason_code, "instruction": str(exc), "capture_paused": True}
+                else:
+                    self.results["arm"] = arm
+                    self._go_to(STATE_SUMMARY)
+                    return {"state": self.state, "instruction": "Screening complete", "elapsed": 0.0, "extra": self.results}
+            if arm.get("instruction"):
+                instruction = arm["instruction"]
+            elif arm.get("pose_found"):
                 instruction = (
                     "Raise both arms together from a lowered position"
                     if arm["elapsed_sec"] < ARM_INITIAL_CHECK_SEC
                     else "Keep both arms raised for 3 seconds"
                 )
-            elif arm["person_found"]:
+            elif arm.get("person_found"):
                 instruction = "Keep shoulders and wrists visible; start with arms down and keep your body still"
             else:
                 instruction = "Step into view so the camera can see you"
-            return {"state": self.state, "instruction": instruction, "elapsed": arm["elapsed_sec"], "extra": arm}
+            return {"state": self.state, "instruction": instruction, "elapsed": arm.get("elapsed_sec", 0), "extra": arm}
 
         if self.state == STATE_SUMMARY:
             return {"state": self.state, "instruction": "Start a new visit step when ready", "elapsed": 0.0, "extra": self.results}
