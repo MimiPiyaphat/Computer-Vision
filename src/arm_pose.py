@@ -127,16 +127,20 @@ class ArmPoseAnalyzer:
         self._last_detected_at = now
         detected_elapsed = self._detected_elapsed_sec
         self.projected_angle.observe({"left": left_wrist, "right": right_wrist}, shoulders, detected_elapsed)
-        test_complete = detected_elapsed >= ARM_HOLD_DURATION_SEC
+        arm_function = self.normalized.function_result()
+        test_complete = (detected_elapsed >= ARM_HOLD_DURATION_SEC or
+                         arm_function["status"] == "normal")
 
         return {
             "pose_found": True,
             "person_found": True,
             "elapsed_sec": round(detected_elapsed, 1),
             "test_complete": test_complete,
-            "normalized_features": self.normalized.vector(),
+            "normalized_features": (self.normalized.complete_vector() if test_complete
+                                    else self.normalized.vector()),
             "capture_setup": self.normalized.setup,
             "research_angles": self.projected_angle.vector(),
+            "arm_function": arm_function,
         }
 
     def draw_debug(self, frame_bgr):

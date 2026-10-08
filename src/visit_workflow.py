@@ -93,7 +93,7 @@ class VisitWorkflow:
         if not self.identity_verified:
             raise ValueError("Identity verification required before measurement comparison.")
 
-    def compare(self, features, setup, partial=False, research_angles=None):
+    def compare(self, features, setup, partial=False, research_angles=None, arm_function=None):
         if self.request is None or self.request["mode"] != "recheck":
             raise ValueError("No symptom-triggered recheck is active.")
         self.require_identity()  # Must precede clinical and research delta functions.
@@ -112,7 +112,8 @@ class VisitWorkflow:
         if self.research:
             return compare_research(self.baseline["record"]["features"], features,
                                     self.baseline["record"].get("research_angles", {}), research_angles or {},
-                                    self.research_parameters, partial)
+                                    self.research_parameters, partial,
+                                    self.baseline["record"].get("arm_function"), arm_function)
         measurement = delta_features(self.baseline["record"]["features"], features, partial)
         threshold = self.policy["threshold"] if self.policy else None
         exceeded = threshold is not None and measurement["score"] > threshold
@@ -123,7 +124,7 @@ class VisitWorkflow:
                 "reason": self.policy_error or ("No validated threshold configured." if threshold is None else
                            "A below-threshold measurement cannot exclude stroke or dismiss symptoms.")}
 
-    def finish(self, features, setup, research_angles=None):
+    def finish(self, features, setup, research_angles=None, arm_function=None):
         if self.request is None:
             raise ValueError("No visit acquisition is active.")
         self.require_identity()
@@ -131,13 +132,16 @@ class VisitWorkflow:
                   "setup": numeric_map(setup, SETUP_KEYS), "context": dict(self.context)}
         if self.research:
             record["research_angles"] = research_angles or {}
+        if arm_function is not None:
+            from src.arm_features import validate_arm_function
+            record["arm_function"] = validate_arm_function(arm_function)
         if self.request["mode"] == "baseline":
             from src.protocol import check_head_pose
             check_head_pose(setup)
             self.store.save_baseline(self.keys, record, self.identity)
             return {"status": "baseline_saved", "alert": False, "reason": "Baseline measurements and separate face identity embedding saved for this customer and visit." +
-                    (" Research angle measurement unavailable. Capture a new baseline under a new visit reference with a visible sideways arm hold before comparing angles."
-                     if self.research and len(record["research_angles"]) != 2 else "")}
-        result = self.compare(features, setup, research_angles=research_angles)
+                    (" Arm function measurement unavailable; repeat the baseline arm step."
+                     if self.research and "arm_function" not in record else "")}
+        result = self.compare(features, setup, research_angles=research_angles, arm_function=arm_function)
         self.store.save_recheck(self.keys, record, result)
         return result

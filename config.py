@@ -32,6 +32,11 @@ ARM_HOLD_DURATION_SEC = 10.0
 ARM_INITIAL_CHECK_SEC = 2.0
 # Minimum resolvable attempted lift; an acquisition-quality floor, not a drift score.
 ARM_INITIAL_LIFT_MIN_PX = 15.0
+# Functional arm check used by the customer workflow. The timer advances only
+# while both shoulders and wrists are visible and the body remains in position.
+# These are project-demo rules, not clinically validated medical thresholds.
+ARM_REQUIRED_RAISED_HOLD_SEC = 3.0
+ARM_RAISED_WRIST_MAX_SHOULDER_SPANS = 0.35
 
 # No clinical delta cutoff is supplied by default.
 FEATURE_STORE_DIR = "data/features"

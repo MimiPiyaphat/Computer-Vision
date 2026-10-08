@@ -116,12 +116,30 @@ class ArmFeatureTests(unittest.TestCase):
         self.assertEqual(a.vector(), b.vector())
         self.assertAlmostEqual(a.vector()["left_arm_drift"], .2)
 
-    def test_missing_shoulders_and_raised_initial_arms_are_rejected(self):
+    def test_raised_initial_arms_are_functionally_observed_but_missing_shoulders_are_rejected(self):
         tracker = ArmFeatures()
-        self.assertFalse(tracker.observe({"left": (100, 60), "right": (200, 60)},
-                                        {"left": (100, 100), "right": (200, 100)}, 640, 480, 0))
+        self.assertTrue(tracker.observe({"left": (100, 60), "right": (200, 60)},
+                                       {"left": (100, 100), "right": (200, 100)}, 640, 480, 0))
         self.assertFalse(tracker.observe({"left": (100, 200), "right": (200, 200)},
                                         {"left": None, "right": (200, 100)}, 640, 480, 0))
+
+    def test_functional_result_distinguishes_normal_raise_hold_and_failures(self):
+        shoulders = {"left": (100, 100), "right": (200, 100)}
+        normal = ArmFeatures()
+        for elapsed, y in ((0, 200), (1, 100), (4, 100)):
+            normal.observe({"left": (100, y), "right": (200, y)}, shoulders, 640, 480, elapsed)
+        self.assertEqual(normal.function_result()["status"], "normal")
+
+        no_raise = ArmFeatures()
+        for elapsed in (0, 10):
+            no_raise.observe({"left": (100, 200), "right": (200, 200)}, shoulders, 640, 480, elapsed)
+        self.assertEqual(no_raise.function_result()["status"], "unable_to_raise")
+        self.assertEqual(set(no_raise.complete_vector()), {"left_arm_drift", "right_arm_drift", "arm_lift_skew"})
+
+        short_hold = ArmFeatures()
+        for elapsed, y in ((0, 200), (1, 100), (2, 100), (3, 200), (10, 200)):
+            short_hold.observe({"left": (100, y), "right": (200, y)}, shoulders, 640, 480, elapsed)
+        self.assertEqual(short_hold.function_result()["status"], "unable_to_hold")
 
     def test_no_attempted_lift_has_no_complete_vector(self):
         tracker = ArmFeatures()

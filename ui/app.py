@@ -7,7 +7,7 @@ from tkinter.scrolledtext import ScrolledText
 from config import CAMERA_INDEX
 from ui.components import Card, VideoPanel, button, label
 from ui.content import STEPS
-from ui.thai import SAFETY_TH, CARE_TH, display_text, configure_fonts
+from ui.thai import SAFETY_TH, CARE_TH, customer_assessment, display_text, configure_fonts
 from ui.visit_panel import VisitModePanel
 from ui.visit_state import MODES, can_change_mode
 from ui.theme import load_theme
@@ -32,12 +32,16 @@ class Dashboard:
         self.setup_confirmed = tk.BooleanVar(value=False)
         self.symptom_notice_latched = False
         self.alert_notified = False
+        from src.dev_access import DevAccess
+        self.dev_access = DevAccess()
+        self.dev_window = None
         self.theme = configure_fonts(root, load_theme())
         root.title("StrokeVision | บันทึกก่อนนวดและตรวจซ้ำ" + (" [ตัวอย่างหน้าจอ]" if preview else ""))
         root.geometry("1280x1000")
         root.minsize(1080, 900)
         root.protocol("WM_DELETE_WINDOW", self.close)
         root.bind("<F5>", lambda _: self.reload_theme())
+        root.bind("<Control-Shift-D>", lambda _: self.open_dev())
         root.bind("<MouseWheel>", self.scroll_page)
         self.build()
         self.poll()
@@ -61,6 +65,7 @@ class Dashboard:
         label(header, "StrokeVision", t, size=24, bold=True).pack(side="left")
         label(header, "  /  บันทึกก่อนนวดและตรวจซ้ำ", t, muted=True).pack(side="left")
         button(header, "โหลดธีมใหม่ · F5", self.reload_theme, t).pack(side="right")
+        button(header, "Dev", self.open_dev, t).pack(side="right", padx=8)
         button(header, "ผู้รับบริการใหม่", self.new_customer, t).pack(side="right", padx=8)
         label(self.container, "ตัวอย่างหน้าจอ · ใช้ข้อมูลจำลองเท่านั้น" if self.preview else
               "บันทึกและเปรียบเทียบการเปลี่ยนแปลงของใบหน้าและแขน", t, muted=True).pack(anchor="w", pady=(0, 16))
@@ -180,6 +185,13 @@ class Dashboard:
         if self.page_canvas.yview() != (0.0, 1.0):
             self.page_canvas.yview_scroll(-int(event.delta / 120), "units")
 
+    def open_dev(self):
+        if self.dev_window and self.dev_window.window.winfo_exists():
+            self.dev_window.window.lift()
+            return
+        from ui.dev_dashboard import DevDashboard
+        self.dev_window = DevDashboard(self.root, self.theme, self.dev_access)
+
     def change_mode(self, mode):
         if mode not in MODES or not can_change_mode(self.snapshot):
             return
@@ -213,6 +225,8 @@ class Dashboard:
         self.update_care_notice()
 
     def new_customer(self):
+        if self.dev_window and self.dev_window.window.winfo_exists():
+            self.dev_window.close()
         # Explicitly end the previous customer's session before clearing its
         # latched care notice and editable identity fields.
         if self.worker and self.worker.thread.is_alive():
@@ -389,14 +403,17 @@ class Dashboard:
         assessment = data.get("assessment")
         if assessment:
             level = assessment["level"]
-            self.result_title.configure(text=display_text(level), fg=t["danger"] if level == "Seek medical attention immediately" or comparison.get("alert") else t["warning"])
-            self.set_result_text("\n".join(display_text(reason) for reason in assessment["reasons"]) + "\n\n" + display_text(assessment["disclaimer"]) + "\n\n" + display_text(data.get("save_status", "")))
+            customer_title, customer_body = customer_assessment(assessment, data.get("save_status", ""))
+            self.result_title.configure(text=customer_title, fg=t["danger"] if level == "Seek medical attention immediately" or comparison.get("alert") else t["warning"])
+            self.set_result_text(customer_body)
         else:
             self.result_title.configure(text="ยังไม่มีผล", fg=t["text"])
             self.set_result_text("ทำตามขั้นตอนให้ครบเพื่อดูผลสรุป")
 
     def close(self):
         self.closing = True
+        if self.dev_window and self.dev_window.window.winfo_exists():
+            self.dev_window.close()
         if self.worker:
             self.worker.close()
             if self.worker.thread.is_alive():

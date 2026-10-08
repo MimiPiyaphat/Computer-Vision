@@ -13,17 +13,21 @@ import unicodedata
 
 from src.features import FEATURE_KEYS, SETUP_KEYS, SCHEMA, numeric_map
 from src.research import validate_angles
+from src.arm_features import validate_arm_function
 from src.face_identity import identity_payload
 
 
 def validate_record(record):
     required = {"schema", "features", "setup", "context"}
-    if not isinstance(record, dict) or not required.issubset(record) or set(record) - required - {"research_angles"} or record["schema"] != SCHEMA:
+    if (not isinstance(record, dict) or not required.issubset(record) or
+            set(record) - required - {"research_angles", "arm_function"} or record["schema"] != SCHEMA):
         raise ValueError("Unsupported feature record schema.")
     numeric_map(record["features"], FEATURE_KEYS)
     numeric_map(record["setup"], SETUP_KEYS)
     if "research_angles" in record:
         validate_angles(record["research_angles"])
+    if "arm_function" in record:
+        validate_arm_function(record["arm_function"])
     context = record["context"]
     if not isinstance(context, dict) or set(context) != {"pipeline", "camera", "width", "height", "station"}:
         raise ValueError("Invalid capture context.")
@@ -116,6 +120,11 @@ class FeatureStore:
                 ("face_delta_threshold", "arm_angle_delta_threshold_deg"))
             if research["arm_angle_delta_deg"] is not None:
                 safe["research_measurement"].update(numeric_map({"arm_angle_delta_deg": research["arm_angle_delta_deg"]}, ("arm_angle_delta_deg",)))
+            arm_status = research.get("arm_function_status")
+            if arm_status is not None:
+                safe["research_measurement"]["arm_function_status"] = validate_arm_function(
+                    comparison["arm_function"])["status"]
+                safe["research_measurement"]["arm_function_alert"] = bool(research.get("arm_function_alert"))
         with closing(sqlite3.connect(self.path)) as db, db:
             db.execute("INSERT INTO rechecks(subject, visit, created, record, comparison) VALUES (?, ?, ?, ?, ?)",
                        (*keys, time.time(), json.dumps(validate_record(record), allow_nan=False), json.dumps(safe, allow_nan=False)))

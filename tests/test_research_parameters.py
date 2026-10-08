@@ -89,6 +89,21 @@ class ResearchRuleTests(unittest.TestCase):
         facial = compare_research(vector(), dict(vector(), neutral_mouth_ratio=.11), {}, {}, load_parameters())
         self.assertTrue(facial["alert"])
 
+    def test_observed_arm_function_completes_decision_without_projected_angles(self):
+        normal = {"status": "normal", "left_raised": True, "right_raised": True,
+                  "hold_sec": 3.0, "required_hold_sec": 3.0}
+        result = compare_research(vector(), vector(), {}, {}, load_parameters(),
+                                  after_arm_function=normal)
+        self.assertEqual(result["status"], "research_below_placeholder")
+        self.assertFalse(result["alert"])
+
+        for status in ("unable_to_raise", "unable_to_hold"):
+            failed = dict(normal, status=status, hold_sec=0.0)
+            result = compare_research(vector(), vector(), {}, {}, load_parameters(),
+                                      after_arm_function=failed)
+            self.assertEqual(result["status"], "research_alert")
+            self.assertTrue(result["research_measurement"]["arm_function_alert"])
+
     def test_bad_parameters_cannot_enable_clinical_policy(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "policy.json"
@@ -123,6 +138,24 @@ class ResearchRuleTests(unittest.TestCase):
             self.assertEqual(baseline["research_angles"], angles(2))
             with self.assertRaises(ValueError):
                 validate_record(dict(baseline, research_angles={"frame": "image"}))
+
+    def test_research_workflow_persists_functional_arm_risk_without_angles(self):
+        normal = {"status": "normal", "left_raised": True, "right_raised": True,
+                  "hold_sec": 3.0, "required_hold_sec": 3.0}
+        failed = dict(normal, status="unable_to_hold", hold_sec=1.0)
+        with tempfile.TemporaryDirectory() as directory:
+            store = FeatureStore(directory)
+            workflow = VisitWorkflow(store, context(), research=True)
+            request = {"mode": "baseline", "user_id": "member", "visit_id": "functional",
+                       "setup_confirmed": True, "symptoms_reported": False}
+            workflow.begin(request)
+            workflow.accept_identity([1.0] + [0.0] * 511, "fixture")
+            workflow.finish(vector(), dict.fromkeys(SETUP_KEYS, 0), {}, normal)
+            workflow.begin(dict(request, mode="recheck", symptoms_reported=True))
+            workflow.accept_identity([1.0] + [0.0] * 511, "fixture")
+            result = workflow.finish(vector(), dict.fromkeys(SETUP_KEYS, 0), {}, failed)
+            self.assertEqual(result["status"], "research_alert")
+            self.assertEqual(store.baseline(store.keys("member", "functional"))["record"]["arm_function"], normal)
 
 
 class ProjectedAngleTests(unittest.TestCase):

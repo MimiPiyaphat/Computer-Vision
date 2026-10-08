@@ -5,7 +5,7 @@ from pathlib import Path
 import unittest
 from unittest.mock import Mock, patch
 
-from ui.thai import display_text, select_font, CARE_TH
+from ui.thai import customer_assessment, display_text, select_font, CARE_TH, SAFETY_TH
 from ui.visit_state import MODES, can_change_mode
 from ui.preview import PreviewSession
 from src.protocol import CARE_MESSAGE
@@ -25,6 +25,31 @@ class ThaiPresentationTests(unittest.TestCase):
         self.assertIn('บุคคล', display_text(message))
         self.assertEqual(display_text('SQLite error 123'), 'SQLite error 123')
         self.assertIn('0.2500', display_text('Face delta 0.2500 / rule 0.1000'))
+
+    def test_missing_measurements_require_retry_and_never_claim_low_risk(self):
+        self.assertIn('ไม่ใช่ผลปกติ', SAFETY_TH)
+        for level, expected in (("Comparison inconclusive", "ไม่มีผลที่ใช้ได้"),
+                                ("Research comparison incomplete", "ข้อมูลไม่ครบ")):
+            title, body = customer_assessment({
+                "level": level,
+                "reasons": ["Unvalidated university demo: one or more measurements are unavailable; this is inconclusive."],
+                "disclaimer": CARE_MESSAGE,
+            }, "No complete feature record was saved.")
+            self.assertIn(expected, title)
+            self.assertIn('ต้องตรวจซ้ำ', title)
+            self.assertIn('ห้ามตีความว่าเป็นผลปกติหรือความเสี่ยงต่ำ', body)
+            self.assertIn('เริ่มตรวจใหม่', body)
+            self.assertIn(CARE_TH, body)
+            self.assertNotIn('inconclusive', body)
+
+    def test_complete_result_keeps_measured_outcome(self):
+        title, body = customer_assessment({
+            "level": "Below demo rules; NOT medical clearance",
+            "reasons": ["Unvalidated university demo: rules were not exceeded; this cannot exclude disease."],
+            "disclaimer": CARE_MESSAGE,
+        })
+        self.assertIn('เกณฑ์ปกติของการทดสอบ', title)
+        self.assertIn('ไม่สามารถยืนยันว่าไม่มีโรค', body)
 
     def test_mode_lock_covers_loading_capture_and_identity_pause(self):
         for state in ('neutral_capture', 'mouth_test', 'arm_test', 'identity_check'):

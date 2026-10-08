@@ -6,6 +6,7 @@ import math
 from pathlib import Path
 
 from src.features import FACE_KEYS, FEATURE_KEYS, delta_features, numeric_map
+from src.arm_features import validate_arm_function
 from src.protocol import CARE_MESSAGE
 
 PARAMETER_PATH = Path(__file__).resolve().parents[1] / "research_parameters.json"
@@ -37,16 +38,23 @@ def validate_angles(angles):
     return angles
 
 
-def compare_research(before, after, before_angles, after_angles, parameters, partial=False):
+def compare_research(before, after, before_angles, after_angles, parameters, partial=False,
+                     before_arm_function=None, after_arm_function=None):
     measurement = delta_features(before, after, partial=partial)
     validate_angles(before_angles)
     validate_angles(after_angles)
     angle_deltas = {k: after_angles[k] - before_angles[k] for k in ANGLE_KEYS if k in before_angles and k in after_angles}
     arm_delta = max([0.0] + list(angle_deltas.values())) if angle_deltas else None
+    if before_arm_function is not None:
+        validate_arm_function(before_arm_function)
+    arm_function = validate_arm_function(after_arm_function) if after_arm_function is not None else None
     face_available = any(key in after for key in FACE_KEYS)
     face_alert = face_available and measurement["face_delta"] > parameters["face_delta_threshold"]
-    arm_alert = arm_delta is not None and arm_delta > parameters["arm_angle_delta_threshold_deg"]
-    complete = set(after) == set(FEATURE_KEYS) and len(angle_deltas) == 2
+    arm_function_alert = arm_function is not None and arm_function["status"] != "normal"
+    arm_alert = arm_function_alert or (arm_delta is not None and arm_delta > parameters["arm_angle_delta_threshold_deg"])
+    # A directly observed raise-and-hold outcome can complete the arm portion
+    # even when a camera-plane angle could not be calculated.
+    complete = set(after) == set(FEATURE_KEYS) and (len(angle_deltas) == 2 or arm_function is not None)
     alert = face_alert or arm_alert
     status = "research_alert" if alert else ("research_below_placeholder" if complete else "research_incomplete")
     return {
@@ -60,7 +68,10 @@ def compare_research(before, after, before_angles, after_angles, parameters, par
         "research_measurement": {"arm_angle_delta_deg": arm_delta, "angle_deltas": angle_deltas,
                                  "face_delta_threshold": parameters["face_delta_threshold"],
                                  "arm_angle_delta_threshold_deg": parameters["arm_angle_delta_threshold_deg"],
-                                 "face_alert": bool(face_alert), "arm_alert": bool(arm_alert)},
+                                 "face_alert": bool(face_alert), "arm_alert": bool(arm_alert),
+                                 "arm_function_status": arm_function["status"] if arm_function else None,
+                                 "arm_function_alert": bool(arm_function_alert)},
+        "arm_function": arm_function,
     }
 
 

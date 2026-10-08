@@ -19,7 +19,7 @@ environments, model weights and local visit data are not included in Git.
 To get this branch on a new computer:
 
 ```powershell
-git clone --branch ThanaTester https://github.com/MimiPiyaphat/Computer-Vision.git
+git clone --branch main https://github.com/MimiPiyaphat/Computer-Vision.git
 cd Computer-Vision
 ```
 
@@ -70,7 +70,37 @@ alternative and sensitivity/specificity goals are documented in
 [literature baselines](validation/LITERATURE_BASELINES.md). They are not measured
 performance or approved clinical cutoffs. Real face/arm datasets are still pending.
 
+## Developer evaluation and Roboflow experiment
+
+The password-gated developer dashboard is separate from the customer result. Open
+**Developer metrics** in the desktop app and use the project password to inspect
+the rehabilitation, volunteer-gesture and Roboflow object-detection reports. None
+of these reports changes the customer-facing comparison rules.
+
+Roboflow Universe dataset `air-a2axo/stroke-2-0-lu7ua`, version 3, is an object-
+detection export licensed CC BY 4.0. Put the extracted YOLOv8 files at
+`data/roboflow-stroke/v3-yolov8/`, then audit and train with:
+
+```powershell
+.\.venv\Scripts\python.exe -m datasets.roboflow_stroke.audit --root data\roboflow-stroke\v3-yolov8 --output data\roboflow-stroke\audit-v3.json
+.\.venv\Scripts\python.exe -m datasets.roboflow_stroke.train --epochs 20 --patience 6 --imgsz 224 --batch 16 --device cpu --freeze 10 --name yolov8n-v3-cpu20
+```
+
+The downloaded images, training runs and `.pt` weights are ignored by Git. The
+small JSON metric report in `models/roboflow_stroke_yolov8n.metrics.json` may be
+shared for reproducibility. This dataset is not paired before/after massage data,
+has no verified clinical outcomes and has source-family overlap across its
+published train/validation/test splits. Its mAP, precision and recall can therefore
+be optimistic and must not be described as medical diagnostic accuracy.
+
 ## Camera workflow
+
+The arm step now records a direct functional outcome in addition to the
+experimental 2D angle: both wrists must reach shoulder level and remain there
+continuously for 3 seconds within the 10-second visible-pose window. A visible
+attempt that cannot raise both arms or cannot maintain the hold is carried into
+the research result as a risk signal; missing shoulders or wrists pause the
+timer instead of being treated as weakness.
 
 The dedicated mode panel has **ก่อนนวด · Baseline** and **หลังนวด · Recheck**
 buttons. Switching retains the customer/visit IDs, resets setup confirmation and

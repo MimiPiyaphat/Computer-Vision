@@ -104,6 +104,8 @@ class ScreeningSession:
                 # Remove measurements from the failed attempt without writing them.
                 self.flow.features.clear()
                 self.flow.research_angles.clear()
+                if hasattr(self.flow, "arm_function") and isinstance(self.flow.arm_function, dict):
+                    self.flow.arm_function.clear()
             except ValueError as exc:
                 reason = str(exc)
         # Paused wall-clock time must not advance detected-time acquisition.
@@ -114,6 +116,8 @@ class ScreeningSession:
             for key in ("left_arm_drift", "right_arm_drift", "arm_lift_skew"):
                 self.flow.features.pop(key, None)
             self.flow.research_angles.clear()
+            if hasattr(self.flow, "arm_function") and isinstance(self.flow.arm_function, dict):
+                self.flow.arm_function.clear()
         return {"state": "identity_rejected" if self._identity_failure else "identity_check",
                 "instruction": reason, "elapsed": 0, "extra": {"detected": False}}
 
@@ -136,11 +140,15 @@ class ScreeningSession:
                 frame = self.arm.draw_debug(frame)
         if identity_ui is None and self.workflow.request and self.workflow.request["mode"] == "recheck" and self.flow.features:
             angles = self.flow.research_angles if self.research else None
-            signature = repr((self.flow.features, angles))
+            arm_function = getattr(self.flow, "arm_function", None)
+            if not isinstance(arm_function, dict):
+                arm_function = None
+            signature = repr((self.flow.features, angles, arm_function))
             if signature != self._evaluated_features:
                 self._evaluated_features = signature
                 try:
-                    self.comparison = self.workflow.compare(self.flow.features, self.flow.setup, partial=True, research_angles=angles)
+                    self.comparison = self.workflow.compare(self.flow.features, self.flow.setup, partial=True,
+                                                            research_angles=angles, arm_function=arm_function)
                     if self.comparison["alert"]:
                         self._latched_alert = self.comparison
                 except ValueError as exc:
@@ -148,8 +156,12 @@ class ScreeningSession:
         if ui["state"] == "summary" and self.assessment is None:
             from src.protocol import CARE_MESSAGE
             try:
+                arm_function = getattr(self.flow, "arm_function", None)
+                if not isinstance(arm_function, dict):
+                    arm_function = None
                 self.comparison = self.workflow.finish(self.flow.features, self.flow.setup,
-                                                       research_angles=self.flow.research_angles if self.research else None)
+                                                       research_angles=self.flow.research_angles if self.research else None,
+                                                       arm_function=arm_function)
                 self.save_status = "Saved numeric measurements; baseline identity embedding is stored separately. No images or video saved."
             except (ValueError, OSError, sqlite3.Error) as exc:
                 self.comparison = {"status": "inconclusive", "reason": str(exc), "alert": False}
@@ -168,6 +180,13 @@ class ScreeningSession:
                 angle = m["arm_angle_delta_deg"]
                 reasons.append(f"Face delta {result['measurement']['face_delta']:.4f} / rule {m['face_delta_threshold']:.4f}")
                 reasons.append(f"2D arm-angle delta: {angle:.1f} degrees / rule {m['arm_angle_delta_threshold_deg']:.1f}" if angle is not None else "2D arm angle unavailable; forearm pronation is not measured.")
+                arm_status = m.get("arm_function_status")
+                if arm_status == "normal":
+                    reasons.append("Arm function: normal raise and hold completed.")
+                elif arm_status == "unable_to_raise":
+                    reasons.append("Arm function: both arms did not reach the required raised position within the test time.")
+                elif arm_status == "unable_to_hold":
+                    reasons.append("Arm function: both arms reached the raised position but were not held for the required time.")
             elif result.get("measurement"):
                 m = result["measurement"]
                 reasons.append(f"Face delta {m['face_delta']:.4f} + arm delta {m['arm_delta']:.4f} = {m['score']:.4f}")

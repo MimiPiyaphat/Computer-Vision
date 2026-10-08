@@ -4,20 +4,20 @@ Unknown technical errors remain visible verbatim, so diagnostics are not hidden.
 Text is Unicode rendered by Tk widgets, never painted onto saved camera frames.
 """
 
-SAFETY_TH = "ต้นแบบเพื่อการวิจัย ไม่สามารถวินิจฉัยหรือยืนยันว่าไม่เป็นโรคหลอดเลือดสมอง หากมีอาการเฉียบพลัน ให้ขอความช่วยเหลือฉุกเฉินทันที อย่ารอผลจากระบบ"
+SAFETY_TH = "ต้นแบบเพื่อการวิจัย ไม่สามารถวินิจฉัยหรือยืนยันว่าไม่เป็นโรคหลอดเลือดสมอง ค่าที่ไม่เกินเกณฑ์หรือข้อมูลที่วัดไม่ครบไม่ใช่ผลปกติ หากมีอาการเฉียบพลัน ให้ขอความช่วยเหลือฉุกเฉินทันที อย่ารอผลจากระบบ"
 CARE_TH = "หากมีหน้าเบี้ยว แขนอ่อนแรง พูดผิดปกติ หรืออาการเฉียบพลันอื่น ให้ติดต่อบริการฉุกเฉินในพื้นที่ทันที อย่ารอผลจากกล้องหรือคะแนน AI"
 
 TEXT = {
     "Baseline saved": "บันทึกข้อมูลก่อนนวดแล้ว",
     "Identity mismatch": "ยืนยันบุคคลไม่สำเร็จ",
     "Identity mismatch: does not match registered user": "บุคคลไม่ตรงกับผู้ลงทะเบียน (Identity mismatch: does not match registered user)",
-    "Comparison inconclusive": "ยังสรุปผลการเปรียบเทียบไม่ได้",
+    "Comparison inconclusive": "ไม่มีผลที่ใช้ได้ · ต้องตรวจซ้ำ",
     "Seek medical attention immediately": "ไปโรงพยาบาลทันที",
     "Delta measured; threshold unconfigured": "คำนวณการเปลี่ยนแปลงแล้ว ยังไม่ได้กำหนดเกณฑ์ทางคลินิก",
     "Below delta threshold; symptoms still need care": "ต่ำกว่าเกณฑ์ แต่อาการผิดปกติยังต้องได้รับการดูแล",
-    "Research rule exceeded; seek medical attention for symptoms": "เกินเกณฑ์ทดลอง — อาการผิดปกติต้องได้รับการดูแล",
-    "Below demo rules; NOT medical clearance": "ต่ำกว่าเกณฑ์ทดลอง ไม่ใช่การรับรองความปลอดภัย",
-    "Research comparison incomplete": "ข้อมูลเปรียบเทียบเพื่อการวิจัยไม่ครบ",
+    "Research rule exceeded; seek medical attention for symptoms": "พบความเสี่ยงจากการทดสอบ · แจ้งเจ้าหน้าที่",
+    "Below demo rules; NOT medical clearance": "ผลอยู่ในเกณฑ์ปกติของการทดสอบ",
+    "Research comparison incomplete": "ข้อมูลไม่ครบ · ต้องตรวจซ้ำ",
     "Preview only": "ตัวอย่างหน้าจอเท่านั้น",
     "Simulated summary for interface development.": "ผลจำลองสำหรับพัฒนาหน้าจอ",
     "No screening was performed.": "ไม่มีการตรวจจริง",
@@ -30,6 +30,7 @@ TEXT = {
     "Start with arms down, then raise both arms together": "เริ่มจากวางแขนลง แล้วค่อยยกแขนทั้งสองข้างพร้อมกัน",
     "Raise both arms together from a lowered position": "เริ่มจากวางแขนลง แล้วยกแขนทั้งสองข้างพร้อมกัน",
     "Keep both arms raised": "ยกแขนทั้งสองข้างค้างไว้",
+    "Keep both arms raised for 3 seconds": "ยกแขนทั้งสองข้างค้างไว้ต่อเนื่อง 3 วินาที",
     "Keep shoulders and wrists visible; start with arms down and keep your body still": "ให้กล้องเห็นหัวไหล่และข้อมือ เริ่มจากวางแขนลง และรักษาท่าทางให้คงที่",
     "Step into view so the camera can see you": "ขยับเข้ามาในมุมกล้องให้เห็นตัวคุณ",
     "Screening complete": "เก็บข้อมูลครบแล้ว",
@@ -52,7 +53,10 @@ TEXT = {
     "Baseline measurements and separate face identity embedding saved for this customer and visit.": "บันทึกข้อมูลก่อนนวดและเวกเตอร์ยืนยันบุคคลแยกกัน สำหรับผู้รับบริการและครั้งรับบริการนี้แล้ว",
     "Unvalidated university demo: a provisional rule was exceeded.": "การทดลองสำหรับโครงงาน: ค่าเกินเกณฑ์เบื้องต้นที่ยังไม่ผ่านการรับรอง",
     "Unvalidated university demo: rules were not exceeded; this cannot exclude disease.": "การทดลองสำหรับโครงงาน: ค่าไม่เกินเกณฑ์ แต่ไม่สามารถยืนยันว่าไม่มีโรคได้",
-    "Unvalidated university demo: one or more measurements are unavailable; this is inconclusive.": "การทดลองสำหรับโครงงาน: ข้อมูลบางส่วนไม่ครบ จึงยังสรุปผลไม่ได้",
+    "Unvalidated university demo: one or more measurements are unavailable; this is inconclusive.": "ระบบวัดข้อมูลที่จำเป็นได้ไม่ครบ กรุณาตรวจท่าและมุมกล้อง แล้วเริ่มตรวจใหม่ตั้งแต่ขั้นตอนแรก",
+    "Arm function: normal raise and hold completed.": "การยกแขน: ยกแขนทั้งสองข้างและค้างไว้ได้ตามเวลาที่กำหนด",
+    "Arm function: both arms did not reach the required raised position within the test time.": "พบความเสี่ยง: ยกแขนทั้งสองข้างไม่ถึงตำแหน่งที่กำหนดภายในเวลา",
+    "Arm function: both arms reached the raised position but were not held for the required time.": "พบความเสี่ยง: ยกแขนขึ้นได้แต่ค้างไว้ไม่ถึงเวลาที่กำหนด",
 }
 
 
@@ -71,6 +75,31 @@ def display_text(text):
             .replace(" + arm delta ", " + การเปลี่ยนแปลงแขน ")
             .replace("2D arm-angle delta: ", "การเปลี่ยนแปลงมุมแขน 2D: ")
             .replace(" / rule ", " / เกณฑ์ ").replace(" degrees", " องศา"))
+
+
+INCOMPLETE_LEVELS = frozenset(("Comparison inconclusive", "Research comparison incomplete"))
+
+
+def customer_assessment(assessment, save_status=""):
+    """Customer copy must not turn missing measurements into a low-risk result."""
+    level = assessment.get("level", "")
+    if level in INCOMPLETE_LEVELS:
+        title = display_text(level)
+        body = ("การตรวจครั้งนี้ไม่มีข้อมูลที่ใช้เปรียบเทียบได้ครบ "
+                "จึงห้ามตีความว่าเป็นผลปกติหรือความเสี่ยงต่ำ\n\n"
+                "สิ่งที่ควรทำ: แจ้งเจ้าหน้าที่ให้ตรวจสอบท่าและมุมกล้อง "
+                "แล้วเริ่มตรวจใหม่ตั้งแต่ขั้นตอนแรก")
+        disclaimer = display_text(assessment.get("disclaimer", ""))
+        if disclaimer:
+            body += "\n\n" + disclaimer
+        if save_status:
+            body += "\n\n" + display_text(save_status)
+        return title, body
+    title = display_text(level)
+    reasons = "\n".join(display_text(reason) for reason in assessment.get("reasons", ()))
+    disclaimer = display_text(assessment.get("disclaimer", ""))
+    saved = display_text(save_status)
+    return title, "\n\n".join(part for part in (reasons, disclaimer, saved) if part)
 
 
 def select_font(preferred, available):

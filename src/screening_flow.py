@@ -43,6 +43,7 @@ class ScreeningFlow:
         self.features = {}
         self.setup = {}
         self.research_angles = {}
+        self.arm_function = {}
         self._geometry = {"neutral": [], "smile": [], "closure": []}
 
     def start(self):
@@ -54,6 +55,7 @@ class ScreeningFlow:
         self.features = {}
         self.setup = {}
         self.research_angles = {}
+        self.arm_function = {}
         self._geometry = {"neutral": [], "smile": [], "closure": []}
         self._go_to(STATE_QUALITY_GATE)
 
@@ -198,6 +200,7 @@ class ScreeningFlow:
         if self.state == STATE_ARM_TEST:
             arm = self.arm_analyzer.analyze(frame_bgr)
             self.research_angles = arm.get("research_angles", {})
+            self.arm_function = arm.get("arm_function", {})
             if arm.get("normalized_features"):
                 # Max drift is monotonic: expose an early lower-bound score
                 # during the hold rather than waiting for the full timer.
@@ -211,7 +214,7 @@ class ScreeningFlow:
                 instruction = (
                     "Raise both arms together from a lowered position"
                     if arm["elapsed_sec"] < ARM_INITIAL_CHECK_SEC
-                    else "Keep both arms raised"
+                    else "Keep both arms raised for 3 seconds"
                 )
             elif arm["person_found"]:
                 instruction = "Keep shoulders and wrists visible; start with arms down and keep your body still"
