@@ -104,7 +104,7 @@ class ResearchRuleTests(unittest.TestCase):
 
     def test_observed_arm_function_completes_decision_without_projected_angles(self):
         normal = {"status": "normal", "left_raised": True, "right_raised": True,
-                  "hold_sec": 3.0, "required_hold_sec": 3.0}
+                  "hold_sec": 10.0, "required_hold_sec": 10.0}
         result = compare_research(vector(), vector(), {}, {}, load_parameters(),
                                   after_arm_function=normal)
         self.assertEqual(result["status"], "research_below_placeholder")
@@ -117,9 +117,37 @@ class ResearchRuleTests(unittest.TestCase):
             self.assertEqual(result["status"], "research_alert")
             self.assertTrue(result["research_measurement"]["arm_function_alert"])
 
+    def test_arm_function_uses_baseline_and_never_latches_incomplete_hold(self):
+        normal = {"status": "normal", "left_raised": True, "right_raised": True,
+                  "hold_sec": 10.0, "required_hold_sec": 10.0,
+                  "left_raise_percent": 100.0, "right_raise_percent": 100.0,
+                  "raise_percent": 100.0, "required_raise_percent": 70.0}
+        incomplete = dict(normal, status="unable_to_hold", hold_sec=9.0)
+
+        pending = compare_research(vector(), vector(), {}, {}, load_parameters(), partial=True,
+                                   before_arm_function=normal, after_arm_function=incomplete)
+        self.assertFalse(pending["alert"])
+        self.assertFalse(pending["research_measurement"]["arm_function_alert"])
+
+        finished = compare_research(vector(), vector(), {}, {}, load_parameters(),
+                                    before_arm_function=normal, after_arm_function=incomplete)
+        self.assertTrue(finished["research_measurement"]["arm_function_alert"])
+
+        existing = dict(normal, status="unable_to_hold", hold_sec=5.0)
+        unchanged = dict(existing, hold_sec=4.5)
+        result = compare_research(vector(), vector(), {}, {}, load_parameters(),
+                                  before_arm_function=existing, after_arm_function=unchanged)
+        self.assertFalse(result["alert"])
+        self.assertEqual(result["research_measurement"]["arm_hold_change_sec"], -0.5)
+
+        worse = dict(existing, hold_sec=2.0)
+        result = compare_research(vector(), vector(), {}, {}, load_parameters(),
+                                  before_arm_function=existing, after_arm_function=worse)
+        self.assertTrue(result["research_measurement"]["arm_function_alert"])
+
     def test_arm_raise_percentage_is_exposed_for_result_copy_and_audit(self):
         arm = {"status": "unable_to_raise", "left_raised": False, "right_raised": True,
-               "hold_sec": 0.0, "required_hold_sec": 3.0,
+               "hold_sec": 0.0, "required_hold_sec": 10.0,
                "left_raise_percent": 62.0, "right_raise_percent": 84.0,
                "raise_percent": 62.0, "required_raise_percent": 70.0}
         result = compare_research(vector(), vector(), {}, {}, load_parameters(),
@@ -166,7 +194,7 @@ class ResearchRuleTests(unittest.TestCase):
 
     def test_research_workflow_persists_functional_arm_risk_without_angles(self):
         normal = {"status": "normal", "left_raised": True, "right_raised": True,
-                  "hold_sec": 3.0, "required_hold_sec": 3.0,
+                  "hold_sec": 10.0, "required_hold_sec": 10.0,
                   "left_raise_percent": 82.0, "right_raise_percent": 78.0,
                   "raise_percent": 78.0, "required_raise_percent": 70.0}
         failed = dict(normal, status="unable_to_hold", hold_sec=1.0)

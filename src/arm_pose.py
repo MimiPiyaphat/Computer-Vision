@@ -61,6 +61,10 @@ class ArmPoseAnalyzer:
         self.normalized = ArmFeatures()
         self.projected_angle = ProjectedArmAngle()
 
+    def pause_test(self):
+        """Pause detected time without discarding a verified person's hold."""
+        self._last_detected_at = None
+
     @staticmethod
     def _empty_result(elapsed_sec=0.0, person_found=False, reason_code="person_missing"):
         return {

@@ -28,7 +28,6 @@ YOLO_CONF_THRESHOLD = 0.5
 YOLO_DEVICE = "cpu"
 YOLO_IMAGE_SIZE = 640
 ARM_KEYPOINT_CONF_THRESHOLD = 0.3
-ARM_HOLD_DURATION_SEC = 10.0
 ARM_INITIAL_CHECK_SEC = 2.0
 # Wall-clock limit per acquisition stage, including visibility/identity pauses.
 CAPTURE_STAGE_TIMEOUT_SEC = 45.0
@@ -37,12 +36,23 @@ ARM_INITIAL_LIFT_MIN_PX = 15.0
 # Functional arm check used by the customer workflow. The timer advances only
 # while both shoulders and wrists are visible and the body remains in position.
 # These are project-demo rules, not clinically validated medical thresholds.
-ARM_REQUIRED_RAISED_HOLD_SEC = 3.0
+ARM_REQUIRED_RAISED_HOLD_SEC = 10.0
+# Allow the initial lowered-position check before starting the full raised hold.
+ARM_HOLD_DURATION_SEC = ARM_INITIAL_CHECK_SEC + ARM_REQUIRED_RAISED_HOLD_SEC
+# Ignore very brief below-threshold pose jitter instead of restarting a valid
+# hold from zero. A sustained drop still resets the continuous hold.
+ARM_RAISE_DROPOUT_GRACE_SEC = 0.75
+# Account for the final camera-frame interval when completing a timed hold.
+ARM_HOLD_COMPLETION_TOLERANCE_SEC = 0.25
 # Percent is calculated from vertical wrist position: 0% means one shoulder
 # span below its shoulder, while 100% means wrist at or above shoulder level.
 # Both arms must meet this project-demo threshold and hold it continuously.
 ARM_RAISE_NORMAL_MIN_PERCENT = 70.0
 ARM_LOWERED_WRIST_REFERENCE_SHOULDER_SPANS = 1.0
+# Paired demo rules: an existing limitation at baseline is not a new alert
+# unless the post-massage measurement worsens beyond these margins.
+ARM_RAISE_CHANGE_ALERT_PERCENT = 10.0
+ARM_HOLD_CHANGE_ALERT_SEC = 2.0
 
 # No clinical delta cutoff is supplied by default.
 FEATURE_STORE_DIR = "data/features"

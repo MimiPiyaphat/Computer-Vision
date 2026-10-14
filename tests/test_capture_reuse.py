@@ -45,7 +45,8 @@ class CaptureReuseTests(unittest.TestCase):
                 self.assertIsNone(face.latest_features)
                 if stage == "arm_test":
                     session.arm.analyze.assert_called_once()
-                    session.arm.start_test.assert_called_once()
+                    session.arm.pause_test.assert_called_once()
+                    session.arm.start_test.assert_not_called()
 
     def test_lighting_ignores_background_but_rejects_unbalanced_face(self):
         import numpy as np

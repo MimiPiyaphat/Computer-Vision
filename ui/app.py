@@ -491,12 +491,12 @@ class Dashboard:
                     self.instruction.configure(text="จบขั้นตอนแล้ว · ดูผลและสิ่งที่ควรทำด้านล่าง")
                 needs_review = customer_result_status(assessment, comparison) in STAFF_REVIEW_STATUSES
                 self.progress["value"] = 0 if needs_review else 100
-                self.detail.configure(text="สิ้นสุดขั้นตอนแล้ว · ต้องให้เจ้าหน้าที่ช่วยตรวจสอบ" if needs_review else
+                self.detail.configure(text="สิ้นสุดขั้นตอนแล้ว · กรุณาตรวจใหม่อีกครั้ง" if needs_review else
                                       "สิ้นสุดขั้นตอนแล้ว · อ่านรายละเอียดผลด้านล่าง")
                 self.stage_labels["summary"].configure(fg=t["warning"] if needs_review else t["accent"])
                 if result_status == "acquisition_failed" and not data.get("command_error"):
                     self.start_button.configure(text="เก็บข้อมูลใหม่อีกครั้ง")
-                    self.current_step.configure(text=f"{mode_title} · เก็บข้อมูลไม่ครบ", fg=t["warning"])
+                    self.current_step.configure(text=f"{mode_title} · กรุณาตรวจใหม่", fg=t["warning"])
                     self.instruction.configure(text="กด ‘เก็บข้อมูลใหม่อีกครั้ง’ เมื่อพร้อม")
                     self.detail.configure(text="เริ่มตั้งแต่ขั้นตอนที่ 1 · ใช้รหัสเดิมได้")
                     if comparison.get("alert") or comparison.get("prior_alert"):

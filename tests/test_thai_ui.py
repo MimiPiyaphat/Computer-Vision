@@ -36,9 +36,9 @@ class ThaiPresentationTests(unittest.TestCase):
 
     def test_safety_copy_never_frames_low_or_missing_result_as_clearance(self):
         self.assertIn('ไม่ได้วินิจฉัย', SAFETY_TH)
-        self.assertIn('ไม่ใช่ผลปกติ', SAFETY_TH)
+        self.assertIn('ไม่ใช่การรับรอง', SAFETY_TH)
         self.assertIn('ฉุกเฉิน', CARE_TH)
-        self.assertIn('ไม่สามารถตัดโรค', display_text('Below demo rules; NOT medical clearance'))
+        self.assertIn('ไม่สามารถยืนยันว่าไม่มีโรค', display_text('Below demo rules; NOT medical clearance'))
 
     def test_customer_incomplete_result_hides_research_diagnostics(self):
         assessment = {
@@ -48,8 +48,8 @@ class ThaiPresentationTests(unittest.TestCase):
             'disclaimer': CARE_MESSAGE,
         }
         title, body = customer_assessment(assessment, {'status': 'research_incomplete', 'alert': False})
-        self.assertEqual(title, 'ข้อมูลไม่ครบ · ติดต่อเจ้าหน้าที่')
-        self.assertIn('ข้อมูลสำหรับเปรียบเทียบไม่ครบ', body)
+        self.assertEqual(title, 'กรุณาตรวจใหม่อีกครั้ง')
+        self.assertIn('ข้อมูลสำหรับเปรียบเทียบยังไม่ครบ', body)
         for internal in ('วิจัย', '0.0802', '0.1000', '2D', 'pronation'):
             self.assertNotIn(internal, title + body)
         fallback_title, fallback_body = customer_assessment(assessment, {})
@@ -59,8 +59,8 @@ class ThaiPresentationTests(unittest.TestCase):
         for status in ('inconclusive', 'research_incomplete', 'threshold_unconfigured'):
             with self.subTest(status=status):
                 title, body = customer_assessment({'level': 'Comparison inconclusive'}, {'status': status})
-                self.assertIn('ติดต่อเจ้าหน้าที่', title)
-                self.assertNotIn('กรุณาตรวจใหม่', body)
+                self.assertEqual(title, 'กรุณาตรวจใหม่อีกครั้ง')
+                self.assertIn('ตรวจใหม่', body)
                 self.assertNotIn('เรียบร้อย', title + body)
                 self.assertNotIn(CARE_TH, body)
                 _, symptomatic_body = customer_assessment(
@@ -71,7 +71,7 @@ class ThaiPresentationTests(unittest.TestCase):
     def test_customer_alert_uses_non_diagnostic_wording(self):
         title, body = customer_assessment({'level': 'Research rule exceeded'},
                                           {'status': 'research_alert', 'alert': True})
-        self.assertIn('ค่าหลังนวดเปลี่ยน', title)
+        self.assertIn('มีความเสี่ยง', title)
         self.assertIn('แจ้งเจ้าหน้าที่ทันที', title)
         self.assertIn('ไม่ใช่การวินิจฉัย', body)
 
@@ -84,11 +84,11 @@ class ThaiPresentationTests(unittest.TestCase):
     def test_retry_copy_preserves_timeout_reason_and_prior_alert(self):
         result = {'status': 'acquisition_failed', 'reason': 'Both wrists are not visible'}
         title, body = customer_assessment({}, result)
-        self.assertIn('เก็บข้อมูลใหม่ได้', title)
+        self.assertEqual(title, 'กรุณาตรวจใหม่อีกครั้ง')
         self.assertIn('ยังไม่เห็นข้อมือทั้งสองข้าง', body)
         self.assertIn('ขั้นตอนแรก', body)
         title, body = customer_assessment({}, dict(result, alert=True))
-        self.assertIn('ค่าที่เปลี่ยนมาก', title)
+        self.assertIn('มีความเสี่ยง', title)
         self.assertTrue(body.startswith('ระบบพบค่าที่เปลี่ยน'))
 
     def test_research_alert_names_only_flagged_regions(self):
@@ -105,7 +105,7 @@ class ThaiPresentationTests(unittest.TestCase):
 
     def test_arm_result_explains_percent_threshold_and_hold(self):
         failed = {'status': 'unable_to_raise', 'left_raised': False, 'right_raised': True,
-                  'hold_sec': 0.0, 'required_hold_sec': 3.0,
+                  'hold_sec': 0.0, 'required_hold_sec': 10.0,
                   'left_raise_percent': 62.0, 'right_raise_percent': 84.0,
                   'raise_percent': 62.0, 'required_raise_percent': 70.0}
         _, body = customer_assessment({}, {
@@ -117,7 +117,7 @@ class ThaiPresentationTests(unittest.TestCase):
         self.assertIn('ต่ำกว่าเกณฑ์', body)
 
         passed = dict(failed, status='normal', left_raised=True,
-                      raise_percent=78.0, left_raise_percent=78.0, hold_sec=3.0)
+                      raise_percent=78.0, left_raise_percent=78.0, hold_sec=10.0)
         _, body = customer_assessment({}, {
             'status': 'research_below_placeholder', 'alert': False,
             'arm_function': passed})
@@ -125,10 +125,12 @@ class ThaiPresentationTests(unittest.TestCase):
         self.assertIn('ไม่พบความเสี่ยงจากการทดสอบยกแขน', body)
 
     def test_result_categories_have_distinct_meanings_and_next_actions(self):
-        statuses = ('baseline_saved', 'research_alert', 'research_below_placeholder',
-                    'research_incomplete', 'inconclusive', 'threshold_unconfigured', 'identity_rejected')
-        titles = [customer_assessment({}, {'status': status})[0] for status in statuses]
-        self.assertEqual(len(titles), len(set(titles)))
+        for status in ('research_alert', 'delta_alert'):
+            self.assertTrue(customer_assessment({}, {'status': status})[0].startswith('มีความเสี่ยง'))
+        for status in ('research_below_placeholder', 'below_threshold'):
+            self.assertTrue(customer_assessment({}, {'status': status})[0].startswith('ไม่พบความเสี่ยง'))
+        for status in ('research_incomplete', 'inconclusive', 'threshold_unconfigured', 'identity_rejected'):
+            self.assertEqual(customer_assessment({}, {'status': status})[0], 'กรุณาตรวจใหม่อีกครั้ง')
         for status in ('research_below_placeholder', 'below_threshold'):
             _, body = customer_assessment({}, {'status': status})
             self.assertIn('ไม่สามารถยืนยันว่าไม่มีโรค', body)
@@ -193,7 +195,7 @@ class ModeInteractionTests(unittest.TestCase):
                     dashboard.instruction.configure.assert_called_with(text='จบขั้นตอนแล้ว · ดูผลและสิ่งที่ควรทำด้านล่าง')
                 dashboard.progress.pack_forget.assert_called_once()
                 if expected == 0 and status != 'acquisition_failed':
-                    self.assertIn('เจ้าหน้าที่', dashboard.detail.configure.call_args.kwargs['text'])
+                    self.assertIn('ตรวจใหม่', dashboard.detail.configure.call_args.kwargs['text'])
 
     def test_latched_alert_never_overwrites_actions_and_is_visible_before_summary(self):
         dashboard = self.dashboard()

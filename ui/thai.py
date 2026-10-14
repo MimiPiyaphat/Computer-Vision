@@ -4,13 +4,13 @@ Unknown technical errors remain visible verbatim, so diagnostics are not hidden.
 Text is Unicode rendered by Tk widgets, never painted onto saved camera frames.
 """
 
-SAFETY_TH = "ระบบช่วยตรวจสอบเพื่อการวิจัย ไม่ได้วินิจฉัยหรือยืนยันว่าไม่มีโรคหลอดเลือดสมอง ผลต่ำหรือสรุปไม่ได้ไม่ใช่ผลปกติ หากมีอาการเฉียบพลันให้ขอความช่วยเหลือฉุกเฉินทันทีโดยไม่รอระบบ"
+SAFETY_TH = "ระบบช่วยตรวจสอบเพื่อการวิจัย ไม่ได้วินิจฉัยหรือยืนยันว่าไม่มีโรคหลอดเลือดสมอง ผลว่าไม่พบความเสี่ยงไม่ใช่การรับรองว่าไม่มีโรค หากระบบขอให้ตรวจใหม่ต้องยังไม่ถือว่าไม่มีความเสี่ยง และหากมีอาการเฉียบพลันให้ขอความช่วยเหลือฉุกเฉินทันทีโดยไม่รอระบบ"
 CARE_TH = "อาการหน้าเบี้ยว แขนอ่อนแรง พูดผิดปกติ หรืออาการทางระบบประสาทที่เกิดฉับพลันอาจเข้าข่ายภาวะฉุกเฉิน ควรติดต่อบริการฉุกเฉินทันที อย่ารอผลจากกล้องหรือคะแนน AI"
 
 CUSTOMER_RESULTS = {
     "acquisition_failed": (
-        "เก็บข้อมูลไม่ครบ · เก็บข้อมูลใหม่ได้",
-        "ระบบยังวัดข้อมูลได้ไม่ครบภายในเวลาที่กำหนด\n\nสาเหตุ: ",
+        "กรุณาตรวจใหม่อีกครั้ง",
+        "ระบบยังเก็บข้อมูลได้ไม่ครบภายในเวลาที่กำหนด จึงยังไม่จัดเป็นผลมีความเสี่ยงหรือไม่มีความเสี่ยง\n\nสาเหตุ: ",
     ),
     "save_failed": (
         "บันทึกข้อมูลไม่สำเร็จ · ติดต่อเจ้าหน้าที่",
@@ -22,42 +22,42 @@ CUSTOMER_RESULTS = {
         "ขั้นตอนต่อไป: แจ้งเจ้าหน้าที่ว่าบันทึกเสร็จแล้ว\n\nข้อมูลนี้ยังไม่ได้บอกความเสี่ยงโรค และไม่ใช่การรับรองความปลอดภัยในการนวด",
     ),
     "research_alert": (
-        "พบความเสี่ยงจากการทดสอบ: ค่าหลังนวดเปลี่ยน · แจ้งเจ้าหน้าที่ทันที",
+        "มีความเสี่ยง · แจ้งเจ้าหน้าที่ทันที",
         "สิ่งที่พบ: ค่าที่ระบบวัดหลังนวดเปลี่ยนจากก่อนนวดมากกว่าระดับทดลอง\n\n"
         "สิ่งที่ควรทำ: แจ้งเจ้าหน้าที่ทันทีเพื่อช่วยประเมินอาการร่วมกัน ผลจากกล้องนี้ไม่ใช่การวินิจฉัยโรค\n\n" + CARE_TH,
     ),
     "delta_alert": (
-        "ค่าหลังนวดเปลี่ยนมากกว่าระดับที่กำหนด · แจ้งเจ้าหน้าที่ทันที",
+        "มีความเสี่ยง · แจ้งเจ้าหน้าที่ทันที",
         "สิ่งที่พบ: ค่ารวมที่ระบบวัดจากใบหน้าและแขนหลังนวดเปลี่ยนจากก่อนนวดมากกว่าระดับที่กำหนด\n\n"
         "สิ่งที่ควรทำ: แจ้งเจ้าหน้าที่ทันทีเพื่อช่วยประเมินอาการร่วมกัน ผลจากกล้องนี้ไม่ใช่การวินิจฉัยโรค\n\n" + CARE_TH,
     ),
     "research_below_placeholder": (
-        "ผลอยู่ในเกณฑ์ปกติของการทดสอบ",
+        "ไม่พบความเสี่ยงจากการเปรียบเทียบครั้งนี้",
         "สิ่งที่พบ: ค่าที่เปรียบเทียบกับก่อนนวดยังไม่เกินเกณฑ์ทดลอง\n\n"
         "ขั้นตอนต่อไป: แจ้งเจ้าหน้าที่ว่าตรวจติดตามหลังนวดเสร็จแล้ว\n\n"
         "ผลนี้ไม่สามารถยืนยันว่าไม่มีโรคหลอดเลือดสมอง",
     ),
     "below_threshold": (
-        "ไม่พบการเปลี่ยนแปลงเกินเกณฑ์",
+        "ไม่พบความเสี่ยงจากการเปรียบเทียบครั้งนี้",
         "สิ่งที่พบ: ค่าที่เปรียบเทียบกับก่อนนวดยังไม่เกินเกณฑ์ที่กำหนด\n\n"
         "ขั้นตอนต่อไป: แจ้งเจ้าหน้าที่ว่าตรวจติดตามหลังนวดเสร็จแล้ว\n\n"
         "ผลนี้ไม่สามารถยืนยันว่าไม่มีโรคหลอดเลือดสมอง",
     ),
     "threshold_unconfigured": (
-        "ระบบยังไม่พร้อมประเมิน · ติดต่อเจ้าหน้าที่",
-        "ระบบยังไม่พร้อมประเมินผลการเปรียบเทียบ กรุณาแจ้งเจ้าหน้าที่เพื่อช่วยตรวจสอบ",
+        "กรุณาตรวจใหม่อีกครั้ง",
+        "ระบบยังไม่มีข้อมูลเพียงพอสำหรับจัดเป็นผลมีความเสี่ยงหรือไม่มีความเสี่ยง กรุณาแจ้งเจ้าหน้าที่แล้วตรวจใหม่อีกครั้ง",
     ),
     "research_incomplete": (
-        "ข้อมูลไม่ครบ · ติดต่อเจ้าหน้าที่",
-        "ระบบได้รับข้อมูลสำหรับเปรียบเทียบไม่ครบ กรุณาให้เจ้าหน้าที่ช่วยตรวจสอบขั้นตอนการเก็บข้อมูล",
+        "กรุณาตรวจใหม่อีกครั้ง",
+        "ข้อมูลสำหรับเปรียบเทียบยังไม่ครบ กรุณาจัดท่าและมุมกล้องตามคำแนะนำ แล้วเริ่มตรวจใหม่ตั้งแต่ขั้นตอนแรก",
     ),
     "inconclusive": (
-        "ประเมินผลไม่ได้ · ติดต่อเจ้าหน้าที่",
-        "ระบบยังประเมินผลครั้งนี้ไม่ได้ กรุณาแจ้งเจ้าหน้าที่เพื่อช่วยตรวจสอบข้อมูลและขั้นตอนการตรวจ",
+        "กรุณาตรวจใหม่อีกครั้ง",
+        "ข้อมูลครั้งนี้ยังไม่เพียงพอสำหรับจัดเป็นผลมีความเสี่ยงหรือไม่มีความเสี่ยง กรุณาตรวจท่า กล้อง และข้อมูลก่อนนวด แล้วเริ่มตรวจใหม่อีกครั้ง",
     ),
     "identity_rejected": (
-        "ไม่สามารถยืนยันผู้รับบริการได้",
-        "ระบบไม่สามารถยืนยันว่าเป็นผู้รับบริการคนเดิม กรุณาเริ่มใหม่หรือติดต่อเจ้าหน้าที่",
+        "กรุณาตรวจใหม่อีกครั้ง",
+        "ระบบยังยืนยันว่าเป็นผู้รับบริการคนเดิมไม่ได้ กรุณาตรวจรหัสผู้รับบริการ มองตรงที่กล้อง แล้วเริ่มตรวจใหม่อีกครั้ง",
     ),
 }
 
@@ -79,13 +79,13 @@ TEXT = {
     "Baseline saved": "บันทึกข้อมูลก่อนนวดแล้ว",
     "Identity mismatch": "ยืนยันบุคคลไม่สำเร็จ",
     "Identity mismatch: does not match registered user": "บุคคลไม่ตรงกับผู้ลงทะเบียน (Identity mismatch: does not match registered user)",
-    "Comparison inconclusive": "ไม่มีผลที่ใช้ได้ · ต้องตรวจซ้ำ",
+    "Comparison inconclusive": "กรุณาตรวจใหม่อีกครั้ง",
     "Seek medical attention immediately": "ไปโรงพยาบาลทันที",
-    "Delta measured; threshold unconfigured": "คำนวณการเปลี่ยนแปลงแล้ว ยังไม่ได้กำหนดเกณฑ์ทางคลินิก",
-    "Below delta threshold; symptoms still need care": "ต่ำกว่าเกณฑ์ แต่อาการผิดปกติยังต้องได้รับการดูแล",
-    "Research rule exceeded; seek medical attention for symptoms": "พบความเสี่ยงจากการทดสอบ · แจ้งเจ้าหน้าที่",
-    "Below demo rules; NOT medical clearance": "ผลอยู่ในเกณฑ์ปกติของการทดสอบ แต่ไม่สามารถตัดโรคได้",
-    "Research comparison incomplete": "ข้อมูลไม่ครบ · ต้องตรวจซ้ำ",
+    "Delta measured; threshold unconfigured": "กรุณาตรวจใหม่อีกครั้ง",
+    "Below delta threshold; symptoms still need care": "ไม่พบความเสี่ยงจากการเปรียบเทียบครั้งนี้ แต่อาการผิดปกติยังต้องได้รับการดูแล",
+    "Research rule exceeded; seek medical attention for symptoms": "มีความเสี่ยง · แจ้งเจ้าหน้าที่ทันที",
+    "Below demo rules; NOT medical clearance": "ไม่พบความเสี่ยงจากการเปรียบเทียบครั้งนี้ แต่ไม่สามารถยืนยันว่าไม่มีโรคได้",
+    "Research comparison incomplete": "กรุณาตรวจใหม่อีกครั้ง",
     "Model, camera, resolution or capture station changed.": "ข้อมูลอ้างอิงไม่ตรงกับการตรวจครั้งนี้ กรุณาใช้กล้อง จุดตรวจ และการตั้งค่าเดิม หรือบันทึก baseline ใหม่",
     "A baseline already exists for this visit; use a recheck or a new visit reference.": "มีข้อมูลก่อนนวดของรหัสครั้งนี้อยู่แล้ว กรุณาใช้การตรวจซ้ำหรือสร้างรหัสครั้งใหม่",
     "Baseline is expired or future-dated.": ("ข้อมูลก่อนนวดหมดอายุหรือเวลาไม่ถูกต้อง หากขณะนี้ไม่มีอาการผิดปกติ ให้เลือก ‘ก่อนนวด’ "
@@ -123,7 +123,7 @@ TEXT = {
     "Start with arms down, then raise both arms together": "เริ่มจากวางแขนลง แล้วค่อยยกแขนทั้งสองข้างพร้อมกัน",
     "Raise both arms together from a lowered position": "เริ่มจากวางแขนลง แล้วยกแขนทั้งสองข้างพร้อมกัน",
     "Keep both arms raised": "ยกแขนทั้งสองข้างค้างไว้",
-    "Keep both arms raised for 3 seconds": "ยกแขนทั้งสองข้างค้างไว้ต่อเนื่อง 3 วินาที",
+    "Keep both arms raised for 10 seconds": "ยกแขนทั้งสองข้างค้างไว้ต่อเนื่อง 10 วินาที",
     "Keep shoulders and wrists visible; start with arms down and keep your body still": "ให้กล้องเห็นหัวไหล่และข้อมือ เริ่มจากวางแขนลง และรักษาท่าทางให้คงที่",
     "Step into view so the camera can see you": "ขยับเข้ามาในมุมกล้องให้เห็นตัวคุณ",
     "Screening complete": "เก็บข้อมูลครบแล้ว",
@@ -172,7 +172,7 @@ def display_text(text):
     )
     for prefix, translated_prefix in prefixes:
         if text.startswith(prefix):
-            suffix = (text[len(prefix):].replace("Comparison is inconclusive.", "การเปรียบเทียบจึงสรุปผลไม่ได้")
+            suffix = (text[len(prefix):].replace("Comparison is inconclusive.", "กรุณาแก้ไขตามคำแนะนำแล้วตรวจใหม่อีกครั้ง")
                       .replace(CARE_MESSAGE, CARE_TH))
             return translated_prefix + suffix
     # Preserve detailed numeric/technical diagnostics; localize common score labels.
@@ -208,6 +208,10 @@ def customer_assessment(assessment, comparison):
         required_percent = arm_function.get("required_raise_percent", measured.get("arm_raise_threshold_percent"))
         hold_sec = arm_function.get("hold_sec", measured.get("arm_hold_sec"))
         required_hold = arm_function.get("required_hold_sec", measured.get("arm_hold_required_sec"))
+        baseline_arm_status = measured.get("baseline_arm_function_status")
+        arm_status = measured.get("arm_function_status") or arm_function.get("status")
+        raise_change = measured.get("arm_raise_change_percent")
+        hold_change = measured.get("arm_hold_change_sec")
         if status == "baseline_saved" and isinstance(comparison, dict) and comparison.get("baseline_replaced"):
             title = "อัปเดตข้อมูลก่อนนวดแล้ว"
             body = ("แทนที่ข้อมูลก่อนนวดชุดเดิมที่ใช้เปรียบเทียบไม่ได้แล้ว\n\n"
@@ -218,7 +222,7 @@ def customer_assessment(assessment, comparison):
             body += ("\n\nกดปุ่ม ‘เก็บข้อมูลใหม่อีกครั้ง’ เพื่อเริ่มตั้งแต่ขั้นตอนแรก "
                      "ใช้รหัสผู้รับบริการและรหัสครั้งเดิมได้\nปรับท่าหรือมุมกล้องตามสาเหตุก่อนเริ่มใหม่")
             if comparison.get("alert") or comparison.get("prior_alert"):
-                title = "เก็บข้อมูลไม่ครบ · พบค่าที่เปลี่ยนมากระหว่างตรวจ"
+                title = "มีความเสี่ยง · แจ้งเจ้าหน้าที่ทันที"
                 body = "ระบบพบค่าที่เปลี่ยนจากก่อนนวดมากระหว่างตรวจ กรุณาแจ้งเจ้าหน้าที่ทันที ไม่ต้องรอเก็บข้อมูลใหม่ให้ครบ\n\n" + body + "\n\n" + CARE_TH
         if status == "save_failed" and isinstance(comparison, dict) and comparison.get("save_reason"):
             body += "รายละเอียดสำหรับเจ้าหน้าที่: " + display_text(comparison["save_reason"])
@@ -239,7 +243,6 @@ def customer_assessment(assessment, comparison):
                        "closed_eyelid_ratio": "ความต่างของการหลับตาซ้าย–ขวา"}
             affected = [details[key] for key in measured.get("face_trigger_features", ()) if key in details]
             detail_text = "รายการที่เปลี่ยน: " + ", ".join(affected) + "\n\n" if affected else ""
-            arm_status = measured.get("arm_function_status")
             if arm_status == "unable_to_raise":
                 arm_detail = (f"การทดสอบแขน: แขนข้างที่ยกได้น้อยกว่ายกได้สูงสุด {raise_percent:.0f}% "
                               f"ต่ำกว่าเกณฑ์ทดลอง {required_percent:.0f}% ภายในเวลาที่กำหนด\n\n"
@@ -257,10 +260,19 @@ def customer_assessment(assessment, comparison):
                     + detail_text +
                     "สิ่งที่ควรทำ: แจ้งเจ้าหน้าที่ทันทีเพื่อช่วยประเมินอาการร่วมกัน "
                     "ผลจากกล้องนี้ไม่ใช่การวินิจฉัยโรค\n\n" + CARE_TH)
-        if status == "research_below_placeholder" and None not in (
+        if status == "research_below_placeholder" and arm_status == "normal" and None not in (
                 raise_percent, required_percent, hold_sec, required_hold):
             body = (f"ผลการยกแขน: ยกได้ {raise_percent:.0f}% ผ่านเกณฑ์ทดลอง {required_percent:.0f}% "
                     f"และค้างครบ {required_hold:.1f} วินาที จึงไม่พบความเสี่ยงจากการทดสอบยกแขนครั้งนี้\n\n" + body)
+        elif status == "research_below_placeholder" and baseline_arm_status and arm_status:
+            changes = []
+            if raise_change is not None:
+                changes.append(f"ระดับการยกเปลี่ยน {raise_change:+.0f}%")
+            if hold_change is not None:
+                changes.append(f"เวลาค้างเปลี่ยน {hold_change:+.1f} วินาที")
+            detail = " และ ".join(changes)
+            body = ("ผลเทียบแขนก่อน–หลัง: ไม่พบว่าความสามารถในการยกแขนหลังนวดแย่ลงจากข้อมูลก่อนนวดมากเกินเกณฑ์ทดลอง"
+                    + (f" ({detail})" if detail else "") + "\n\n" + body)
         if symptoms_reported and status not in ("research_alert", "delta_alert") and CARE_TH not in body:
             body += ("\n\nคุณระบุว่ามีอาการผิดปกติ กรุณาบอกอาการแก่เจ้าหน้าที่ แม้ค่าที่วัดจะไม่เกินเกณฑ์"
                      "หรือระบบประเมินไม่ได้\n\n" + CARE_TH)

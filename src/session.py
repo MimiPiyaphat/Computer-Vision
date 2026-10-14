@@ -155,13 +155,10 @@ class ScreeningSession:
         # Paused wall-clock time must not advance detected-time acquisition.
         self.flow._last_detected_at = None
         if self.flow.state == "arm_test":
-            # Arm hold uses its own clock: restart that hold after identity loss.
-            self.arm.start_test()
-            for key in ("left_arm_drift", "right_arm_drift", "arm_lift_skew"):
-                self.flow.features.pop(key, None)
-            self.flow.research_angles.clear()
-            if hasattr(self.flow, "arm_function") and isinstance(self.flow.arm_function, dict):
-                self.flow.arm_function.clear()
+            # A transient face/identity miss pauses the pose clock. Once the
+            # same person is verified again, continue instead of erasing a
+            # valid arm hold. A confirmed identity mismatch is still rejected.
+            self.arm.pause_test()
         return {"state": "identity_rejected" if self._identity_failure else "identity_check",
                 "instruction": reason, "elapsed": 0, "extra": {"detected": False}}
 

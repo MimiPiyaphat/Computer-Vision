@@ -199,6 +199,17 @@ class IdentityTests(unittest.TestCase):
         session.flow.update.assert_not_called()
         self.assertIsNone(session.flow._last_detected_at)
 
+    def test_identity_reacquisition_pauses_arm_hold_without_erasing_it(self):
+        session, cv = self.session(EMBEDDING)
+        self.flow.accept_identity(EMBEDDING, IDENTITY_MODEL)
+        session.flow.state = 'arm_test'
+        session.arm = Mock()
+        session.face._observe.return_value = None
+        with patch.dict('sys.modules', {'cv2': cv}):
+            self.assertEqual(session.read()['state'], 'identity_check')
+        session.arm.pause_test.assert_called_once_with()
+        session.arm.start_test.assert_not_called()
+
     def test_same_person_reacquires_after_leaving_frame(self):
         session, cv = self.session(EMBEDDING)
         session.face._observe.side_effect = [None] + [object()] * IDENTITY_REACQUIRE_MATCH_FRAMES

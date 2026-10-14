@@ -136,10 +136,17 @@ The arm step now records a direct functional outcome in addition to the
 experimental 2D angle. Vertical progress is normalized per arm: 0% is a wrist
 one shoulder-span below its shoulder and 100% is wrist-at-shoulder height or
 higher. The lower of the two arms must reach at least 70% and remain there
-continuously for 3 seconds within the 10-second visible-pose window. A visible
+continuously for 10 seconds within the 12-second visible-pose window (2 seconds
+to establish the starting movement, followed by the 10-second hold). A visible
 attempt below 70%, or one that cannot maintain the hold, is carried into the
 research result as a risk signal; missing shoulders or wrists pause the timer
-instead of being treated as weakness. The 70% boundary is an engineering rule
+instead of being treated as weakness. Brief pose-estimation drops up to 0.75
+seconds are tolerated, and a transient face recheck pauses rather than erases
+the same verified person's hold. A final-frame shortfall of up to 0.25 seconds
+is treated as completing the 10-second hold. Recheck arm function is compared
+with that person's baseline: an existing baseline limitation is not a new alert
+unless the post-massage raise drops by more than 10 percentage points, the hold
+drops by more than 2 seconds, or the functional status worsens. The 70% boundary is an engineering rule
 for this university demo, not a validated clinical cutoff or stroke probability.
 
 The dedicated mode panel has **ก่อนนวด · Baseline** and **หลังนวด · Recheck**

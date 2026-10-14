@@ -128,7 +128,7 @@ class ArmFeatureTests(unittest.TestCase):
     def test_functional_result_distinguishes_normal_raise_hold_and_failures(self):
         shoulders = {"left": (100, 100), "right": (200, 100)}
         normal = ArmFeatures()
-        for elapsed, y in ((0, 200), (1, 100), (4, 100)):
+        for elapsed, y in ((0, 200), (1, 100), (11, 100)):
             normal.observe({"left": (100, y), "right": (200, y)}, shoulders, 640, 480, elapsed)
         self.assertEqual(normal.function_result()["status"], "normal")
 
@@ -146,7 +146,7 @@ class ArmFeatureTests(unittest.TestCase):
     def test_raise_percentage_uses_weaker_arm_and_seventy_percent_boundary(self):
         shoulders = {"left": (100, 100), "right": (200, 100)}
         passing = ArmFeatures()
-        for elapsed in (0, 1, 4):
+        for elapsed in (0, 1, 11):
             passing.observe({"left": (100, 130), "right": (200, 120)},
                             shoulders, 640, 480, elapsed)
         result = passing.function_result()
@@ -163,6 +163,31 @@ class ArmFeatureTests(unittest.TestCase):
         result = failing.function_result()
         self.assertEqual(result["raise_percent"], 69.0)
         self.assertEqual(result["status"], "unable_to_raise")
+
+    def test_brief_pose_jitter_does_not_erase_hold_but_sustained_drop_does(self):
+        shoulders = {"left": (100, 100), "right": (200, 100)}
+
+        jitter = ArmFeatures()
+        for elapsed, y in ((0, 200), (1, 100), (5, 131), (5.1, 100), (11, 100)):
+            jitter.observe({"left": (100, y), "right": (200, y)},
+                           shoulders, 640, 480, elapsed)
+        self.assertEqual(jitter.function_result()["status"], "normal")
+
+        lowered = ArmFeatures()
+        for elapsed, y in ((0, 200), (1, 100), (5, 200), (6, 200), (7, 100), (12, 100)):
+            lowered.observe({"left": (100, y), "right": (200, y)},
+                            shoulders, 640, 480, elapsed)
+        self.assertEqual(lowered.function_result()["status"], "unable_to_hold")
+
+    def test_final_frame_interval_completes_ten_second_hold(self):
+        shoulders = {"left": (100, 100), "right": (200, 100)}
+        tracker = ArmFeatures()
+        for elapsed, y in ((0, 200), (1, 100), (10.9, 100)):
+            tracker.observe({"left": (100, y), "right": (200, y)},
+                            shoulders, 640, 480, elapsed)
+        result = tracker.function_result()
+        self.assertEqual(result["status"], "normal")
+        self.assertEqual(result["hold_sec"], 10.0)
 
     def test_no_attempted_lift_has_no_complete_vector(self):
         tracker = ArmFeatures()

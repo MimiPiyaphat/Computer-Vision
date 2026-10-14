@@ -2,7 +2,9 @@
 
 import math
 from config import (ARM_INITIAL_CHECK_SEC, ARM_INITIAL_LIFT_MIN_PX,
+                    ARM_HOLD_COMPLETION_TOLERANCE_SEC,
                     ARM_LOWERED_WRIST_REFERENCE_SHOULDER_SPANS,
+                    ARM_RAISE_DROPOUT_GRACE_SEC,
                     ARM_RAISE_NORMAL_MIN_PERCENT,
                     ARM_REQUIRED_RAISED_HOLD_SEC, SETUP_TOLERANCES)
 
@@ -41,6 +43,7 @@ class ArmFeatures:
         self.raised_ever = {"left": False, "right": False}
         self.max_raise_percent = {"left": 0.0, "right": 0.0}
         self._raised_started_at = None
+        self._below_threshold_started_at = None
         self.max_hold_sec = 0.0
         self.reason_code = None
 
@@ -77,9 +80,15 @@ class ArmFeatures:
         if all(raised.values()):
             if self._raised_started_at is None:
                 self._raised_started_at = elapsed
+            self._below_threshold_started_at = None
+        elif self._raised_started_at is not None:
+            if self._below_threshold_started_at is None:
+                self._below_threshold_started_at = elapsed
+            elif elapsed - self._below_threshold_started_at > ARM_RAISE_DROPOUT_GRACE_SEC:
+                self._raised_started_at = None
+                self._below_threshold_started_at = None
+        if self._raised_started_at is not None:
             self.max_hold_sec = max(self.max_hold_sec, elapsed - self._raised_started_at)
-        else:
-            self._raised_started_at = None
 
         # A lowered reference is still preferred for the continuous drift
         # features, but the functional raise/hold result above remains usable
@@ -118,7 +127,9 @@ class ArmFeatures:
                                  "arm_lift_skew": 0.0}
 
     def function_result(self):
-        if self.max_hold_sec >= ARM_REQUIRED_RAISED_HOLD_SEC:
+        hold_complete = (self.max_hold_sec + ARM_HOLD_COMPLETION_TOLERANCE_SEC >=
+                         ARM_REQUIRED_RAISED_HOLD_SEC)
+        if hold_complete:
             status = "normal"
         elif all(self.raised_ever.values()):
             status = "unable_to_hold"
@@ -128,7 +139,9 @@ class ArmFeatures:
             "status": status,
             "left_raised": self.raised_ever["left"],
             "right_raised": self.raised_ever["right"],
-            "hold_sec": round(self.max_hold_sec, 2),
+            # A one-frame shortfall represents the unsampled interval between
+            # the last two frames, so report the completed target consistently.
+            "hold_sec": float(ARM_REQUIRED_RAISED_HOLD_SEC) if hold_complete else round(self.max_hold_sec, 2),
             "required_hold_sec": float(ARM_REQUIRED_RAISED_HOLD_SEC),
             "left_raise_percent": round(self.max_raise_percent["left"], 1),
             "right_raise_percent": round(self.max_raise_percent["right"], 1),

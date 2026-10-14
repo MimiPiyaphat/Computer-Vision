@@ -8,6 +8,7 @@ import time
 
 from config import (
     ARM_INITIAL_CHECK_SEC,
+    ARM_REQUIRED_RAISED_HOLD_SEC,
     BLINK_TARGET_COUNT,
     EYE_TEST_DURATION_SEC,
     EYE_CLOSURE_HOLD_SEC,
@@ -278,7 +279,7 @@ class ScreeningFlow:
                 instruction = (
                     "Raise both arms together from a lowered position"
                     if arm["elapsed_sec"] < ARM_INITIAL_CHECK_SEC
-                    else "Keep both arms raised for 3 seconds"
+                    else f"Keep both arms raised for {ARM_REQUIRED_RAISED_HOLD_SEC:.0f} seconds"
                 )
             elif arm.get("person_found"):
                 instruction = "Keep shoulders and wrists visible; start with arms down and keep your body still"

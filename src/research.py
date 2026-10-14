@@ -8,9 +8,26 @@ from pathlib import Path
 from src.features import FACE_KEYS, FEATURE_KEYS, delta_features, numeric_map
 from src.arm_features import validate_arm_function
 from src.protocol import CARE_MESSAGE
+from config import ARM_HOLD_CHANGE_ALERT_SEC, ARM_RAISE_CHANGE_ALERT_PERCENT
 
 PARAMETER_PATH = Path(__file__).resolve().parents[1] / "research_parameters.json"
 ANGLE_KEYS = ("left_projected_drift_deg", "right_projected_drift_deg")
+
+
+def _arm_function_worsened(before, after):
+    """Compare function to this person's baseline, not to an ideal body."""
+    if before is None:
+        return after["status"] != "normal", None, None
+    severity = {"normal": 0, "unable_to_hold": 1, "unable_to_raise": 2}
+    raise_change = (after.get("raise_percent") - before.get("raise_percent")
+                    if "raise_percent" in before and "raise_percent" in after else None)
+    hold_change = (after["hold_sec"] - before["hold_sec"])
+    worsened = severity[after["status"]] > severity[before["status"]]
+    # When the coarse status is unchanged, flag only a material deterioration.
+    if severity[after["status"]] == severity[before["status"]] and after["status"] != "normal":
+        worsened = ((raise_change is not None and raise_change < -ARM_RAISE_CHANGE_ALERT_PERCENT) or
+                    hold_change < -ARM_HOLD_CHANGE_ALERT_SEC)
+    return worsened, raise_change, hold_change
 
 
 def load_parameters(path=PARAMETER_PATH):
@@ -45,15 +62,22 @@ def compare_research(before, after, before_angles, after_angles, parameters, par
     validate_angles(after_angles)
     angle_deltas = {k: after_angles[k] - before_angles[k] for k in ANGLE_KEYS if k in before_angles and k in after_angles}
     arm_delta = max([0.0] + list(angle_deltas.values())) if angle_deltas else None
-    if before_arm_function is not None:
-        validate_arm_function(before_arm_function)
+    baseline_arm_function = (validate_arm_function(before_arm_function)
+                             if before_arm_function is not None else None)
     arm_function = validate_arm_function(after_arm_function) if after_arm_function is not None else None
     face_available = any(key in after for key in FACE_KEYS)
     # Keep absolute differences for auditing, but a decrease in measured
     # asymmetry must not be labelled an increase requiring attention.
     face_increase = max([0.0] + [measurement["deltas"][key] for key in FACE_KEYS if key in after])
     face_alert = face_available and face_increase > parameters["face_delta_threshold"]
-    arm_function_alert = arm_function is not None and arm_function["status"] != "normal"
+    arm_function_alert = False
+    arm_raise_change = arm_hold_change = None
+    if arm_function is not None:
+        arm_function_alert, arm_raise_change, arm_hold_change = _arm_function_worsened(
+            baseline_arm_function, arm_function)
+        # An in-progress hold is not a failed hold. Only the finished arm step
+        # may create or latch a functional alert.
+        arm_function_alert = arm_function_alert and not partial
     arm_alert = arm_function_alert or (arm_delta is not None and arm_delta > parameters["arm_angle_delta_threshold_deg"])
     # A directly observed raise-and-hold outcome can complete the arm portion
     # even when a camera-plane angle could not be calculated.
@@ -75,8 +99,11 @@ def compare_research(before, after, before_angles, after_angles, parameters, par
                                  "face_delta_threshold": parameters["face_delta_threshold"],
                                  "arm_angle_delta_threshold_deg": parameters["arm_angle_delta_threshold_deg"],
                                  "face_alert": bool(face_alert), "arm_alert": bool(arm_alert),
+                                 "baseline_arm_function_status": baseline_arm_function["status"] if baseline_arm_function else None,
                                  "arm_function_status": arm_function["status"] if arm_function else None,
                                  "arm_function_alert": bool(arm_function_alert),
+                                 "arm_raise_change_percent": arm_raise_change,
+                                 "arm_hold_change_sec": arm_hold_change,
                                  "arm_raise_percent": arm_function.get("raise_percent") if arm_function else None,
                                  "arm_raise_threshold_percent": arm_function.get("required_raise_percent") if arm_function else None,
                                  "arm_hold_sec": arm_function["hold_sec"] if arm_function else None,
