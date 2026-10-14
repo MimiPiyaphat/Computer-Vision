@@ -38,7 +38,11 @@ ARM_INITIAL_LIFT_MIN_PX = 15.0
 # while both shoulders and wrists are visible and the body remains in position.
 # These are project-demo rules, not clinically validated medical thresholds.
 ARM_REQUIRED_RAISED_HOLD_SEC = 3.0
-ARM_RAISED_WRIST_MAX_SHOULDER_SPANS = 0.35
+# Percent is calculated from vertical wrist position: 0% means one shoulder
+# span below its shoulder, while 100% means wrist at or above shoulder level.
+# Both arms must meet this project-demo threshold and hold it continuously.
+ARM_RAISE_NORMAL_MIN_PERCENT = 70.0
+ARM_LOWERED_WRIST_REFERENCE_SHOULDER_SPANS = 1.0
 
 # No clinical delta cutoff is supplied by default.
 FEATURE_STORE_DIR = "data/features"

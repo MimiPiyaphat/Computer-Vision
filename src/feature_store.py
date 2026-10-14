@@ -148,9 +148,18 @@ class FeatureStore:
                 safe["research_measurement"].update(numeric_map({"arm_angle_delta_deg": research["arm_angle_delta_deg"]}, ("arm_angle_delta_deg",)))
             arm_status = research.get("arm_function_status")
             if arm_status is not None:
-                safe["research_measurement"]["arm_function_status"] = validate_arm_function(
-                    comparison["arm_function"])["status"]
+                arm_function = validate_arm_function(comparison["arm_function"])
+                safe["research_measurement"]["arm_function_status"] = arm_function["status"]
                 safe["research_measurement"]["arm_function_alert"] = bool(research.get("arm_function_alert"))
+                percent_keys = ("raise_percent", "required_raise_percent", "hold_sec", "required_hold_sec")
+                if all(key in arm_function for key in percent_keys):
+                    safe["research_measurement"].update(numeric_map(
+                        {"arm_raise_percent": arm_function["raise_percent"],
+                         "arm_raise_threshold_percent": arm_function["required_raise_percent"],
+                         "arm_hold_sec": arm_function["hold_sec"],
+                         "arm_hold_required_sec": arm_function["required_hold_sec"]},
+                        ("arm_raise_percent", "arm_raise_threshold_percent",
+                         "arm_hold_sec", "arm_hold_required_sec")))
         with closing(sqlite3.connect(self.path)) as db, db:
             db.execute("INSERT INTO rechecks(subject, visit, created, record, comparison) VALUES (?, ?, ?, ?, ?)",
                        (*keys, time.time(), json.dumps(validate_record(record), allow_nan=False), json.dumps(safe, allow_nan=False)))

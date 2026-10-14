@@ -4,7 +4,7 @@ import tkinter as tk
 from tkinter import messagebox, ttk
 from tkinter.scrolledtext import ScrolledText
 
-from config import CAMERA_INDEX
+from config import CAMERA_INDEX, ARM_RAISE_NORMAL_MIN_PERCENT, ARM_REQUIRED_RAISED_HOLD_SEC
 from ui.components import Card, VideoPanel, button, label
 from ui.content import STEPS
 from ui.thai import (SAFETY_TH, CARE_TH, customer_assessment, customer_result_status,
@@ -232,7 +232,10 @@ class Dashboard:
         self.start_button.configure(bg=self.theme["accent"] if ready else self.theme["surface"])
 
     def show_research_rules(self, parameters):
-        self.research_banner.configure(text=f"โหมดวิจัย • ยังไม่ผ่านการรับรอง | เกณฑ์ใบหน้า {parameters['face_delta_threshold']:.2f} | มุมแขน 2D {parameters['arm_angle_delta_threshold_deg']:.1f}° | ยังไม่ได้ยืนยันประสิทธิภาพ")
+        self.research_banner.configure(
+            text=(f"โหมดวิจัย • ยังไม่ผ่านการรับรอง | เกณฑ์ใบหน้า {parameters['face_delta_threshold']:.2f} | "
+                  f"ยกแขน {ARM_RAISE_NORMAL_MIN_PERCENT:.0f}% ค้าง {ARM_REQUIRED_RAISED_HOLD_SEC:.0f} วินาที | "
+                  f"มุมแขน 2D {parameters['arm_angle_delta_threshold_deg']:.1f}° | ยังไม่ได้ยืนยันประสิทธิภาพ"))
 
     def symptom_changed(self):
         if self.symptoms_reported.get():
@@ -446,6 +449,11 @@ class Dashboard:
             detail += f"\nเวลาสูงสุดของขั้นตอนนี้ {data['timeout_remaining']:.0f} วินาที"
         if state == "eye_test":
             detail += f"\nกะพริบตา · ซ้าย {extra.get('left', 0)} / ขวา {extra.get('right', 0)}"
+        if state == "arm_test":
+            arm = extra.get("arm_function") or {}
+            if arm.get("raise_percent") is not None:
+                detail += (f"\nยกแขนได้ {arm['raise_percent']:.0f}% / เกณฑ์ {arm['required_raise_percent']:.0f}%"
+                           f" · ค้าง {arm['hold_sec']:.1f}/{arm['required_hold_sec']:.1f} วินาที")
         if state == "identity_check":
             detail = "พักการเก็บข้อมูลชั่วคราว · ทำตามคำแนะนำเพื่อกลับไปยังขั้นตอนเดิม"
         elif stage_index is not None and state != "summary":

@@ -103,6 +103,27 @@ class ThaiPresentationTests(unittest.TestCase):
         _, body = customer_assessment({}, {'status': 'delta_alert', 'alert': True})
         self.assertNotIn('ค่าความสมมาตรของใบหน้าเปลี่ยน', body)
 
+    def test_arm_result_explains_percent_threshold_and_hold(self):
+        failed = {'status': 'unable_to_raise', 'left_raised': False, 'right_raised': True,
+                  'hold_sec': 0.0, 'required_hold_sec': 3.0,
+                  'left_raise_percent': 62.0, 'right_raise_percent': 84.0,
+                  'raise_percent': 62.0, 'required_raise_percent': 70.0}
+        _, body = customer_assessment({}, {
+            'status': 'research_alert', 'alert': True, 'arm_function': failed,
+            'research_measurement': {'face_alert': False, 'arm_alert': True,
+                                     'arm_function_status': 'unable_to_raise'}})
+        self.assertIn('62%', body)
+        self.assertIn('70%', body)
+        self.assertIn('ต่ำกว่าเกณฑ์', body)
+
+        passed = dict(failed, status='normal', left_raised=True,
+                      raise_percent=78.0, left_raise_percent=78.0, hold_sec=3.0)
+        _, body = customer_assessment({}, {
+            'status': 'research_below_placeholder', 'alert': False,
+            'arm_function': passed})
+        self.assertIn('78%', body)
+        self.assertIn('ไม่พบความเสี่ยงจากการทดสอบยกแขน', body)
+
     def test_result_categories_have_distinct_meanings_and_next_actions(self):
         statuses = ('baseline_saved', 'research_alert', 'research_below_placeholder',
                     'research_incomplete', 'inconclusive', 'threshold_unconfigured', 'identity_rejected')

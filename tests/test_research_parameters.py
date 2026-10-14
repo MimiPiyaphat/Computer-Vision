@@ -2,6 +2,8 @@
 
 import json
 import math
+import sqlite3
+from contextlib import closing
 from pathlib import Path
 import tempfile
 import unittest
@@ -115,6 +117,18 @@ class ResearchRuleTests(unittest.TestCase):
             self.assertEqual(result["status"], "research_alert")
             self.assertTrue(result["research_measurement"]["arm_function_alert"])
 
+    def test_arm_raise_percentage_is_exposed_for_result_copy_and_audit(self):
+        arm = {"status": "unable_to_raise", "left_raised": False, "right_raised": True,
+               "hold_sec": 0.0, "required_hold_sec": 3.0,
+               "left_raise_percent": 62.0, "right_raise_percent": 84.0,
+               "raise_percent": 62.0, "required_raise_percent": 70.0}
+        result = compare_research(vector(), vector(), {}, {}, load_parameters(),
+                                  after_arm_function=arm)
+        measured = result["research_measurement"]
+        self.assertEqual(measured["arm_raise_percent"], 62.0)
+        self.assertEqual(measured["arm_raise_threshold_percent"], 70.0)
+        self.assertTrue(measured["arm_function_alert"])
+
     def test_bad_parameters_cannot_enable_clinical_policy(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "policy.json"
@@ -152,7 +166,9 @@ class ResearchRuleTests(unittest.TestCase):
 
     def test_research_workflow_persists_functional_arm_risk_without_angles(self):
         normal = {"status": "normal", "left_raised": True, "right_raised": True,
-                  "hold_sec": 3.0, "required_hold_sec": 3.0}
+                  "hold_sec": 3.0, "required_hold_sec": 3.0,
+                  "left_raise_percent": 82.0, "right_raise_percent": 78.0,
+                  "raise_percent": 78.0, "required_raise_percent": 70.0}
         failed = dict(normal, status="unable_to_hold", hold_sec=1.0)
         with tempfile.TemporaryDirectory() as directory:
             store = FeatureStore(directory)
@@ -167,6 +183,10 @@ class ResearchRuleTests(unittest.TestCase):
             result = workflow.finish(vector(), dict.fromkeys(SETUP_KEYS, 0), {}, failed)
             self.assertEqual(result["status"], "research_alert")
             self.assertEqual(store.baseline(store.keys("member", "functional"))["record"]["arm_function"], normal)
+            with closing(sqlite3.connect(store.path)) as db:
+                saved = json.loads(db.execute("SELECT comparison FROM rechecks").fetchone()[0])
+            self.assertEqual(saved["research_measurement"]["arm_raise_percent"], 78.0)
+            self.assertEqual(saved["research_measurement"]["arm_raise_threshold_percent"], 70.0)
 
 
 class ProjectedAngleTests(unittest.TestCase):

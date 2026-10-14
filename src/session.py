@@ -248,12 +248,16 @@ class ScreeningSession:
                 reasons.append(f"Face asymmetry increase {m['face_asymmetry_increase']:.4f} / rule {m['face_delta_threshold']:.4f}")
                 reasons.append(f"2D arm-angle delta: {angle:.1f} degrees / rule {m['arm_angle_delta_threshold_deg']:.1f}" if angle is not None else "2D arm angle unavailable; forearm pronation is not measured.")
                 arm_status = m.get("arm_function_status")
+                arm_percent = m.get("arm_raise_percent")
+                arm_threshold = m.get("arm_raise_threshold_percent")
+                progress = (f" ยกได้ {arm_percent:.0f}% / เกณฑ์ {arm_threshold:.0f}%"
+                            if arm_percent is not None and arm_threshold is not None else "")
                 if arm_status == "normal":
-                    reasons.append("Arm function: normal raise and hold completed.")
+                    reasons.append("Arm function: normal raise and hold completed." + progress)
                 elif arm_status == "unable_to_raise":
-                    reasons.append("Arm function: both arms did not reach the required raised position within the test time.")
+                    reasons.append("Arm function: both arms did not reach the required raised position within the test time." + progress)
                 elif arm_status == "unable_to_hold":
-                    reasons.append("Arm function: both arms reached the raised position but were not held for the required time.")
+                    reasons.append("Arm function: both arms reached the raised position but were not held for the required time." + progress)
             elif result.get("measurement"):
                 m = result["measurement"]
                 reasons.append(f"Face delta {m['face_delta']:.4f} + arm delta {m['arm_delta']:.4f} = {m['score']:.4f}")

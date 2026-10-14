@@ -2,7 +2,8 @@
 
 import math
 from config import (ARM_INITIAL_CHECK_SEC, ARM_INITIAL_LIFT_MIN_PX,
-                    ARM_RAISED_WRIST_MAX_SHOULDER_SPANS,
+                    ARM_LOWERED_WRIST_REFERENCE_SHOULDER_SPANS,
+                    ARM_RAISE_NORMAL_MIN_PERCENT,
                     ARM_REQUIRED_RAISED_HOLD_SEC, SETUP_TOLERANCES)
 
 
@@ -11,7 +12,8 @@ ARM_FUNCTION_STATUSES = frozenset(("normal", "unable_to_raise", "unable_to_hold"
 
 def validate_arm_function(value):
     required = {"status", "left_raised", "right_raised", "hold_sec", "required_hold_sec"}
-    if not isinstance(value, dict) or set(value) != required:
+    percentages = {"left_raise_percent", "right_raise_percent", "raise_percent", "required_raise_percent"}
+    if not isinstance(value, dict) or set(value) not in (required, required | percentages):
         raise ValueError("Invalid arm function result.")
     if value["status"] not in ARM_FUNCTION_STATUSES:
         raise ValueError("Invalid arm function status.")
@@ -20,6 +22,12 @@ def validate_arm_function(value):
     for key in ("hold_sec", "required_hold_sec"):
         if type(value[key]) not in (int, float) or not math.isfinite(value[key]) or value[key] < 0:
             raise ValueError("Arm hold times must be finite non-negative numbers.")
+    if percentages <= set(value):
+        for key in percentages:
+            if type(value[key]) not in (int, float) or not math.isfinite(value[key]) or not 0 <= value[key] <= 100:
+                raise ValueError("Arm raise percentages must be finite values from 0 to 100.")
+        if value["required_raise_percent"] <= 0:
+            raise ValueError("Required arm raise percentage must be positive.")
     return dict(value)
 
 
@@ -31,6 +39,7 @@ class ArmFeatures:
         self.drift = {"left": 0.0, "right": 0.0}
         self.lift = None
         self.raised_ever = {"left": False, "right": False}
+        self.max_raise_percent = {"left": 0.0, "right": 0.0}
         self._raised_started_at = None
         self.max_hold_sec = 0.0
         self.reason_code = None
@@ -55,7 +64,14 @@ class ArmFeatures:
             self.reason_code = "body_moved"
             return False
 
-        raised = {side: position[side] <= ARM_RAISED_WRIST_MAX_SHOULDER_SPANS for side in position}
+        progress = {
+            side: max(0.0, min(100.0, 100.0 * (
+                1.0 - position[side] / ARM_LOWERED_WRIST_REFERENCE_SHOULDER_SPANS)))
+            for side in position
+        }
+        for side in progress:
+            self.max_raise_percent[side] = max(self.max_raise_percent[side], progress[side])
+        raised = {side: progress[side] >= ARM_RAISE_NORMAL_MIN_PERCENT for side in position}
         for side in raised:
             self.raised_ever[side] = self.raised_ever[side] or raised[side]
         if all(raised.values()):
@@ -114,4 +130,8 @@ class ArmFeatures:
             "right_raised": self.raised_ever["right"],
             "hold_sec": round(self.max_hold_sec, 2),
             "required_hold_sec": float(ARM_REQUIRED_RAISED_HOLD_SEC),
+            "left_raise_percent": round(self.max_raise_percent["left"], 1),
+            "right_raise_percent": round(self.max_raise_percent["right"], 1),
+            "raise_percent": round(min(self.max_raise_percent.values()), 1),
+            "required_raise_percent": float(ARM_RAISE_NORMAL_MIN_PERCENT),
         }

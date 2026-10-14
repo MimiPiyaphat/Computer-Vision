@@ -200,6 +200,14 @@ def customer_assessment(assessment, comparison):
     if status in CUSTOMER_RESULTS:
         title, body = CUSTOMER_RESULTS[status]
         symptoms_reported = isinstance(comparison, dict) and comparison.get("symptoms_reported") is True
+        measured = comparison.get("research_measurement") if isinstance(comparison, dict) else {}
+        measured = measured or {}
+        arm_function = comparison.get("arm_function") if isinstance(comparison, dict) else {}
+        arm_function = arm_function or {}
+        raise_percent = arm_function.get("raise_percent", measured.get("arm_raise_percent"))
+        required_percent = arm_function.get("required_raise_percent", measured.get("arm_raise_threshold_percent"))
+        hold_sec = arm_function.get("hold_sec", measured.get("arm_hold_sec"))
+        required_hold = arm_function.get("required_hold_sec", measured.get("arm_hold_required_sec"))
         if status == "baseline_saved" and isinstance(comparison, dict) and comparison.get("baseline_replaced"):
             title = "อัปเดตข้อมูลก่อนนวดแล้ว"
             body = ("แทนที่ข้อมูลก่อนนวดชุดเดิมที่ใช้เปรียบเทียบไม่ได้แล้ว\n\n"
@@ -220,7 +228,6 @@ def customer_assessment(assessment, comparison):
         if status == "research_alert" and isinstance(comparison, dict):
             # Name only regions explicitly flagged by the research OR-rule.
             # The combined deployment score does not identify a triggering region.
-            measured = comparison.get("research_measurement") or {}
             regions = []
             if measured.get("face_alert") is True:
                 regions.append("ความไม่สมมาตรของใบหน้า")
@@ -234,9 +241,15 @@ def customer_assessment(assessment, comparison):
             detail_text = "รายการที่เปลี่ยน: " + ", ".join(affected) + "\n\n" if affected else ""
             arm_status = measured.get("arm_function_status")
             if arm_status == "unable_to_raise":
-                arm_detail = "การทดสอบแขน: ไม่สามารถยกแขนทั้งสองข้างถึงระดับที่กำหนดภายในเวลา\n\n"
+                arm_detail = (f"การทดสอบแขน: แขนข้างที่ยกได้น้อยกว่ายกได้สูงสุด {raise_percent:.0f}% "
+                              f"ต่ำกว่าเกณฑ์ทดลอง {required_percent:.0f}% ภายในเวลาที่กำหนด\n\n"
+                              if raise_percent is not None and required_percent is not None else
+                              "การทดสอบแขน: ไม่สามารถยกแขนทั้งสองข้างถึงระดับที่กำหนดภายในเวลา\n\n")
             elif arm_status == "unable_to_hold":
-                arm_detail = "การทดสอบแขน: ยกแขนขึ้นได้ แต่ค้างไว้ไม่ครบ 3 วินาที\n\n"
+                arm_detail = (f"การทดสอบแขน: ยกได้ {raise_percent:.0f}% ผ่านเกณฑ์ทดลอง {required_percent:.0f}% "
+                              f"แต่ค้างได้ {hold_sec:.1f} จาก {required_hold:.1f} วินาที\n\n"
+                              if None not in (raise_percent, required_percent, hold_sec, required_hold) else
+                              "การทดสอบแขน: ยกแขนขึ้นได้ แต่ค้างไว้ไม่ครบเวลาที่กำหนด\n\n")
             else:
                 arm_detail = ""
             body = (f"สิ่งที่พบ: ระบบวัดพบว่า{region_text}หลังนวดเพิ่มขึ้นหรือผิดปกติจากก่อนนวดเกินระดับทดลอง\n\n"
@@ -244,6 +257,10 @@ def customer_assessment(assessment, comparison):
                     + detail_text +
                     "สิ่งที่ควรทำ: แจ้งเจ้าหน้าที่ทันทีเพื่อช่วยประเมินอาการร่วมกัน "
                     "ผลจากกล้องนี้ไม่ใช่การวินิจฉัยโรค\n\n" + CARE_TH)
+        if status == "research_below_placeholder" and None not in (
+                raise_percent, required_percent, hold_sec, required_hold):
+            body = (f"ผลการยกแขน: ยกได้ {raise_percent:.0f}% ผ่านเกณฑ์ทดลอง {required_percent:.0f}% "
+                    f"และค้างครบ {required_hold:.1f} วินาที จึงไม่พบความเสี่ยงจากการทดสอบยกแขนครั้งนี้\n\n" + body)
         if symptoms_reported and status not in ("research_alert", "delta_alert") and CARE_TH not in body:
             body += ("\n\nคุณระบุว่ามีอาการผิดปกติ กรุณาบอกอาการแก่เจ้าหน้าที่ แม้ค่าที่วัดจะไม่เกินเกณฑ์"
                      "หรือระบบประเมินไม่ได้\n\n" + CARE_TH)

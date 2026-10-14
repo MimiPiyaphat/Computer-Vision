@@ -133,11 +133,14 @@ and evaluation. The application does not currently estimate stroke probability.
 ## Camera workflow
 
 The arm step now records a direct functional outcome in addition to the
-experimental 2D angle: both wrists must reach shoulder level and remain there
+experimental 2D angle. Vertical progress is normalized per arm: 0% is a wrist
+one shoulder-span below its shoulder and 100% is wrist-at-shoulder height or
+higher. The lower of the two arms must reach at least 70% and remain there
 continuously for 3 seconds within the 10-second visible-pose window. A visible
-attempt that cannot raise both arms or cannot maintain the hold is carried into
-the research result as a risk signal; missing shoulders or wrists pause the
-timer instead of being treated as weakness.
+attempt below 70%, or one that cannot maintain the hold, is carried into the
+research result as a risk signal; missing shoulders or wrists pause the timer
+instead of being treated as weakness. The 70% boundary is an engineering rule
+for this university demo, not a validated clinical cutoff or stroke probability.
 
 The dedicated mode panel has **ก่อนนวด · Baseline** and **หลังนวด · Recheck**
 buttons. Switching retains the customer/visit IDs, resets setup confirmation and

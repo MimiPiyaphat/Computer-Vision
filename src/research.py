@@ -76,7 +76,11 @@ def compare_research(before, after, before_angles, after_angles, parameters, par
                                  "arm_angle_delta_threshold_deg": parameters["arm_angle_delta_threshold_deg"],
                                  "face_alert": bool(face_alert), "arm_alert": bool(arm_alert),
                                  "arm_function_status": arm_function["status"] if arm_function else None,
-                                 "arm_function_alert": bool(arm_function_alert)},
+                                 "arm_function_alert": bool(arm_function_alert),
+                                 "arm_raise_percent": arm_function.get("raise_percent") if arm_function else None,
+                                 "arm_raise_threshold_percent": arm_function.get("required_raise_percent") if arm_function else None,
+                                 "arm_hold_sec": arm_function["hold_sec"] if arm_function else None,
+                                 "arm_hold_required_sec": arm_function["required_hold_sec"] if arm_function else None},
         "arm_function": arm_function,
     }
 

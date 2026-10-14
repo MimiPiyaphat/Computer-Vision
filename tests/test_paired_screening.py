@@ -143,6 +143,27 @@ class ArmFeatureTests(unittest.TestCase):
             short_hold.observe({"left": (100, y), "right": (200, y)}, shoulders, 640, 480, elapsed)
         self.assertEqual(short_hold.function_result()["status"], "unable_to_hold")
 
+    def test_raise_percentage_uses_weaker_arm_and_seventy_percent_boundary(self):
+        shoulders = {"left": (100, 100), "right": (200, 100)}
+        passing = ArmFeatures()
+        for elapsed in (0, 1, 4):
+            passing.observe({"left": (100, 130), "right": (200, 120)},
+                            shoulders, 640, 480, elapsed)
+        result = passing.function_result()
+        self.assertEqual(result["left_raise_percent"], 70.0)
+        self.assertEqual(result["right_raise_percent"], 80.0)
+        self.assertEqual(result["raise_percent"], 70.0)
+        self.assertEqual(result["required_raise_percent"], 70.0)
+        self.assertEqual(result["status"], "normal")
+
+        failing = ArmFeatures()
+        for elapsed in (0, 4, 10):
+            failing.observe({"left": (100, 131), "right": (200, 100)},
+                            shoulders, 640, 480, elapsed)
+        result = failing.function_result()
+        self.assertEqual(result["raise_percent"], 69.0)
+        self.assertEqual(result["status"], "unable_to_raise")
+
     def test_no_attempted_lift_has_no_complete_vector(self):
         tracker = ArmFeatures()
         for elapsed in (0, 1, 3, 10):
