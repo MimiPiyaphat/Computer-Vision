@@ -1,7 +1,7 @@
 """Tk dashboard. Presentation only; all inference lives behind SessionWorker."""
 
 import tkinter as tk
-from tkinter import messagebox, ttk
+from tkinter import messagebox
 from tkinter.scrolledtext import ScrolledText
 
 from config import CAMERA_INDEX, ARM_RAISE_NORMAL_MIN_PERCENT, ARM_REQUIRED_RAISED_HOLD_SEC
@@ -69,12 +69,15 @@ class Dashboard:
         self.dev_window = None
         self.theme = configure_fonts(root, load_theme())
         root.title("StrokeVision" + (" [ตัวอย่างหน้าจอ]" if preview else ""))
-        root.geometry("1280x1000")
-        root.minsize(1080, 900)
+        root.geometry("1280x800")
+        root.minsize(1080, 700)
+        try:
+            root.state("zoomed")
+        except tk.TclError:
+            pass
         root.protocol("WM_DELETE_WINDOW", self.close)
         root.bind("<F5>", lambda _: self.reload_theme())
         root.bind("<Control-Shift-D>", lambda _: self.open_dev())
-        root.bind("<MouseWheel>", self.scroll_page)
         self.build()
         self.poll()
 
@@ -108,6 +111,11 @@ class Dashboard:
 
     def set_overlay(self, visible, title="เชื่อมต่อกล้องเพื่อเริ่มต้น", status="", error=False):
         """Placeholder shown inside the preview area while the camera is not streaming."""
+        # Render tests and lightweight controller doubles intentionally omit
+        # concrete Tk preview widgets. The overlay is presentation-only, so it
+        # must not make the state renderer depend on those widgets existing.
+        if not hasattr(self, "overlay"):
+            return
         if not visible:
             self.overlay.place_forget()
             return
@@ -119,14 +127,24 @@ class Dashboard:
     def toggle_settings(self, _event=None):
         self.settings_open = not self.settings_open
         if self.settings_open:
-            self.settings_row.pack(fill="x", padx=12, pady=(10, 0), before=self.video_stage)
+            # Overlay advanced camera controls on the preview so opening them
+            # never makes the single-screen dashboard taller.
+            self.settings_row.place(x=10, y=8, relwidth=1.0, width=-20, height=42)
+            self.settings_row.lift()
         else:
-            self.settings_row.pack_forget()
+            self.settings_row.place_forget()
         self.settings_toggle.configure(text=("▾" if self.settings_open else "▸") + " ตั้งค่าเพิ่มเติม (กล้อง, จุดอ้างอิง)")
 
     def paint_stage(self, key, kind):
         """kind: active | done | wait | warn"""
         t = self.theme
+        if not hasattr(self, "stage_badges"):
+            # Compatibility for lightweight renderers/tests that use only the
+            # original text stage labels rather than the newer badge canvases.
+            label = next((step[1] for step in STEPS if step[0] == key), key)
+            suffix = {"active": "กำลังทำ", "done": "เสร็จแล้ว", "wait": "รอ", "warn": "พัก"}[kind]
+            self.stage_labels[key].configure(text=f"{label} · {suffix}")
+            return
         badge, title = self.stage_badges[key], self.stage_labels[key]
         number = self.stage_numbers[key]
         fill, num_fg, title_fg, bold, text = {
@@ -148,28 +166,22 @@ class Dashboard:
     def build(self):
         t = self.theme
         self.border = blend(t["muted"], t["surface"], 0.35)
-        self.settings_open = True
+        self.settings_open = False
         self.root.configure(bg=t["background"])
         self.page = tk.Frame(self.root, bg=t["background"])
         self.page.pack(fill="both", expand=True)
-        self.page_canvas = tk.Canvas(self.page, bg=t["background"], highlightthickness=0)
-        scrollbar = ttk.Scrollbar(self.page, orient="vertical", command=self.page_canvas.yview)
-        scrollbar.pack(side="right", fill="y")
-        self.page_canvas.pack(side="left", fill="both", expand=True)
-        self.page_canvas.configure(yscrollcommand=scrollbar.set)
-        self.container = tk.Frame(self.page_canvas, bg=t["background"], padx=t["spacing"], pady=t["spacing"])
-        self.page_window = self.page_canvas.create_window(0, 0, anchor="nw", window=self.container)
-        self.page_canvas.bind("<Configure>", self.resize_page)
+        self.container = tk.Frame(self.page, bg=t["background"], padx=14, pady=10)
+        self.container.pack(fill="both", expand=True)
         self.container.bind("<Configure>", self.resize_page)
 
         # ---- header: title + subtitle on the left; Dev / reload theme / mode switch on the right
         header = tk.Frame(self.container, bg=t["background"])
-        header.pack(fill="x", pady=(0, 18))
-        title = label(header, "StrokeVision", t, size=24, bold=True)
+        header.pack(fill="x", pady=(0, 8))
+        title = label(header, "StrokeVision", t, size=21, bold=True)
         title.configure(fg=t["accent"])
         title.pack(side="left")
-        label(header, "บันทึกก่อนนวดและตรวจซ้ำ", t, muted=True, size=10).pack(side="left", padx=(12, 0), anchor="s", pady=(0, 6))
-        self.mode_panel = VisitModePanel(header, self.visit_mode, self.change_mode, t)
+        label(header, "บันทึกก่อนนวดและตรวจซ้ำ", t, muted=True, size=9).pack(side="left", padx=(10, 0), anchor="s", pady=(0, 4))
+        self.mode_panel = VisitModePanel(header, self.visit_mode, self.change_mode, t, compact=True)
         self.mode_panel.pack(side="right")
         self.flat_button(header, "โหลดธีมใหม่", self.reload_theme, "ghost").pack(side="right", padx=(0, 10))
         self.flat_button(header, "Dev", self.open_dev, "ghost").pack(side="right", padx=(0, 10))
@@ -177,8 +189,8 @@ class Dashboard:
         if self.research:
             from src.research import load_parameters
             parameters = load_parameters()
-            self.research_banner = label(self.container, "", t, bold=True, size=10, wraplength=1100)
-            self.research_banner.pack(anchor="w", pady=(0, 12))
+            self.research_banner = label(self.container, "", t, bold=True, size=9, wraplength=1200)
+            self.research_banner.pack(anchor="w", pady=(0, 6))
             self.show_research_rules(parameters)
 
         body = tk.Frame(self.container, bg=t["background"])
@@ -187,17 +199,19 @@ class Dashboard:
         body.columnconfigure(1, weight=35, uniform="body")
         body.rowconfigure(0, weight=1)
         left = tk.Frame(body, bg=t["background"])
-        left.grid(row=0, column=0, sticky="nsew", padx=(0, 16))
+        left.grid(row=0, column=0, sticky="nsew", padx=(0, 12))
         right = tk.Frame(body, bg=t["background"])
         right.grid(row=0, column=1, sticky="nsew")
 
         # ---- left column, card 1: customer
-        visit = tk.Frame(left, bg=t["surface"], padx=20, pady=16)
-        visit.pack(fill="x", pady=(0, 16))
+        visit = tk.Frame(left, bg=t["surface"], padx=14, pady=10)
+        visit.pack(fill="x", pady=(0, 10))
         visit_header = tk.Frame(visit, bg=t["surface"])
-        visit_header.grid(row=0, column=0, columnspan=2, sticky="ew", pady=(0, 12))
-        label(visit_header, "ผู้รับบริการ", t, size=14, bold=True).pack(side="left")
-        self.flat_button(visit_header, "+ ผู้รับบริการใหม่", self.new_customer, "outline").pack(side="right")
+        visit_header.grid(row=0, column=0, columnspan=2, sticky="ew", pady=(0, 6))
+        label(visit_header, "ผู้รับบริการ", t, size=12, bold=True).pack(side="left")
+        new_customer = self.flat_button(visit_header, "+ ผู้รับบริการใหม่", self.new_customer, "outline")
+        new_customer.configure(padx=10, pady=4)
+        new_customer.pack(side="right")
         self.visit_controls = []
         for column, (caption, variable) in enumerate((("รหัสผู้รับบริการ / QR สมาชิก", self.user_id), ("รหัสครั้งรับบริการ", self.visit_id))):
             label(visit, caption, t, muted=True, size=10).grid(row=1, column=column, sticky="w")
@@ -205,29 +219,28 @@ class Dashboard:
                              relief="flat", bg=t["surface"], fg=t["text"], insertbackground=t["text"],
                              disabledbackground=t["preview"], highlightthickness=1,
                              highlightbackground=self.border, highlightcolor=t["accent"])
-            entry.grid(row=2, column=column, sticky="ew", padx=(0, 16 if column == 0 else 0), pady=(4, 12), ipady=8)
+            entry.grid(row=2, column=column, sticky="ew", padx=(0, 12 if column == 0 else 0), pady=(3, 6), ipady=5)
             visit.columnconfigure(column, weight=1, uniform="visit")
             self.visit_controls.append(entry)
         self.symptom_check = tk.Checkbutton(visit, text="มีอาการผิดปกติ (ถ้ามี กรุณาเลือกเพื่อแสดงคำแนะนำฉุกเฉิน)", variable=self.symptoms_reported,
                        command=self.symptom_changed, bg=t["surface"], fg=t["text"], selectcolor=t["surface"],
                        activebackground=t["surface"], activeforeground=t["text"], font=(t["font"], 10))
-        self.symptom_check.grid(row=3, column=0, columnspan=2, sticky="w")
+        self.symptom_check.grid(row=3, column=0, sticky="w", padx=(0, 8))
         self.visit_controls.append(self.symptom_check)
         self.update_symptom_visibility()
         self.setup_check = tk.Checkbutton(visit, text="ยืนยันกล้องและจุดตรวจเดิม ทำตามท่าที่กำหนด และมองตรง",
                        variable=self.setup_confirmed, bg=t["surface"], fg=t["text"], selectcolor=t["surface"],
                        activebackground=t["surface"], activeforeground=t["text"], font=(t["font"], 10))
-        self.setup_check.grid(row=4, column=0, columnspan=2, sticky="w")
+        self.setup_check.grid(row=3, column=1, sticky="w")
 
         # ---- left column, card 2: camera preview + actions
-        card = tk.Frame(left, bg=t["surface"], padx=20, pady=16)
+        card = tk.Frame(left, bg=t["surface"], padx=14, pady=10)
         card.pack(fill="both", expand=True)
         self.video_holder = tk.Frame(card, bg=t["preview"])
         self.video_holder.pack(fill="both", expand=True)
 
         # Camera number (left) and reference points (right) sit on the top edge of the preview area.
         self.settings_row = tk.Frame(self.video_holder, bg=t["preview"])
-        self.settings_row.pack(fill="x", padx=12, pady=(10, 0))
         if not self.preview:
             cam = label(self.settings_row, "กล้อง", t)
             cam.configure(bg=t["preview"], fg=t["text"])
@@ -243,6 +256,7 @@ class Dashboard:
         self.video_stage = tk.Frame(self.video_holder, bg=t["preview"])
         self.video_stage.pack(fill="both", expand=True)
         self.video = VideoPanel(self.video_stage, t, self.preview)
+        self.video.configure(height=245)
         self.video.pack(fill="both", expand=True)
 
         # Placeholder drawn over the preview while the camera is off.
@@ -264,7 +278,7 @@ class Dashboard:
         self.connection = label(card, "", t, muted=True, size=10)
 
         actions = tk.Frame(card, bg=t["surface"])
-        actions.pack(fill="x", pady=(16, 0))
+        actions.pack(fill="x", pady=(10, 0))
         actions.columnconfigure(0, weight=1, uniform="actions")
         actions.columnconfigure(1, weight=1, uniform="actions")
         self.connect_button = self.flat_button(actions, "เปิดตัวอย่าง" if self.preview else "เชื่อมต่อกล้อง", self.connect, "primary")
@@ -277,39 +291,44 @@ class Dashboard:
         self.settings_toggle = label(card, "▾ ตั้งค่าเพิ่มเติม (กล้อง, จุดอ้างอิง)", t, muted=True, size=10)
         self.settings_toggle.configure(cursor="hand2")
         self.settings_toggle.bind("<Button-1>", self.toggle_settings)
-        self.settings_toggle.pack(anchor="w", pady=(14, 0))
+        self.settings_toggle.configure(text="▸ ตั้งค่าเพิ่มเติม (กล้อง, จุดอ้างอิง)")
+        self.settings_toggle.pack(anchor="w", pady=(8, 0))
 
         # ---- right column, card 2 (displayed below steps): current step (accent background)
-        current = tk.Frame(right, bg=t["accent"], padx=20, pady=18)
+        current = tk.Frame(right, bg=t["accent"], padx=14, pady=12)
         self.current_step = label(current, "ขั้นตอนปัจจุบัน", t, size=10)
         self.current_step.configure(bg=t["accent"], fg=t["accent_text"], anchor="w", justify="left")
         self.current_step.pack(fill="x")
-        self.instruction = label(current, "เชื่อมต่อกล้องเพื่อเริ่มต้น", t, size=16, bold=True, wraplength=360)
+        self.instruction = label(current, "เชื่อมต่อกล้องเพื่อเริ่มต้น", t, size=14, bold=True, wraplength=430)
         self.instruction.configure(bg=t["accent"], fg=t["accent_text"], anchor="w", justify="left")
         self.instruction.pack(fill="x", pady=(8, 0))
         self.progress = ThinProgress(current, track=blend(t["accent_text"], t["accent"], 0.3),
                                      fill=t["accent_text"], bg=t["accent"])
-        self.progress.pack(fill="x", pady=(14, 0))
-        self.detail = label(current, "", t, size=10, wraplength=360)
+        self.progress.pack(fill="x", pady=(10, 0))
+        self.detail = label(current, "", t, size=9, wraplength=430)
         self.detail.configure(bg=t["accent"], fg=t["accent_text"], anchor="w", justify="left")
         self.detail.pack(fill="x", pady=(8, 0))
 
         # ---- right column, card 1: numbered steps
         stages = Card(right, t, "ขั้นตอนการเก็บข้อมูล")
-        stages.configure(padx=20, pady=16)
-        stages.pack(fill="x", pady=(0, 16))
-        current.pack(fill="x", pady=(0, 16))  # shown below the steps card
+        stages.configure(padx=14, pady=10)
+        stages.pack(fill="x", pady=(0, 10))
+        current.pack(fill="x", pady=(0, 10))  # shown below the steps card
+        stage_grid = tk.Frame(stages, bg=t["surface"])
+        stage_grid.pack(fill="x")
+        stage_grid.columnconfigure(0, weight=1, uniform="stage")
+        stage_grid.columnconfigure(1, weight=1, uniform="stage")
         self.stage_labels, self.stage_badges, self.stage_numbers = {}, {}, {}
         for index, (state, step_title, _, _) in enumerate(STEPS):
-            row = tk.Frame(stages, bg=t["surface"])
-            row.pack(fill="x", pady=5)
-            badge = tk.Canvas(row, width=24, height=24, bg=t["surface"], highlightthickness=0)
-            badge.create_oval(1, 1, 23, 23, outline="", tags="bg")
-            badge.create_text(12, 12, text=str(index + 1), font=(t["font"], 9, "bold"), tags="num")
+            row = tk.Frame(stage_grid, bg=t["surface"])
+            row.grid(row=index // 2, column=index % 2, sticky="ew", padx=(0, 8), pady=2)
+            badge = tk.Canvas(row, width=21, height=21, bg=t["surface"], highlightthickness=0)
+            badge.create_oval(1, 1, 20, 20, outline="", tags="bg")
+            badge.create_text(10.5, 10.5, text=str(index + 1), font=(t["font"], 8, "bold"), tags="num")
             badge.pack(side="left")
-            item = label(row, step_title, t)
+            item = label(row, step_title, t, size=9)
             item.configure(bg=t["surface"], anchor="w")
-            item.pack(side="left", padx=(12, 0))
+            item.pack(side="left", padx=(7, 0))
             self.stage_labels[state] = item
             self.stage_badges[state] = badge
             self.stage_numbers[state] = str(index + 1)
@@ -317,20 +336,22 @@ class Dashboard:
 
         # ---- right column, card 3: result
         result = Card(right, t, "ผลของคุณ")
-        result.configure(padx=20, pady=16)
-        result.pack(fill="x")
-        self.result_title = label(result, "ยังไม่มีผล", t, bold=True, wraplength=360)
+        result.configure(padx=14, pady=10)
+        result.pack(fill="both", expand=True)
+        self.result_title = label(result, "ยังไม่มีผล", t, bold=True, wraplength=430)
         self.result_title.pack(fill="x")
-        self.result_body = ScrolledText(result, height=4, width=28, wrap="word", relief="flat",
+        self.result_body = ScrolledText(result, height=5, width=28, wrap="word", relief="flat",
                                        bg=t["surface"], fg=t["muted"],
                                        font=(t["font"], t["font_size"]), borderwidth=0)
         self.result_body.vbar.pack_forget()  # wheel scrolling still works; no scrollbar chrome
-        self.result_body.pack(fill="x", pady=(6, 0))
+        self.result_body.pack(fill="both", expand=True, pady=(4, 0))
         self.set_result_text("ทำตามขั้นตอนให้ครบเพื่อดูผลสรุป")
 
         # Keep symptom guidance visible even when the main page is scrolled.
-        self.footer = label(self.root, SAFETY_TH, t, muted=True, size=10, wraplength=1120)
-        self.footer.pack(side="bottom", fill="x", padx=t["spacing"], pady=(8, 12))
+        compact_safety = ("ระบบช่วยคัดกรอง ไม่ใช่การวินิจฉัยหรือยืนยันว่าไม่มีโรค · "
+                          "หากมีหน้าเบี้ยว แขนอ่อนแรง หรือพูดผิดปกติเฉียบพลัน ให้ติดต่อบริการฉุกเฉินทันที")
+        self.footer = label(self.root, compact_safety, t, muted=True, size=8, wraplength=1280)
+        self.footer.pack(side="bottom", fill="x", padx=14, pady=(3, 4), before=self.page)
         self.update_care_notice()
         self.set_overlay(True, status="ยังไม่เชื่อมต่อ - กล้องปิดอยู่")
         self.set_ready(False)
@@ -355,10 +376,7 @@ class Dashboard:
     # ----------------------------------------------------------------------------------------------------   
 
     def resize_page(self, _event=None):
-        width = max(1, self.page_canvas.winfo_width())
-        height = max(self.page_canvas.winfo_height(), self.container.winfo_reqheight())
-        self.page_canvas.itemconfigure(self.page_window, width=width, height=height)
-        self.page_canvas.configure(scrollregion=(0, 0, width, height))
+        width = max(1, self.container.winfo_width())
         self.footer.configure(wraplength=max(200, width - 2 * self.theme["spacing"]))
         if self.research:
             self.research_banner.configure(wraplength=max(200, width - 2 * self.theme["spacing"]))
@@ -369,13 +387,6 @@ class Dashboard:
             return
         from ui.dev_dashboard import DevDashboard
         self.dev_window = DevDashboard(self.root, self.theme, self.dev_access)
-
-    def scroll_page(self, event):
-        # The result text box keeps its own wheel scrolling and text selection.
-        if isinstance(event.widget, tk.Text):
-            return
-        if self.page_canvas.yview() != (0.0, 1.0):
-            self.page_canvas.yview_scroll(-int(event.delta / 120), "units")
 
     def open_dev(self):
         if self.dev_window and self.dev_window.window.winfo_exists():
@@ -590,7 +601,7 @@ class Dashboard:
             self.set_overlay(True, "ไม่สามารถใช้กล้องได้" if status == "error" else "เชื่อมต่อกล้องเพื่อเริ่มต้น",
                              message, error=status == "error")
             self.video.render(message="ไม่สามารถใช้กล้องได้" if status == "error" else None)
-            self.current_step.configure(text="ขั้นตอนปัจจุบัน", fg=t["accent_text"])
+            self.current_step.configure(text="ขั้นตอนปัจจุบัน", fg=t.get("accent_text", t["accent"]))
             self.instruction.configure(text="เชื่อมต่อกล้องเพื่อเริ่มต้น" if status != "error" else "เชื่อมต่อใหม่เพื่อลองอีกครั้ง")
             self.progress["value"] = 0
             self.detail.configure(text="")
@@ -616,7 +627,7 @@ class Dashboard:
             step_heading = f"{mode_title} · หยุดการตรวจเพื่อยืนยันบุคคล"
         if data.get("command_error"):
             step_heading = f"{mode_title} · ยังเริ่มตรวจไม่ได้"
-        self.current_step.configure(text=step_heading, fg=t["accent_text"])
+        self.current_step.configure(text=step_heading, fg=t.get("accent_text", t["accent"]))
         if state == "summary":
             self.progress.pack_forget()  # A full green bar could be read as a normal result.
         else:
@@ -704,7 +715,7 @@ class Dashboard:
                     self.paint_stage("summary", "warn" if needs_review else "active")
                 if result_status == "acquisition_failed" and not data.get("command_error"):
                     self.start_button.configure(text="เก็บข้อมูลใหม่อีกครั้ง")
-                    self.current_step.configure(text=f"{mode_title} · กรุณาตรวจใหม่", fg=t["accent_text"])
+                    self.current_step.configure(text=f"{mode_title} · กรุณาตรวจใหม่", fg=t.get("accent_text", t["accent"]))
                     self.instruction.configure(text="กด ‘เก็บข้อมูลใหม่อีกครั้ง’ เมื่อพร้อม")
                     self.detail.configure(text="เริ่มตั้งแต่ขั้นตอนที่ 1 · ใช้รหัสเดิมได้")
                     if comparison.get("alert") or comparison.get("prior_alert"):

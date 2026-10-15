@@ -30,14 +30,30 @@ class ScreeningSession:
     def open(self):
         # Lazy imports allow UI preview and controller tests without CV packages.
         import cv2
-        from src.face_analytics import FaceAnalyzer
-        from src.arm_pose import ArmPoseAnalyzer
-        from src.screening_flow import ScreeningFlow
         self.cap = cv2.VideoCapture(self.camera_index)
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, FRAME_WIDTH)
         self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, FRAME_HEIGHT)
         if not self.cap.isOpened():
             raise RuntimeError("Camera unavailable. Close other camera apps or change the camera index.")
+        self._open_pipeline(int(self.cap.get(cv2.CAP_PROP_FRAME_WIDTH)),
+                            int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))
+
+    def open_frames(self, width=FRAME_WIDTH, height=FRAME_HEIGHT, station=None):
+        """Open the CV pipeline for frames supplied by a browser or test client.
+
+        Browser frames use a distinct protocol signature so a baseline recorded
+        with one camera path cannot be compared silently with another.
+        """
+        width, height = int(width), int(height)
+        if width < 160 or height < 120 or width > 1920 or height > 1080:
+            raise ValueError("Browser frame size must be between 160x120 and 1920x1080.")
+        self.cap = None
+        self._open_pipeline(width, height, pipeline_suffix="-browser-camera-v1", station=station)
+
+    def _open_pipeline(self, width, height, pipeline_suffix="", station=None):
+        from src.face_analytics import FaceAnalyzer
+        from src.arm_pose import ArmPoseAnalyzer
+        from src.screening_flow import ScreeningFlow
         self.face = FaceAnalyzer()
         self.arm = ArmPoseAnalyzer(require_angles=self.research)
         self.flow = ScreeningFlow(self.face, self.arm, require_angles=self.research)
@@ -46,10 +62,10 @@ class ScreeningSession:
         from src.protocol import pipeline_signature
         from src.visit_workflow import VisitWorkflow
         context = {"pipeline": pipeline_signature(), "camera": self.camera_index,
-                   "width": int(self.cap.get(cv2.CAP_PROP_FRAME_WIDTH)),
-                   "height": int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT)), "station": CAPTURE_STATION_ID}
+                   "width": width, "height": height, "station": station or CAPTURE_STATION_ID}
         if self.research:
             context["pipeline"] += "-research-sideways-arms-v1"
+        context["pipeline"] += pipeline_suffix
         directory = FEATURE_STORE_DIR + "-research" if self.research else FEATURE_STORE_DIR
         self.workflow = VisitWorkflow(FeatureStore(directory), context, research=self.research)
         self.identity_model = FaceIdentity()
@@ -164,10 +180,27 @@ class ScreeningSession:
 
     def read(self):
         import cv2
+        if self.cap is None:
+            raise RuntimeError("This session expects browser frames; use read_frame().")
         ok, frame = self.cap.read()
         if not ok:
             raise RuntimeError("Camera disconnected or failed to return a frame. Reconnect to try again.")
         frame = cv2.flip(frame, 1)
+        return self._process_frame(frame)
+
+    def read_frame(self, frame, mirror=True):
+        """Process one BGR frame supplied by a browser camera client."""
+        import cv2
+        if self.workflow is None or self.flow is None:
+            raise RuntimeError("Session is not connected.")
+        if frame is None or getattr(frame, "ndim", 0) != 3 or frame.shape[2] != 3:
+            raise ValueError("Browser camera did not provide a valid colour frame.")
+        if mirror:
+            frame = cv2.flip(frame, 1)
+        return self._process_frame(frame)
+
+    def _process_frame(self, frame):
+        import cv2
         if (frame.shape[1] != self.workflow.context["width"] or frame.shape[0] != self.workflow.context["height"]):
             raise RuntimeError("Camera resolution changed during acquisition. Reconnect; comparison is inconclusive.")
         identity_ui = self._identity_gate(frame)

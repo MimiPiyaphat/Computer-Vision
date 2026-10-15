@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f4f7f6">
+  <title>StrokeVision | บันทึกก่อนนวดและตรวจซ้ำ</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <div class="eyebrow">STROKEVISION AI</div>
+      <h1>บันทึกก่อนนวดและตรวจซ้ำ</h1>
+      <p>ระบบช่วยติดตามการเปลี่ยนแปลงของใบหน้าและการยกแขนก่อน–หลังนวด</p>
+    </div>
+    <span id="connectionPill" class="pill offline">ยังไม่เชื่อมต่อ</span>
+  </header>
+
+  <main>
+    <section class="setup card" aria-labelledby="setupTitle">
+      <div class="section-heading">
+        <div><span class="step-number">01</span><h2 id="setupTitle">เลือกการตรวจ</h2></div>
+        <p>ใช้รหัสเดิมทั้งสองช่องเมื่อตรวจหลังนวด</p>
+      </div>
+      <div class="mode-switch" role="group" aria-label="ประเภทการตรวจ">
+        <button class="mode active" data-mode="baseline" type="button">ก่อนนวด <small>Baseline</small></button>
+        <button class="mode" data-mode="recheck" type="button">หลังนวด <small>Recheck</small></button>
+      </div>
+      <div class="fields">
+        <label>รหัสผู้รับบริการ<input id="userId" autocomplete="off" placeholder="เช่น SV-001"></label>
+        <label>รหัสครั้งรับบริการ<input id="visitId" autocomplete="off" placeholder="เช่น VISIT-01"></label>
+      </div>
+      <label id="symptomRow" class="check hidden"><input id="symptoms" type="checkbox"> มีอาการผิดปกติที่ต้องแจ้งเจ้าหน้าที่</label>
+      <label class="check"><input id="confirmed" type="checkbox"> ยืนยันว่าอยู่จุดเดิม จัดกล้องตรง และทำตามคำแนะนำบนหน้าจอ</label>
+    </section>
+
+    <div class="workspace">
+      <section class="camera-card card" aria-labelledby="cameraTitle">
+        <div class="section-heading compact">
+          <div><span class="step-number">02</span><h2 id="cameraTitle">กล้อง</h2></div>
+          <p id="fpsText">พร้อมใช้งานบนคอมและมือถือ</p>
+        </div>
+        <div class="preview-shell">
+          <video id="camera" autoplay muted playsinline></video>
+          <canvas id="capture" width="640" height="480" hidden></canvas>
+          <div id="cameraEmpty" class="camera-empty">
+            <strong>ยังไม่ได้เปิดกล้อง</strong>
+            <span>กด “เชื่อมต่อกล้อง” และอนุญาตการใช้งานกล้อง</span>
+          </div>
+          <div class="frame-guide" aria-hidden="true"><span>จัดใบหน้าให้อยู่กึ่งกลาง</span></div>
+        </div>
+        <div class="actions">
+          <button id="connectButton" class="button secondary" type="button">เชื่อมต่อกล้อง</button>
+          <button id="startButton" class="button primary" type="button" disabled>เริ่มบันทึกก่อนนวด</button>
+          <button id="stopButton" class="button ghost" type="button" disabled>หยุด</button>
+        </div>
+        <p class="camera-note">ขั้นตอนยกแขน: วางมือถือแนวนอนหรือถอยให้เห็นหัวไหล่และข้อมือทั้งสองข้าง</p>
+      </section>
+
+      <aside class="status-column">
+        <section class="card current-card" aria-live="polite">
+          <div class="section-heading compact"><div><span class="step-number">03</span><h2>ขั้นตอนปัจจุบัน</h2></div></div>
+          <div id="stageBadge" class="stage-badge">เตรียมเริ่มตรวจ</div>
+          <h3 id="instruction">เชื่อมต่อกล้อง กรอกรหัส และยืนยันจุดตรวจ</h3>
+          <p id="stageDetail">ระบบจะแนะนำทีละขั้นตอน</p>
+          <div class="progress-track"><div id="progressBar"></div></div>
+          <p id="timerText" class="timer"></p>
+        </section>
+
+        <section class="card stages-card">
+          <h2>ลำดับการเก็บข้อมูล</h2>
+          <ol id="stageList"></ol>
+        </section>
+
+        <section id="resultCard" class="card result-card neutral" aria-live="assertive">
+          <p class="eyebrow">ผลของคุณ / สิ่งที่ควรทำ</p>
+          <h2 id="resultTitle">ยังไม่มีผล</h2>
+          <p id="resultBody">ทำตามขั้นตอนให้ครบเพื่อดูผลสรุป</p>
+          <button id="retryButton" class="button secondary hidden" type="button">ตรวจใหม่อีกครั้ง</button>
+        </section>
+      </aside>
+    </div>
+  </main>
+
+  <footer>
+    ระบบนี้เป็นเครื่องมือช่วยคัดกรองสำหรับโครงงาน ไม่ใช่การวินิจฉัยหรือยืนยันว่าไม่มีโรคหลอดเลือดสมอง หากมีหน้าเบี้ยว แขนอ่อนแรง พูดผิดปกติ หรืออาการทางระบบประสาทที่เกิดฉับพลัน ให้ติดต่อบริการฉุกเฉินทันทีโดยไม่รอผลจากระบบ
+  </footer>
+  <div id="toast" class="toast" role="alert" hidden></div>
+  <script src="/app.js" defer></script>
+</body>
+</html>

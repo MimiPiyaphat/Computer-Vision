@@ -72,6 +72,49 @@ For later runs:
 .\.venv\Scripts\python.exe desktop.py --research
 ```
 
+### เปิดเป็นเว็บบนคอมและมือถือ
+
+หน้าเว็บใช้กล้องของเบราว์เซอร์ แต่ยังประมวลผลด้วย Python, MediaPipe,
+YOLOv8-Pose และ FaceNet บนเครื่องที่รันเซิร์ฟเวอร์ จึงใช้กฎและฐานข้อมูลเดียวกับ
+แอปเดสก์ท็อป เซิร์ฟเวอร์ไม่บันทึกรูปหรือวิดีโอ เริ่มเซิร์ฟเวอร์ด้วย:
+
+```powershell
+.\.venv\Scripts\python.exe web_app.py
+```
+
+Terminal จะแสดงลิงก์ลักษณะ `http://127.0.0.1:8000/?key=...` ให้เปิดลิงก์เต็ม
+บนคอมเครื่องเดียวกัน แล้วกด **เชื่อมต่อกล้อง** เบราว์เซอร์จะขอสิทธิ์ใช้กล้อง
+access key ถูกสุ่มใหม่ทุกครั้งที่เปิดเซิร์ฟเวอร์และใช้ป้องกัน API สำหรับการสาธิต
+
+กล้องเว็บบนมือถือทำงานได้เฉพาะ secure context (HTTPS) ตามข้อกำหนดของเบราว์เซอร์
+วิธีสาธิตที่ง่ายคือเปิด HTTPS tunnel บนเครื่องที่รัน StrokeVision เช่น
+[Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/do-more-with-tunnels/trycloudflare/):
+
+```powershell
+# Terminal ที่ 1
+.\.venv\Scripts\python.exe web_app.py
+
+# Terminal ที่ 2 (เมื่อติดตั้ง cloudflared แล้ว)
+cloudflared tunnel --url http://127.0.0.1:8000
+```
+
+นำโดเมน `https://...trycloudflare.com` ที่ tunnel แสดงมาต่อด้วย `/?key=...`
+โดยใช้ key จากลิงก์ใน Terminal แรก แล้วเปิดบนมือถือ ห้ามแชร์ลิงก์หรือ key
+นอกทีม เพราะ tunnel เปิดทางเข้าเครื่องชั่วคราว กด `Ctrl+C` ทั้งสองหน้าต่างเมื่อจบเดโม
+เซิร์ฟเวอร์รองรับจุดตรวจหนึ่งจุดในเวลาเดียวกัน; การเชื่อมต่อใหม่จะแทน session เดิม
+เมื่อใช้ tunnel เฟรมกล้องจะส่งแบบเข้ารหัสผ่านผู้ให้บริการ tunnel มายังเครื่องเซิร์ฟเวอร์
+ควรขอความยินยอมจากผู้ถูกบันทึกก่อนเริ่ม หน้าเว็บผูก baseline กับเบราว์เซอร์เดิม
+จึงควรตรวจก่อนและหลังด้วยอุปกรณ์และเบราว์เซอร์เดียวกัน
+หน้า Developer metrics ยังอยู่ในแอปเดสก์ท็อปเท่านั้น
+
+หากมีใบรับรอง HTTPS ของเครือข่ายอยู่แล้ว สามารถรันโดยตรงได้:
+
+```powershell
+.\.venv\Scripts\python.exe web_app.py --host 0.0.0.0 --certfile certificate.pem --keyfile private-key.pem
+```
+
+มือถือจะต้องเชื่อถือใบรับรองนั้น มิฉะนั้นเบราว์เซอร์อาจไม่อนุญาตใช้กล้อง
+
 Other modes:
 
 ```powershell

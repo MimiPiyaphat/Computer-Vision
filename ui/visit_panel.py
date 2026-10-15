@@ -7,24 +7,27 @@ from ui.visit_state import MODES
 
 
 class VisitModePanel(tk.Frame):
-    def __init__(self, parent, variable, command, theme):
-        super().__init__(parent, bg=theme["surface"], padx=14, pady=10)
+    def __init__(self, parent, variable, command, theme, compact=False):
+        super().__init__(parent, bg=theme["surface"], padx=8 if compact else 14, pady=4 if compact else 10)
         self.variable, self.command, self.theme = variable, command, theme
+        self.compact = compact
         self.enabled = True
         self.buttons = {}
         for column, (mode, content) in enumerate(MODES.items()):
             self.columnconfigure(column, weight=1, uniform="mode")
             widget = tk.Button(self, text=content[0], command=lambda value=mode: self.select(value),
-                               font=(theme["font"], 12, "bold"), relief="flat", borderwidth=0,
-                               pady=9, cursor="hand2", takefocus=True, highlightthickness=2,
+                               font=(theme["font"], 10 if compact else 12, "bold"), relief="flat", borderwidth=0,
+                               pady=5 if compact else 9, cursor="hand2", takefocus=True, highlightthickness=2,
                                highlightcolor=theme["text"])
             widget.grid(row=0, column=column, sticky="ew", padx=(0, 8) if column == 0 else (8, 0))
             self.buttons[mode] = widget
-        self.title = label(self, "", theme, bold=True, size=12)
-        self.title.grid(row=1, column=0, columnspan=2, sticky="w", pady=(8, 2))
-        self.description = label(self, "", theme, muted=True, size=10)
-        self.description.grid(row=2, column=0, columnspan=2, sticky="ew")
-        self.bind("<Configure>", lambda event: self.description.configure(wraplength=max(200, event.width - 32)))
+        self.title = self.description = None
+        if not compact:
+            self.title = label(self, "", theme, bold=True, size=12)
+            self.title.grid(row=1, column=0, columnspan=2, sticky="w", pady=(8, 2))
+            self.description = label(self, "", theme, muted=True, size=10)
+            self.description.grid(row=2, column=0, columnspan=2, sticky="ew")
+            self.bind("<Configure>", lambda event: self.description.configure(wraplength=max(200, event.width - 32)))
         self.trace_id = variable.trace_add("write", self.refresh)
         self.refresh()
 
@@ -48,8 +51,9 @@ class VisitModePanel(tk.Frame):
                              highlightbackground=t["accent"] if active else t["background"],
                              state="normal" if self.enabled else "disabled")
         content = MODES[selected]
-        self.title.configure(text=content[1])
-        self.description.configure(text=content[2] if self.enabled else "กำลังเก็บข้อมูล — กดหยุดก่อนเปลี่ยนโหมด")
+        if self.title is not None:
+            self.title.configure(text=content[1])
+            self.description.configure(text=content[2] if self.enabled else "กำลังเก็บข้อมูล — กดหยุดก่อนเปลี่ยนโหมด")
 
     def destroy(self):
         self.variable.trace_remove("write", self.trace_id)
