@@ -279,9 +279,8 @@ class Dashboard:
         self.settings_toggle.bind("<Button-1>", self.toggle_settings)
         self.settings_toggle.pack(anchor="w", pady=(14, 0))
 
-        # ---- right column, card 1: current step (accent background)
+        # ---- right column, card 2 (displayed below steps): current step (accent background)
         current = tk.Frame(right, bg=t["accent"], padx=20, pady=18)
-        current.pack(fill="x", pady=(0, 16))
         self.current_step = label(current, "ขั้นตอนปัจจุบัน", t, size=10)
         self.current_step.configure(bg=t["accent"], fg=t["accent_text"], anchor="w", justify="left")
         self.current_step.pack(fill="x")
@@ -295,10 +294,11 @@ class Dashboard:
         self.detail.configure(bg=t["accent"], fg=t["accent_text"], anchor="w", justify="left")
         self.detail.pack(fill="x", pady=(8, 0))
 
-        # ---- right column, card 2: numbered steps
+        # ---- right column, card 1: numbered steps
         stages = Card(right, t, "ขั้นตอนการเก็บข้อมูล")
         stages.configure(padx=20, pady=16)
         stages.pack(fill="x", pady=(0, 16))
+        current.pack(fill="x", pady=(0, 16))  # shown below the steps card
         self.stage_labels, self.stage_badges, self.stage_numbers = {}, {}, {}
         for index, (state, step_title, _, _) in enumerate(STEPS):
             row = tk.Frame(stages, bg=t["surface"])
