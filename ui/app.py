@@ -124,6 +124,15 @@ class Dashboard:
         self.overlay.place(x=0, y=0, relwidth=1, relheight=1)
         self.overlay.lift()
 
+    def show_current(self, visible):
+        card = getattr(self, "current_card", None)
+        if card is None:
+            return
+        if visible and not card.winfo_manager():
+            card.pack(fill="x", pady=(0, 10), before=self.result_card)
+        elif not visible and card.winfo_manager():
+            card.pack_forget()
+
     def toggle_settings(self, _event=None):
         self.settings_open = not self.settings_open
         if self.settings_open:
@@ -183,8 +192,6 @@ class Dashboard:
         label(header, "บันทึกก่อนนวดและตรวจซ้ำ", t, muted=True, size=9).pack(side="left", padx=(10, 0), anchor="s", pady=(0, 4))
         self.mode_panel = VisitModePanel(header, self.visit_mode, self.change_mode, t, compact=True)
         self.mode_panel.pack(side="right")
-        self.flat_button(header, "โหลดธีมใหม่", self.reload_theme, "ghost").pack(side="right", padx=(0, 10))
-        self.flat_button(header, "Dev", self.open_dev, "ghost").pack(side="right", padx=(0, 10))
 
         if self.research:
             from src.research import load_parameters
@@ -192,6 +199,26 @@ class Dashboard:
             self.research_banner = label(self.container, "", t, bold=True, size=9, wraplength=1200)
             self.research_banner.pack(anchor="w", pady=(0, 6))
             self.show_research_rules(parameters)
+
+        # ---- step bar: seven numbered steps in one wide card
+        stages = tk.Frame(self.container, bg=t["surface"], padx=14, pady=10)
+        stages.pack(fill="x", pady=(0, 10))
+        self.stage_labels, self.stage_badges, self.stage_numbers = {}, {}, {}
+        for index, (state, step_title, _, _) in enumerate(STEPS):
+            stages.columnconfigure(index, weight=1, uniform="stage")
+            cell = tk.Frame(stages, bg=t["surface"])
+            cell.grid(row=0, column=index, sticky="n")
+            badge = tk.Canvas(cell, width=24, height=24, bg=t["surface"], highlightthickness=0)
+            badge.create_oval(1, 1, 23, 23, outline="", tags="bg")
+            badge.create_text(12, 12, text=str(index + 1), font=(t["font"], 9, "bold"), tags="num")
+            badge.pack()
+            item = label(cell, step_title, t, size=9)
+            item.configure(bg=t["surface"], anchor="center")
+            item.pack(pady=(5, 0))
+            self.stage_labels[state] = item
+            self.stage_badges[state] = badge
+            self.stage_numbers[state] = str(index + 1)
+        self.paint_stages_idle()
 
         body = tk.Frame(self.container, bg=t["background"])
         body.pack(fill="both", expand=True)
@@ -203,35 +230,37 @@ class Dashboard:
         right = tk.Frame(body, bg=t["background"])
         right.grid(row=0, column=1, sticky="nsew")
 
-        # ---- left column, card 1: customer
-        visit = tk.Frame(left, bg=t["surface"], padx=14, pady=10)
+        # ---- right column, card 1: customer (stacked fields)
+        visit = tk.Frame(right, bg=t["surface"], padx=16, pady=14)
         visit.pack(fill="x", pady=(0, 10))
+        visit.columnconfigure(0, weight=1)
         visit_header = tk.Frame(visit, bg=t["surface"])
-        visit_header.grid(row=0, column=0, columnspan=2, sticky="ew", pady=(0, 6))
+        visit_header.grid(row=0, column=0, sticky="ew", pady=(0, 6))
         label(visit_header, "ผู้รับบริการ", t, size=12, bold=True).pack(side="left")
-        new_customer = self.flat_button(visit_header, "+ ผู้รับบริการใหม่", self.new_customer, "outline")
-        new_customer.configure(padx=10, pady=4)
+        new_customer = self.flat_button(visit_header, "+ ใหม่", self.new_customer, "outline")
+        new_customer.configure(padx=16, pady=5)
         new_customer.pack(side="right")
         self.visit_controls = []
-        for column, (caption, variable) in enumerate((("รหัสผู้รับบริการ / QR สมาชิก", self.user_id), ("รหัสครั้งรับบริการ", self.visit_id))):
-            label(visit, caption, t, muted=True, size=10).grid(row=1, column=column, sticky="w")
-            entry = tk.Entry(visit, textvariable=variable, show="*" if column == 0 else "", font=(t["font"], t["font_size"]),
+        for index, (caption, variable) in enumerate((("รหัสผู้รับบริการ / QR สมาชิก", self.user_id), ("รหัสครั้งรับบริการ", self.visit_id))):
+            label(visit, caption, t, muted=True, size=10).grid(row=1 + index * 2, column=0, sticky="w", pady=(6, 0))
+            entry = tk.Entry(visit, textvariable=variable, show="*" if index == 0 else "", font=(t["font"], t["font_size"]),
                              relief="flat", bg=t["surface"], fg=t["text"], insertbackground=t["text"],
                              disabledbackground=t["preview"], highlightthickness=1,
                              highlightbackground=self.border, highlightcolor=t["accent"])
-            entry.grid(row=2, column=column, sticky="ew", padx=(0, 12 if column == 0 else 0), pady=(3, 6), ipady=5)
-            visit.columnconfigure(column, weight=1, uniform="visit")
+            entry.grid(row=2 + index * 2, column=0, sticky="ew", pady=(3, 4), ipady=8)
             self.visit_controls.append(entry)
+        self.setup_check = tk.Checkbutton(visit, text="ยืนยันว่ากล้องและจุดตรวจเดิม ทำตามท่าที่กำหนด และมองตรง",
+                       variable=self.setup_confirmed, bg=t["surface"], fg=t["text"], selectcolor=t["surface"],
+                       activebackground=t["surface"], activeforeground=t["text"], font=(t["font"], 10),
+                       wraplength=330, justify="left", anchor="w")
+        self.setup_check.grid(row=5, column=0, sticky="w", pady=(8, 0))
         self.symptom_check = tk.Checkbutton(visit, text="มีอาการผิดปกติ (ถ้ามี กรุณาเลือกเพื่อแสดงคำแนะนำฉุกเฉิน)", variable=self.symptoms_reported,
                        command=self.symptom_changed, bg=t["surface"], fg=t["text"], selectcolor=t["surface"],
-                       activebackground=t["surface"], activeforeground=t["text"], font=(t["font"], 10))
-        self.symptom_check.grid(row=3, column=0, sticky="w", padx=(0, 8))
+                       activebackground=t["surface"], activeforeground=t["text"], font=(t["font"], 10),
+                       wraplength=330, justify="left", anchor="w")
+        self.symptom_check.grid(row=6, column=0, sticky="w", pady=(4, 0))
         self.visit_controls.append(self.symptom_check)
         self.update_symptom_visibility()
-        self.setup_check = tk.Checkbutton(visit, text="ยืนยันกล้องและจุดตรวจเดิม ทำตามท่าที่กำหนด และมองตรง",
-                       variable=self.setup_confirmed, bg=t["surface"], fg=t["text"], selectcolor=t["surface"],
-                       activebackground=t["surface"], activeforeground=t["text"], font=(t["font"], 10))
-        self.setup_check.grid(row=3, column=1, sticky="w")
 
         # ---- left column, card 2: camera preview + actions
         card = tk.Frame(left, bg=t["surface"], padx=14, pady=10)
@@ -296,6 +325,7 @@ class Dashboard:
 
         # ---- right column, card 2 (displayed below steps): current step (accent background)
         current = tk.Frame(right, bg=t["accent"], padx=14, pady=12)
+        self.current_card = current  # only shown while the camera is streaming
         self.current_step = label(current, "ขั้นตอนปัจจุบัน", t, size=10)
         self.current_step.configure(bg=t["accent"], fg=t["accent_text"], anchor="w", justify="left")
         self.current_step.pack(fill="x")
@@ -309,51 +339,28 @@ class Dashboard:
         self.detail.configure(bg=t["accent"], fg=t["accent_text"], anchor="w", justify="left")
         self.detail.pack(fill="x", pady=(8, 0))
 
-        # ---- right column, card 1: numbered steps
-        stages = Card(right, t, "ขั้นตอนการเก็บข้อมูล")
-        stages.configure(padx=14, pady=10)
-        stages.pack(fill="x", pady=(0, 10))
-        current.pack(fill="x", pady=(0, 10))  # shown below the steps card
-        stage_grid = tk.Frame(stages, bg=t["surface"])
-        stage_grid.pack(fill="x")
-        stage_grid.columnconfigure(0, weight=1, uniform="stage")
-        stage_grid.columnconfigure(1, weight=1, uniform="stage")
-        self.stage_labels, self.stage_badges, self.stage_numbers = {}, {}, {}
-        for index, (state, step_title, _, _) in enumerate(STEPS):
-            row = tk.Frame(stage_grid, bg=t["surface"])
-            row.grid(row=index // 2, column=index % 2, sticky="ew", padx=(0, 8), pady=2)
-            badge = tk.Canvas(row, width=21, height=21, bg=t["surface"], highlightthickness=0)
-            badge.create_oval(1, 1, 20, 20, outline="", tags="bg")
-            badge.create_text(10.5, 10.5, text=str(index + 1), font=(t["font"], 8, "bold"), tags="num")
-            badge.pack(side="left")
-            item = label(row, step_title, t, size=9)
-            item.configure(bg=t["surface"], anchor="w")
-            item.pack(side="left", padx=(7, 0))
-            self.stage_labels[state] = item
-            self.stage_badges[state] = badge
-            self.stage_numbers[state] = str(index + 1)
-        self.paint_stages_idle()
-
         # ---- right column, card 3: result
         result = Card(right, t, "ผลของคุณ")
         result.configure(padx=14, pady=10)
-        result.pack(fill="both", expand=True)
+        result.pack(fill="x")
+        self.result_card = result
         self.result_title = label(result, "ยังไม่มีผล", t, bold=True, wraplength=430)
         self.result_title.pack(fill="x")
-        self.result_body = ScrolledText(result, height=5, width=28, wrap="word", relief="flat",
+        self.result_body = ScrolledText(result, height=2, width=28, wrap="word", relief="flat",
                                        bg=t["surface"], fg=t["muted"],
                                        font=(t["font"], t["font_size"]), borderwidth=0)
         self.result_body.vbar.pack_forget()  # wheel scrolling still works; no scrollbar chrome
-        self.result_body.pack(fill="both", expand=True, pady=(4, 0))
+        self.result_body.pack(fill="x", pady=(4, 0))
         self.set_result_text("ทำตามขั้นตอนให้ครบเพื่อดูผลสรุป")
 
         # Keep symptom guidance visible even when the main page is scrolled.
         compact_safety = ("ระบบช่วยคัดกรอง ไม่ใช่การวินิจฉัยหรือยืนยันว่าไม่มีโรค · "
                           "หากมีหน้าเบี้ยว แขนอ่อนแรง หรือพูดผิดปกติเฉียบพลัน ให้ติดต่อบริการฉุกเฉินทันที")
-        self.footer = label(self.root, compact_safety, t, muted=True, size=8, wraplength=1280)
-        self.footer.pack(side="bottom", fill="x", padx=14, pady=(3, 4), before=self.page)
+        self.footer = tk.Label(self.root, text=compact_safety, font=(t["font"], 10), justify="left", anchor="w",
+                               wraplength=1240, padx=14, pady=8, bd=0, highlightthickness=1)
+        self.footer.pack(side="bottom", fill="x", padx=14, pady=(0, 10), before=self.page)
         self.update_care_notice()
-        self.set_overlay(True, status="ยังไม่เชื่อมต่อ - กล้องปิดอยู่")
+        self.set_overlay(True, status="ยังไม่เชื่อมต่อ · กล้องปิดอยู่")
         self.set_ready(False)
         self.video.render()
         if self.snapshot:
@@ -377,7 +384,7 @@ class Dashboard:
 
     def resize_page(self, _event=None):
         width = max(1, self.container.winfo_width())
-        self.footer.configure(wraplength=max(200, width - 2 * self.theme["spacing"]))
+        self.footer.configure(wraplength=max(200, width - 2 * self.theme["spacing"] - 30))
         if self.research:
             self.research_banner.configure(wraplength=max(200, width - 2 * self.theme["spacing"]))
 
@@ -470,9 +477,12 @@ class Dashboard:
         if message:
             self.symptom_notice_latched = True
         urgent = self.symptom_notice_latched or self.symptoms_reported.get()
+        t = self.theme
+        tint = t["danger"] if urgent else t["warning"]
         self.footer.configure(text=CARE_TH if urgent else SAFETY_TH,
-                              fg=self.theme["danger"] if urgent else self.theme["muted"],
-                              font=(self.theme["font"], 11 if urgent else 10, "bold" if urgent else "normal"))
+                              bg=blend(tint, t["surface"], 0.10), highlightbackground=blend(tint, t["surface"], 0.35),
+                              fg=t["danger"] if urgent else blend(t["warning"], "#000000", 0.55),
+                              font=(t["font"], 11 if urgent else 10, "bold" if urgent else "normal"))
 
     def start_visit(self):
         request = {"mode": self.visit_mode.get(), "user_id": self.user_id.get(), "visit_id": self.visit_id.get(),
@@ -485,7 +495,9 @@ class Dashboard:
         # Avoid resetting selection and scroll position on every camera frame.
         if self.result_body.get("1.0", "end-1c") == text:
             return
-        self.result_body.configure(state="normal")
+        # Grow with the text so the card stays compact when there is little to say.
+        rows = sum(max(1, -(-len(part) // 34)) for part in text.split("\n"))
+        self.result_body.configure(state="normal", height=max(2, min(12, rows)))
         self.result_body.delete("1.0", "end")
         self.result_body.insert("1.0", text)
         self.result_body.configure(state="disabled")
@@ -596,8 +608,9 @@ class Dashboard:
         if not ready:
             message = {"loading": "กำลังเตรียมกล้องและโมเดล ครั้งแรกอาจต้องดาวน์โหลดไฟล์…",
                        "disconnecting": "กำลังตัดการเชื่อมต่อกล้อง…",
-                       "disconnected": "ยังไม่เชื่อมต่อ - กล้องปิดอยู่"}.get(status, data.get("message", "ไม่สามารถใช้กล้องได้"))
+                       "disconnected": "ยังไม่เชื่อมต่อ · กล้องปิดอยู่"}.get(status, data.get("message", "ไม่สามารถใช้กล้องได้"))
             self.connection.pack_forget()
+            self.show_current(False)
             self.set_overlay(True, "ไม่สามารถใช้กล้องได้" if status == "error" else "เชื่อมต่อกล้องเพื่อเริ่มต้น",
                              message, error=status == "error")
             self.video.render(message="ไม่สามารถใช้กล้องได้" if status == "error" else None)
@@ -610,6 +623,7 @@ class Dashboard:
             self.paint_stages_idle()
             return
         self.set_overlay(False)
+        self.show_current(True)
         if not self.connection.winfo_manager():
             self.connection.pack(fill="x", pady=(8, 0), after=self.video_holder)
         self.connection.configure(text=("กำลังแสดงตัวอย่าง · ข้อมูลจำลอง" if self.preview else f"เชื่อมต่อกล้องแล้ว · {data.get('fps', 0):.0f} FPS"), fg=t["muted"])
