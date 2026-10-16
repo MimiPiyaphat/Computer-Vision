@@ -5,6 +5,8 @@ thresholds. Keep calibration values in this file so they can be adjusted
 without changing the application logic.
 """
 
+import os
+
 # Camera
 CAMERA_INDEX = 0
 FRAME_WIDTH = 640
@@ -55,7 +57,7 @@ ARM_RAISE_CHANGE_ALERT_PERCENT = 10.0
 ARM_HOLD_CHANGE_ALERT_SEC = 2.0
 
 # No clinical delta cutoff is supplied by default.
-FEATURE_STORE_DIR = "data/features"
+FEATURE_STORE_DIR = os.environ.get("STROKEVISION_DATA_DIR", "data/features")
 DELTA_POLICY_PATH = "validation/deployment_threshold.json"
 CAPTURE_STATION_ID = "station-01"  # Fixed physical camera/seat/floor markers.
 BASELINE_MAX_AGE_HOURS = 12

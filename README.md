@@ -115,6 +115,26 @@ cloudflared tunnel --url http://127.0.0.1:8000
 
 มือถือจะต้องเชื่อถือใบรับรองนั้น มิฉะนั้นเบราว์เซอร์อาจไม่อนุญาตใช้กล้อง
 
+#### Deploy บน Render โดยไม่ต้องเปิดคอมทิ้งไว้
+
+ไฟล์ `render.yaml` เตรียม Web Service บน branch `main` ให้ bind กับพอร์ตของ
+Render, ดาวน์โหลด FaceNet และ YOLOv8-Pose ระหว่าง build และเก็บฐานข้อมูล SQLite
+ไว้บน persistent disk ขนาด 1 GB ขั้นตอน deploy:
+
+1. Push branch `main` ขึ้น GitHub แล้วเข้า Render เลือก **New > Blueprint**
+2. เชื่อม repository นี้และยืนยัน Blueprint จาก `render.yaml`
+3. เมื่อ Render ถามค่า `STROKEVISION_ACCESS_KEY` ให้ตั้งเป็นข้อความสุ่มที่เดายาก
+   และเก็บไว้เป็นความลับ
+4. รอ build/deploy สำเร็จ แล้วเปิด
+   `https://ชื่อบริการ.onrender.com/?key=ค่าที่ตั้งไว้`
+
+Blueprint ใช้แผน Starter เพราะ Python, MediaPipe, YOLOv8-Pose และ FaceNet ต้องใช้
+หน่วยความจำ และใช้ persistent disk เพื่อไม่ให้ baseline หายหลัง restart จึงไม่ใช่
+การ deploy แบบฟรี หากใช้ Free instance ระบบไฟล์รวมถึง SQLite จะหายเมื่อ service
+หยุดหรือ redeploy ทำให้ขั้นตอนก่อนนวดและหลังนวดไม่น่าเชื่อถือสำหรับการใช้งานจริง
+Render เป็นผู้ยุติ HTTPS ให้โดยอัตโนมัติ กล้องมือถือจึงเปิดได้โดยไม่ต้องใช้
+Cloudflare Tunnel และไม่ต้องเปิด Terminal บนคอมไว้
+
 Other modes:
 
 ```powershell

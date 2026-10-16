@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: strokevision-ai
+    runtime: python
+    plan: starter
+    branch: main
+    buildCommand: bash render-build.sh
+    startCommand: python web_app.py --host 0.0.0.0
+    healthCheckPath: /healthz
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.6
+      - key: STROKEVISION_ACCESS_KEY
+        sync: false
+      - key: STROKEVISION_DATA_DIR
+        value: /var/data/features
+    disk:
+      name: strokevision-data
+      mountPath: /var/data
+      sizeGB: 1

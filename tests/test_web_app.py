@@ -104,6 +104,11 @@ class WebServerTests(unittest.TestCase):
         self.assertIn("StrokeVision", text)
         self.assertIn("viewport", text)
 
+    def test_health_check_does_not_require_access_key(self):
+        with urllib.request.urlopen(self.base + "/healthz", timeout=2) as response:
+            data = json.loads(response.read())
+        self.assertEqual(data, {"status": "ok"})
+
     def test_api_requires_access_key(self):
         with self.assertRaises(urllib.error.HTTPError) as caught:
             urllib.request.urlopen(self.base + "/api/status", timeout=2)
