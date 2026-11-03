@@ -106,6 +106,10 @@ class WebServerTests(unittest.TestCase):
         self.assertIn('id="stageList"', text)
         self.assertIn('id="newCustomerButton"', text)
         self.assertIn('id="currentCard" class="card current-card hidden"', text)
+        for screen in ("loginScreen", "modeScreen", "captureScreen", "resultScreen"):
+            self.assertIn(f'id="{screen}"', text)
+        self.assertIn('id="loginButton"', text)
+        self.assertIn('id="continueButton"', text)
 
     def test_health_check_does_not_require_access_key(self):
         with urllib.request.urlopen(self.base + "/healthz", timeout=2) as response:

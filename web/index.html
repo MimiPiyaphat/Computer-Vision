@@ -3,92 +3,93 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#f4f7f6">
-  <title>StrokeVision | บันทึกก่อนนวดและตรวจซ้ำ</title>
+  <meta name="theme-color" content="#f8f5ee">
+  <title>StrokeVision | ดูแลก่อนและหลังนวด</title>
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-  <header class="topbar">
-    <div class="brand-block">
-      <div class="eyebrow">STROKEVISION AI</div>
-      <div class="title-line">
-        <h1>StrokeVision</h1>
-        <span>บันทึกก่อนนวดและตรวจซ้ำ</span>
-      </div>
-      <p>ติดตามการเปลี่ยนแปลงของใบหน้าและการยกแขนก่อน–หลังนวด</p>
-    </div>
-    <span id="connectionPill" class="pill offline">ยังไม่เชื่อมต่อ</span>
-  </header>
+  <div class="app-shell">
+    <header class="topbar">
+      <button class="brand" type="button" aria-label="กลับหน้าแรก"><span class="brand-mark">S</span><span><strong>StrokeVision</strong><small>ดูแลก่อนและหลังนวด</small></span></button>
+      <div class="top-actions"><span id="connectionPill" class="pill offline"><i></i> ยังไม่เชื่อมต่อ</span><button id="newCustomerButton" class="button outline compact" type="button">เริ่มใหม่</button></div>
+    </header>
 
-  <main>
-    <section class="card stages-card" aria-labelledby="stagesTitle">
-      <h2 id="stagesTitle" class="sr-only">ขั้นตอนการเก็บข้อมูล</h2>
-      <ol id="stageList"></ol>
-    </section>
-
-    <div class="workspace">
-      <section class="camera-card card" aria-labelledby="cameraTitle">
-        <div class="section-heading compact">
-          <div><span class="step-number">กล้อง</span><h2 id="cameraTitle">ภาพขณะตรวจ</h2></div>
-          <p id="fpsText">ใช้งานได้บนคอมและมือถือ</p>
-        </div>
-        <div class="preview-shell">
-          <video id="camera" autoplay muted playsinline></video>
-          <canvas id="capture" width="640" height="480" hidden></canvas>
-          <div id="cameraEmpty" class="camera-empty">
-            <strong>ยังไม่ได้เปิดกล้อง</strong>
-            <span>กด “เชื่อมต่อกล้อง” และอนุญาตการใช้งานกล้อง</span>
+    <main>
+      <section id="loginScreen" class="screen active login-screen" aria-labelledby="loginTitle">
+        <div class="welcome-panel">
+          <div class="leaf leaf-one"></div><div class="leaf leaf-two"></div>
+          <div class="welcome-copy">
+            <p class="eyebrow">STROKEVISION AI</p>
+            <h1>เริ่มต้นการดูแล<br><span>อย่างสบายใจ</span></h1>
+            <p>ระบบติดตามการเปลี่ยนแปลงของใบหน้าและการยกแขนก่อน–หลังนวด พร้อมแนะนำทีละขั้นตอน</p>
+            <div class="trust-note"><span>✓</span><div><strong>ข้อมูลของคุณได้รับการดูแล</strong><small>ระบบไม่บันทึกภาพหรือวิดีโอจากกล้อง</small></div></div>
           </div>
-          <div class="frame-guide" aria-hidden="true"><span>จัดใบหน้าให้อยู่กึ่งกลาง</span></div>
+          <div class="wellness-art" aria-hidden="true"><span>✿</span><i></i><b></b></div>
         </div>
-        <div class="actions">
-          <button id="connectButton" class="button secondary" type="button">เชื่อมต่อกล้อง</button>
-          <button id="startButton" class="button primary" type="button" disabled>เริ่มบันทึกก่อนนวด</button>
-          <button id="stopButton" class="button ghost" type="button" disabled>หยุด</button>
-        </div>
-        <p class="camera-note">ขั้นตอนยกแขน: วางมือถือแนวนอนหรือถอยให้เห็นหัวไหล่และข้อมือทั้งสองข้าง</p>
-      </section>
-
-      <aside class="sidebar">
-        <section class="setup card" aria-labelledby="setupTitle">
-          <div class="section-heading compact">
-            <div><h2 id="setupTitle">ผู้รับบริการ</h2></div>
-            <button id="newCustomerButton" class="button outline small" type="button">+ ใหม่</button>
-          </div>
-          <div class="mode-switch" role="group" aria-label="ประเภทการตรวจ">
-            <button class="mode active" data-mode="baseline" type="button">ก่อนนวด <small>Baseline</small></button>
-            <button class="mode" data-mode="recheck" type="button">หลังนวด <small>Recheck</small></button>
-          </div>
-          <div class="fields">
+        <div class="login-panel card">
+          <div><p class="eyebrow">ยินดีต้อนรับ</p><h2 id="loginTitle">เข้าสู่ระบบ</h2><p class="muted">กรอกรหัสเพื่อเริ่มการตรวจ ใช้เวลาเพียงไม่กี่นาที</p></div>
+          <div class="fields login-fields">
             <label>รหัสผู้รับบริการ / QR สมาชิก<input id="userId" autocomplete="off" placeholder="เช่น SV-001"></label>
             <label>รหัสครั้งรับบริการ<input id="visitId" autocomplete="off" placeholder="เช่น VISIT-01"></label>
           </div>
-          <label class="check"><input id="confirmed" type="checkbox"> ยืนยันว่ากล้องและจุดตรวจเดิม ทำตามท่าที่กำหนด และมองตรง</label>
-          <label id="symptomRow" class="check hidden"><input id="symptoms" type="checkbox"> มีอาการผิดปกติที่ต้องแจ้งเจ้าหน้าที่</label>
-        </section>
+          <button id="loginButton" class="button primary wide" type="button">เข้าสู่ระบบ <span>→</span></button>
+          <p class="helper-line"><span>?</span> หากไม่ทราบรหัส กรุณาติดต่อเจ้าหน้าที่</p>
+        </div>
+      </section>
 
-        <section id="currentCard" class="card current-card hidden" aria-live="polite">
-          <div class="current-label">ขั้นตอนปัจจุบัน</div>
-          <div id="stageBadge" class="stage-badge">เตรียมเริ่มตรวจ</div>
-          <h3 id="instruction">เชื่อมต่อกล้อง กรอกรหัส และยืนยันจุดตรวจ</h3>
-          <p id="stageDetail">ระบบจะแนะนำทีละขั้นตอน</p>
-          <div class="progress-track"><div id="progressBar"></div></div>
-          <p id="timerText" class="timer"></p>
-        </section>
+      <section id="modeScreen" class="screen mode-screen" aria-labelledby="modeTitle">
+        <div class="screen-header"><button id="backToLogin" class="back-button" type="button">← ย้อนกลับ</button><div><p class="eyebrow">ขั้นตอนที่ 1 จาก 3</p><h1 id="modeTitle">วันนี้คุณต้องการทำรายการใด?</h1><p>เลือกช่วงเวลาที่กำลังเข้ารับบริการ</p></div></div>
+        <div class="mode-layout">
+          <div class="mode-options" role="group" aria-label="ประเภทการตรวจ">
+            <button class="mode active" data-mode="baseline" type="button"><span class="mode-icon">♨</span><span><strong>ก่อนนวด</strong><small>Baseline · บันทึกข้อมูลอ้างอิง</small></span><i>✓</i></button>
+            <button class="mode" data-mode="recheck" type="button"><span class="mode-icon">↻</span><span><strong>หลังนวด</strong><small>Recheck · เปรียบเทียบการเปลี่ยนแปลง</small></span><i>✓</i></button>
+          </div>
+          <aside class="guide-card"><div class="guide-avatar">☺</div><div><strong>ถัดไปคุณจะได้ทำอะไร?</strong><p>เปิดกล้องและทำตามคำแนะนำ 7 ขั้นตอน ระบบจะแสดงท่าที่ต้องทำทีละอย่าง</p></div></aside>
+        </div>
+        <div class="confirm-panel card">
+          <label class="check"><input id="confirmed" type="checkbox"><span><strong>ฉันพร้อมเริ่มตรวจ</strong><small>ใช้กล้องและจุดตรวจเดิม ทำตามท่าที่กำหนด และมองตรง</small></span></label>
+          <label id="symptomRow" class="check warning-check hidden"><input id="symptoms" type="checkbox"><span><strong>มีอาการผิดปกติที่ต้องแจ้งเจ้าหน้าที่</strong><small>หากมีอาการฉับพลัน ให้ขอความช่วยเหลือทันทีโดยไม่รอผล</small></span></label>
+          <button id="continueButton" class="button primary" type="button">ไปยังหน้าตรวจ <span>→</span></button>
+        </div>
+      </section>
 
-        <section id="resultCard" class="card result-card neutral" aria-live="assertive">
-          <p class="eyebrow">ผลของคุณ</p>
-          <h2 id="resultTitle">ยังไม่มีผล</h2>
-          <p id="resultBody">ทำตามขั้นตอนให้ครบเพื่อดูผลสรุป</p>
-          <button id="retryButton" class="button secondary hidden" type="button">ตรวจใหม่อีกครั้ง</button>
-        </section>
-      </aside>
-    </div>
-  </main>
+      <section id="captureScreen" class="screen capture-screen" aria-labelledby="cameraTitle">
+        <div class="capture-top">
+          <button id="backToMode" class="back-button" type="button">← เลือกใหม่</button>
+          <div class="customer-chip"><span id="customerCode">—</span><small id="visitModeText">ก่อนนวด</small></div>
+          <section class="stages-card" aria-labelledby="stagesTitle"><h2 id="stagesTitle" class="sr-only">ขั้นตอนการเก็บข้อมูล</h2><ol id="stageList"></ol></section>
+        </div>
+        <div class="capture-layout">
+          <section class="camera-card card">
+            <div class="section-heading"><div><span class="camera-dot"></span><h2 id="cameraTitle">ภาพขณะตรวจ</h2></div><p id="fpsText">จัดใบหน้าให้อยู่กึ่งกลาง</p></div>
+            <div class="preview-shell">
+              <video id="camera" autoplay muted playsinline></video><canvas id="capture" width="640" height="480" hidden></canvas>
+              <div id="cameraEmpty" class="camera-empty"><span class="camera-symbol">▣</span><strong>พร้อมเปิดกล้อง</strong><small>กดปุ่มด้านล่างและอนุญาตการใช้งานกล้อง</small></div><div class="frame-guide" aria-hidden="true"></div>
+            </div>
+          </section>
+          <aside class="task-column">
+            <section id="currentCard" class="card current-card hidden" aria-live="polite">
+              <p class="eyebrow">ขั้นตอนปัจจุบัน</p><div id="stageBadge" class="stage-badge">เตรียมเริ่มตรวจ</div><h3 id="instruction">เปิดกล้องเพื่อเริ่มต้น</h3><p id="stageDetail">ระบบจะแนะนำทีละขั้นตอน</p>
+              <div class="timer-ring"><strong id="timerValue">—</strong><small>วินาที</small></div><div class="progress-track"><div id="progressBar"></div></div><p id="timerText" class="timer"></p>
+            </section>
+            <section id="readyCard" class="card ready-card"><span>☘</span><h3>เตรียมพร้อมก่อนเริ่ม</h3><p>นั่งตัวตรง มองกล้อง และจัดแสงให้เห็นใบหน้าชัดเจน</p></section>
+            <div class="actions"><button id="connectButton" class="button secondary" type="button">เชื่อมต่อกล้อง</button><button id="startButton" class="button primary" type="button" disabled>เริ่มบันทึกก่อนนวด</button><button id="stopButton" class="button ghost" type="button" disabled>หยุด</button></div>
+            <p class="camera-note">ตอนยกแขน กรุณาถอยให้เห็นหัวไหล่และข้อมือทั้งสองข้าง</p>
+          </aside>
+        </div>
+      </section>
 
-  <footer>
-    ระบบช่วยคัดกรอง ไม่ใช่การวินิจฉัยหรือยืนยันว่าไม่มีโรค หากมีหน้าเบี้ยว แขนอ่อนแรง พูดผิดปกติ หรืออาการทางระบบประสาทที่เกิดฉับพลัน ให้ติดต่อบริการฉุกเฉินทันทีโดยไม่รอผลจากระบบ
-  </footer>
+      <section id="resultScreen" class="screen result-screen" aria-labelledby="resultTitle">
+        <div class="result-wrap">
+          <div class="result-illustration"><span>✓</span></div>
+          <section id="resultCard" class="card result-card neutral" aria-live="assertive"><p class="eyebrow">ผลของคุณ</p><h1 id="resultTitle">ยังไม่มีผล</h1><p id="resultBody">ทำตามขั้นตอนให้ครบเพื่อดูผลสรุป</p><div class="result-actions"><button id="retryButton" class="button secondary hidden" type="button">ตรวจใหม่อีกครั้ง</button><button id="finishButton" class="button primary" type="button">เสร็จสิ้น <span>→</span></button></div></section>
+          <aside class="next-card"><strong>สิ่งที่ควรทำต่อ</strong><p>หากรู้สึกผิดปกติหรือไม่มั่นใจ กรุณาแจ้งเจ้าหน้าที่ทันที</p></aside>
+        </div>
+      </section>
+    </main>
+
+    <footer><span>!</span> ระบบช่วยคัดกรอง ไม่ใช่การวินิจฉัย หากมีหน้าเบี้ยว แขนอ่อนแรง พูดผิดปกติ หรืออาการฉับพลัน ให้ติดต่อบริการฉุกเฉินทันที</footer>
+  </div>
   <div id="toast" class="toast" role="alert" hidden></div>
   <script src="/app.js" defer></script>
 </body>

@@ -25,6 +25,17 @@ const resultCard = document.querySelector("#resultCard");
 const resultTitle = document.querySelector("#resultTitle");
 const resultBody = document.querySelector("#resultBody");
 const toast = document.querySelector("#toast");
+const screens = [...document.querySelectorAll(".screen")];
+const loginButton = document.querySelector("#loginButton");
+const continueButton = document.querySelector("#continueButton");
+const finishButton = document.querySelector("#finishButton");
+const backToLogin = document.querySelector("#backToLogin");
+const backToMode = document.querySelector("#backToMode");
+const readyCard = document.querySelector("#readyCard");
+const customerCode = document.querySelector("#customerCode");
+const visitModeText = document.querySelector("#visitModeText");
+const timerValue = document.querySelector("#timerValue");
+const timerRing = document.querySelector(".timer-ring");
 
 const state = { mode: "baseline", stream: null, connected: false, running: false, loop: 0 };
 const queryKey = new URLSearchParams(location.search).get("key");
@@ -44,6 +55,26 @@ function notify(message) {
   toast.hidden = false;
   clearTimeout(notify.timer);
   notify.timer = setTimeout(() => { toast.hidden = true; }, 5000);
+}
+
+function showScreen(id) {
+  screens.forEach(screen => screen.classList.toggle("active", screen.id === id));
+  document.querySelector(`#${id} button:not([disabled]), #${id} input:not([disabled])`)?.focus({ preventScroll: true });
+}
+
+function enterCustomer() {
+  if (!userId.value.trim() || !visitId.value.trim()) {
+    return notify("กรุณากรอกรหัสผู้รับบริการและรหัสครั้งรับบริการ");
+  }
+  customerCode.textContent = `${userId.value.trim()} · ${visitId.value.trim()}`;
+  showScreen("modeScreen");
+}
+
+async function continueToCapture() {
+  if (!confirmed.checked) return notify("กรุณายืนยันความพร้อมก่อนเริ่มตรวจ");
+  visitModeText.textContent = state.mode === "baseline" ? "ก่อนนวด" : "หลังนวด";
+  showScreen("captureScreen");
+  if (!state.connected) await connectCamera();
 }
 
 async function api(path, options = {}) {
@@ -71,6 +102,7 @@ function setMode(mode) {
   symptomRow.classList.toggle("hidden", mode !== "recheck");
   startButton.textContent = mode === "baseline" ? "เริ่มบันทึกก่อนนวด" : "เริ่มตรวจหลังนวด";
   stageBadge.textContent = mode === "baseline" ? "ก่อนนวด · เตรียมเริ่มตรวจ" : "หลังนวด · เตรียมเริ่มตรวจ";
+  visitModeText.textContent = mode === "baseline" ? "ก่อนนวด" : "หลังนวด";
 }
 
 function drawCover() {
@@ -103,6 +135,9 @@ function renderSnapshot(data) {
   stageDetail.textContent = active?.instruction || "ระบบกำลังประมวลผลข้อมูลจากกล้อง";
   progressBar.style.width = `${Math.round((data.progress || 0) * 100)}%`;
   timerText.textContent = data.duration ? `${Math.min(data.elapsed, data.duration).toFixed(1)} / ${data.duration.toFixed(0)} วินาที` : "";
+  const remaining = data.duration ? Math.max(0, data.duration - data.elapsed) : null;
+  timerValue.textContent = remaining == null ? "—" : Math.ceil(remaining);
+  timerRing.style.setProperty("--ring", `${Math.round((data.progress || 0) * 100)}%`);
 
   if (data.result) {
     resultTitle.textContent = data.result.title;
@@ -116,6 +151,7 @@ function renderSnapshot(data) {
     stopButton.disabled = true;
     startButton.disabled = false;
     setLocked(false);
+    showScreen("resultScreen");
   }
 }
 
@@ -158,6 +194,7 @@ async function connectCamera() {
     connectButton.textContent = "เชื่อมต่อใหม่";
     startButton.disabled = false;
     currentCard.classList.remove("hidden");
+    readyCard.classList.add("hidden");
   } catch (error) {
     state.connected = false;
     notify(error.name === "NotAllowedError" ? "ไม่ได้รับอนุญาตใช้กล้อง กรุณาอนุญาตกล้องในเบราว์เซอร์" : error.message);
@@ -183,6 +220,8 @@ async function startScreening() {
     resultTitle.textContent = "กำลังเก็บข้อมูล";
     resultBody.textContent = "ทำตามคำแนะนำทีละขั้นตอน";
     retryButton.classList.add("hidden");
+    currentCard.classList.remove("hidden");
+    readyCard.classList.add("hidden");
     state.running = true;
     state.loop += 1;
     setLocked(true);
@@ -206,11 +245,20 @@ async function stopScreening() {
 }
 
 modeButtons.forEach(button => button.addEventListener("click", () => setMode(button.dataset.mode)));
+loginButton.addEventListener("click", enterCustomer);
+userId.addEventListener("keydown", event => { if (event.key === "Enter") visitId.focus(); });
+visitId.addEventListener("keydown", event => { if (event.key === "Enter") enterCustomer(); });
+continueButton.addEventListener("click", continueToCapture);
+backToLogin.addEventListener("click", () => showScreen("loginScreen"));
+backToMode.addEventListener("click", () => {
+  if (state.running) return notify("กรุณาหยุดการตรวจก่อนเลือกใหม่");
+  showScreen("modeScreen");
+});
 connectButton.addEventListener("click", connectCamera);
 startButton.addEventListener("click", startScreening);
 stopButton.addEventListener("click", stopScreening);
-retryButton.addEventListener("click", startScreening);
-newCustomerButton.addEventListener("click", () => {
+retryButton.addEventListener("click", () => { showScreen("captureScreen"); startScreening(); });
+function resetCustomer() {
   if (state.running) return notify("กรุณาหยุดการตรวจก่อนเปลี่ยนผู้รับบริการ");
   userId.value = "";
   visitId.value = "";
@@ -221,7 +269,15 @@ newCustomerButton.addEventListener("click", () => {
   resultTitle.textContent = "ยังไม่มีผล";
   resultBody.textContent = "ทำตามขั้นตอนให้ครบเพื่อดูผลสรุป";
   retryButton.classList.add("hidden");
-  userId.focus();
+  currentCard.classList.add("hidden");
+  readyCard.classList.remove("hidden");
+  customerCode.textContent = "—";
+  showScreen("loginScreen");
+}
+newCustomerButton.addEventListener("click", resetCustomer);
+finishButton.addEventListener("click", resetCustomer);
+document.querySelector(".brand").addEventListener("click", () => {
+  if (!state.running) showScreen("loginScreen");
 });
 window.addEventListener("pagehide", () => {
   state.running = false;
@@ -233,6 +289,7 @@ window.addEventListener("pagehide", () => {
 });
 
 setMode("baseline");
+showScreen("loginScreen");
 renderStages([
   "ตรวจสอบกล้อง", "ใบหน้าผ่อนคลาย", "ยิ้ม", "หลับตา", "กะพริบตา", "ยกแขน", "สรุปผล",
 ].map((label, index) => ({ label, status: index === 0 ? "active" : "waiting" })));
