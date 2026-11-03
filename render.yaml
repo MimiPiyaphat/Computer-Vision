@@ -16,6 +16,8 @@ services:
         value: /tmp/strokevision/features
       - key: STROKEVISION_IDENTITY_BACKEND
         value: landmark
+      - key: STROKEVISION_ARM_POSE_BACKEND
+        value: mediapipe
       - key: MALLOC_ARENA_MAX
         value: "2"
       - key: OMP_NUM_THREADS

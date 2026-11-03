@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-python -m pip install -r requirements.txt
+python -m pip install -r requirements-render.txt
 
 # MediaPipe declares the GUI-enabled contrib wheel. The hosted service has no
 # display server, so replace all OpenCV variants with one compatible headless

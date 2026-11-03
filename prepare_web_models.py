@@ -10,11 +10,14 @@ def main():
     else:
         print("Skipping FaceNet weights; hosted identity backend:", IDENTITY_BACKEND)
 
-    from ultralytics import YOLO
-
-    model = YOLO(YOLO_POSE_MODEL)
-    model.model.cpu()
-    print("Pose model ready:", YOLO_POSE_MODEL)
+    from config import ARM_POSE_BACKEND
+    if ARM_POSE_BACKEND == "yolo":
+        from ultralytics import YOLO
+        model = YOLO(YOLO_POSE_MODEL)
+        model.model.cpu()
+        print("Pose model ready:", YOLO_POSE_MODEL)
+    else:
+        print("Using bundled MediaPipe Pose backend:", ARM_POSE_BACKEND)
 
 
 if __name__ == "__main__":

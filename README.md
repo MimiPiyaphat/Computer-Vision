@@ -75,7 +75,7 @@ For later runs:
 ### เปิดเป็นเว็บบนคอมและมือถือ
 
 หน้าเว็บใช้กล้องของเบราว์เซอร์ แต่ยังประมวลผลด้วย Python, MediaPipe,
-YOLOv8-Pose และตัวตรวจความสอดคล้องของบุคคลบนเครื่องที่รันเซิร์ฟเวอร์
+ตัวตรวจท่าทาง และตัวตรวจความสอดคล้องของบุคคลบนเครื่องที่รันเซิร์ฟเวอร์
 จึงใช้กฎและฐานข้อมูลเดียวกับแอปเดสก์ท็อป เซิร์ฟเวอร์ไม่บันทึกรูปหรือวิดีโอ
 เริ่มเซิร์ฟเวอร์ด้วย:
 
@@ -119,7 +119,7 @@ cloudflared tunnel --url http://127.0.0.1:8000
 #### Deploy บน Render โดยไม่ต้องเปิดคอมทิ้งไว้
 
 ไฟล์ `render.yaml` เตรียม Free Web Service บน branch `main` ให้ bind กับพอร์ตของ
-Render และดาวน์โหลด YOLOv8-Pose ระหว่าง build ขั้นตอน deploy:
+Render โดยใช้ MediaPipe Face Mesh และ MediaPipe Pose ที่มากับแพ็กเกจ ขั้นตอน deploy:
 
 1. Push branch `main` ขึ้น GitHub แล้วเข้า Render เลือก **New > Blueprint**
 2. เชื่อม repository นี้และยืนยัน Blueprint จาก `render.yaml`
@@ -131,7 +131,9 @@ Render และดาวน์โหลด YOLOv8-Pose ระหว่าง bu
 Blueprint ใช้แผน Free และจำกัดจำนวน thread เพื่อลดการใช้หน่วยความจำ พร้อมตั้ง
 `STROKEVISION_IDENTITY_BACKEND=landmark` เพื่อใช้ Face Mesh ที่โหลดอยู่แล้วตรวจ
 ความต่อเนื่องของบุคคลแทน FaceNet วิธีนี้ไม่ใช่การยืนยันตัวตนทางชีวมิติหรือการตรวจ
-liveness และเหมาะสำหรับเดโมระยะสั้นเท่านั้น Free instance มี RAM จำกัดและระบบไฟล์ชั่วคราว ดังนั้น SQLite
+liveness และตั้ง `STROKEVISION_ARM_POSE_BACKEND=mediapipe` เพื่อไม่โหลด PyTorch/
+YOLO ใน RAM 512 MB ส่วนการรันบนคอมยังใช้ FaceNet และ YOLOv8-Pose ตามเดิม
+โหมด hosted นี้เหมาะสำหรับเดโมระยะสั้นเท่านั้น Free instance มี RAM จำกัดและระบบไฟล์ชั่วคราว ดังนั้น SQLite
 และ baseline จะหายเมื่อ service พัก, restart หรือ deploy ใหม่ ควรทำก่อนนวดและ
 ตรวจซ้ำในช่วงที่ service เดิมยังทำงานอยู่ หากหน่วยความจำไม่พอต้องเปลี่ยนเป็นแผน
 ที่มี RAM มากขึ้น และใช้ persistent disk ก่อนใช้งานต่อเนื่อง Render เป็นผู้ยุติ

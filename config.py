@@ -26,6 +26,7 @@ EYE_CLOSED_RATIO = 0.70
 
 # Arm-pose screening
 YOLO_POSE_MODEL = "yolov8n-pose.pt"
+ARM_POSE_BACKEND = os.environ.get("STROKEVISION_ARM_POSE_BACKEND", "yolo").strip().lower()
 YOLO_CONF_THRESHOLD = 0.5
 YOLO_DEVICE = "cpu"
 YOLO_IMAGE_SIZE = 640

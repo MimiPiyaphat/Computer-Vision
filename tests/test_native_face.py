@@ -12,6 +12,14 @@ HAS_CV = all(importlib.util.find_spec(name) is not None for name in ('cv2', 'num
 
 @unittest.skipUnless(HAS_CV, 'Native CV dependencies are not installed in this interpreter')
 class HeadPoseTests(unittest.TestCase):
+    def test_hosted_arm_factory_selects_mediapipe_without_yolo(self):
+        import src.arm_pose as module
+        marker = object()
+        with patch.object(module, "ARM_POSE_BACKEND", "mediapipe"), \
+                patch.object(module, "MediaPipeArmPoseAnalyzer", return_value=marker) as constructor:
+            self.assertIs(module.create_arm_pose_analyzer(require_angles=True), marker)
+            constructor.assert_called_once_with(require_angles=True)
+
     @unittest.skipUnless(importlib.util.find_spec('ultralytics') is not None, 'YOLO missing')
     def test_arm_adapter_retains_normalized_drift_and_pauses_on_missing_pose(self):
         import numpy as np

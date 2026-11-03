@@ -52,10 +52,10 @@ class ScreeningSession:
 
     def _open_pipeline(self, width, height, pipeline_suffix="", station=None):
         from src.face_analytics import FaceAnalyzer
-        from src.arm_pose import ArmPoseAnalyzer
+        from src.arm_pose import create_arm_pose_analyzer
         from src.screening_flow import ScreeningFlow
         self.face = FaceAnalyzer()
-        self.arm = ArmPoseAnalyzer(require_angles=self.research)
+        self.arm = create_arm_pose_analyzer(require_angles=self.research)
         self.flow = ScreeningFlow(self.face, self.arm, require_angles=self.research)
         from src.face_identity import create_face_identity
         from src.feature_store import FeatureStore

@@ -33,12 +33,18 @@ def pipeline_signature():
     root = Path(__file__).resolve().parents[1]
     paths = [package / "modules/face_landmark/face_landmark_with_attention.tflite",
              package / "modules/face_landmark/face_landmark_front_cpu.binarypb",
-             package / "modules/face_detection/face_detection_short_range.tflite",
-             Path(config.YOLO_POSE_MODEL)]
+             package / "modules/face_detection/face_detection_short_range.tflite"]
+    if config.ARM_POSE_BACKEND == "mediapipe":
+        paths += [package / "modules/pose_landmark/pose_landmark_full.tflite",
+                  package / "modules/pose_landmark/pose_landmark_cpu.binarypb"]
+    else:
+        paths.append(Path(config.YOLO_POSE_MODEL))
     paths += [root / "src" / name for name in ("features.py", "head_pose.py", "face_analytics.py", "arm_features.py", "projected_arm_angle.py", "arm_pose.py", "screening_flow.py")]
     assets = [hashlib.sha256(path.read_bytes()).hexdigest() for path in paths]
-    packages = {name: importlib.metadata.version(name)
-                for name in ("mediapipe", "ultralytics", "numpy", "torch", "torchvision")}
+    package_names = ["mediapipe", "numpy"]
+    if config.ARM_POSE_BACKEND == "yolo":
+        package_names += ["ultralytics", "torch", "torchvision"]
+    packages = {name: importlib.metadata.version(name) for name in package_names}
     opencv_name, opencv_version = _installed_distribution(
         "opencv-python", "opencv-contrib-python-headless", "opencv-python-headless", "opencv-contrib-python"
     )

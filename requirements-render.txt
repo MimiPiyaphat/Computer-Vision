@@ -1,0 +1,4 @@
+# Low-memory hosted runtime. Desktop-only PyTorch, Ultralytics and FaceNet are
+# intentionally excluded; Render uses the MediaPipe backends in render.yaml.
+mediapipe==0.10.14
+numpy==1.26.4

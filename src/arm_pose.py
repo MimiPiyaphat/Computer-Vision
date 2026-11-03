@@ -7,10 +7,6 @@ Only visible, stable shoulder/wrist samples advance the hold timer.
 import time
 import math
 
-from src.runtime import configure_yolo_runtime
-
-configure_yolo_runtime()  # Must precede Ultralytics' import-time settings access.
-from ultralytics import YOLO
 from src.arm_features import ArmFeatures
 from src.projected_arm_angle import ProjectedArmAngle
 from src.acquisition import MESSAGES
@@ -24,7 +20,17 @@ from config import (
     YOLO_CONF_THRESHOLD,
     YOLO_DEVICE,
     YOLO_IMAGE_SIZE,
+    ARM_POSE_BACKEND,
 )
+
+# Do not import PyTorch/Ultralytics on the constrained hosted backend. Merely
+# importing that stack consumes a substantial part of Render Free's 512 MB.
+if ARM_POSE_BACKEND == "yolo":
+    from src.runtime import configure_yolo_runtime
+    configure_yolo_runtime()  # Must precede Ultralytics' settings access.
+    from ultralytics import YOLO
+else:
+    YOLO = None
 
 # COCO keypoint indices used by YOLOv8-Pose (17 standard points)
 # Reference: https://docs.ultralytics.com/tasks/pose/
@@ -34,7 +40,7 @@ LEFT_WRIST = 9
 RIGHT_WRIST = 10
 
 
-class ArmPoseAnalyzer:
+class YoloArmPoseAnalyzer:
     """
     Tracks arm position with YOLOv8-Pose to detect Arm Weakness.
     Usage: start_test() -> analyze(frame) repeatedly across frames during the test.
@@ -177,3 +183,117 @@ class ArmPoseAnalyzer:
     def close(self):
         self._last_yolo_results = None
         self._model = None
+
+
+class MediaPipeArmPoseAnalyzer(YoloArmPoseAnalyzer):
+    """Low-memory shoulder/wrist adapter used by constrained web hosting."""
+
+    def __init__(self, conf_threshold=YOLO_CONF_THRESHOLD,
+                 keypoint_conf_threshold=ARM_KEYPOINT_CONF_THRESHOLD, require_angles=False):
+        import mediapipe as mp
+        self._mp = mp
+        self._model = mp.solutions.pose.Pose(
+            # Complexity 1 uses the full model bundled in the MediaPipe wheel;
+            # complexity 0 attempts a runtime network download of the lite file.
+            static_image_mode=False, model_complexity=1, smooth_landmarks=True,
+            min_detection_confidence=conf_threshold,
+            min_tracking_confidence=conf_threshold)
+        self._conf_threshold = conf_threshold
+        self._keypoint_conf_threshold = keypoint_conf_threshold
+        self._started = False
+        self.require_angles = require_angles
+        self._detected_elapsed_sec = 0.0
+        self._last_detected_at = None
+        self._last_yolo_results = None
+        self._last_pose_results = None
+        self.normalized = ArmFeatures()
+        self.projected_angle = ProjectedArmAngle()
+
+    def analyze(self, frame_bgr):
+        if not self._started:
+            raise RuntimeError("start_test() must be called before analyze()")
+        import cv2
+        result = self._model.process(cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2RGB))
+        self._last_pose_results = result
+        pose = result.pose_landmarks
+        if pose is None:
+            self._last_detected_at = None
+            return self._empty_result(elapsed_sec=self._detected_elapsed_sec, reason_code="person_missing")
+        height, width = frame_bgr.shape[:2]
+
+        def point(index):
+            landmark = pose.landmark[index]
+            visibility = float(getattr(landmark, "visibility", 1.0))
+            x, y = float(landmark.x) * width, float(landmark.y) * height
+            if (not math.isfinite(visibility) or visibility < self._keypoint_conf_threshold or
+                    not math.isfinite(x) or not math.isfinite(y) or not (0 < x < width and 0 < y < height)):
+                return None
+            return x, y
+
+        left_wrist, right_wrist = point(15), point(16)
+        shoulders = {"left": point(11), "right": point(12)}
+        if left_wrist is None or right_wrist is None or any(value is None for value in shoulders.values()):
+            self._last_detected_at = None
+            reason = ("wrists_missing" if left_wrist is None and right_wrist is None else
+                      "wrist_missing" if left_wrist is None or right_wrist is None else "shoulders_missing")
+            return self._empty_result(elapsed_sec=self._detected_elapsed_sec, person_found=True,
+                                      reason_code=reason)
+        return self._analyze_visible(frame_bgr, left_wrist, right_wrist, shoulders)
+
+    def _analyze_visible(self, frame_bgr, left_wrist, right_wrist, shoulders):
+        now = time.monotonic()
+        proposed_elapsed = self._detected_elapsed_sec + (
+            now - self._last_detected_at if self._last_detected_at is not None else 0)
+        span = math.dist(shoulders["left"], shoulders["right"])
+        attempted = self.normalized.base and max(
+            self.normalized.base[side] - self.normalized.highest[side] for side in ("left", "right")) * span >= ARM_INITIAL_LIFT_MIN_PX
+        if not self.normalized.observe({"left": left_wrist, "right": right_wrist}, shoulders,
+                                       frame_bgr.shape[1], frame_bgr.shape[0], proposed_elapsed):
+            self._last_detected_at = None
+            return self._empty_result(elapsed_sec=self._detected_elapsed_sec, person_found=True,
+                                      reason_code=self.normalized.reason_code)
+        projected_now = self.projected_angle.angles({"left": left_wrist, "right": right_wrist}, shoulders)
+        self._detected_elapsed_sec = proposed_elapsed
+        self._last_detected_at = now
+        self.projected_angle.observe({"left": left_wrist, "right": right_wrist}, shoulders,
+                                     self._detected_elapsed_sec)
+        arm_function = self.normalized.function_result()
+        test_complete = (self._detected_elapsed_sec >= ARM_HOLD_DURATION_SEC or
+                         arm_function["status"] == "normal")
+        vector, angles = self.normalized.vector(), self.projected_angle.vector()
+        reason = ("hold_arms" if arm_function["status"] in ("normal", "unable_to_hold") else
+                  "spread_arms" if projected_now is None and attempted else "raise_arms")
+        return {
+            "pose_found": True, "person_found": True,
+            "elapsed_sec": round(self._detected_elapsed_sec, 1), "test_complete": test_complete,
+            "normalized_features": self.normalized.complete_vector() if test_complete else vector,
+            "capture_setup": self.normalized.setup, "research_angles": angles,
+            "arm_function": arm_function, "reason_code": reason,
+            "instruction": MESSAGES[reason], "capture_paused": False,
+        }
+
+    def draw_debug(self, frame_bgr):
+        if self._last_pose_results is not None and self._last_pose_results.pose_landmarks is not None:
+            self._mp.solutions.drawing_utils.draw_landmarks(
+                frame_bgr, self._last_pose_results.pose_landmarks,
+                self._mp.solutions.pose.POSE_CONNECTIONS)
+        return frame_bgr
+
+    def close(self):
+        if self._model is not None:
+            self._model.close()
+        self._model = None
+        self._last_pose_results = None
+
+
+def create_arm_pose_analyzer(require_angles=False):
+    selected = ARM_POSE_BACKEND
+    if selected == "yolo":
+        return YoloArmPoseAnalyzer(require_angles=require_angles)
+    if selected == "mediapipe":
+        return MediaPipeArmPoseAnalyzer(require_angles=require_angles)
+    raise ValueError("STROKEVISION_ARM_POSE_BACKEND must be 'yolo' or 'mediapipe'.")
+
+
+# Backwards-compatible public class for desktop callers and existing tests.
+ArmPoseAnalyzer = YoloArmPoseAnalyzer
