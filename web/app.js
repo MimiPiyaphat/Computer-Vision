@@ -5,8 +5,10 @@ const connectButton = document.querySelector("#connectButton");
 const startButton = document.querySelector("#startButton");
 const stopButton = document.querySelector("#stopButton");
 const retryButton = document.querySelector("#retryButton");
+const newCustomerButton = document.querySelector("#newCustomerButton");
 const connectionPill = document.querySelector("#connectionPill");
 const cameraEmpty = document.querySelector("#cameraEmpty");
+const currentCard = document.querySelector("#currentCard");
 const modeButtons = [...document.querySelectorAll(".mode")];
 const userId = document.querySelector("#userId");
 const visitId = document.querySelector("#visitId");
@@ -155,6 +157,7 @@ async function connectCamera() {
     connectionPill.classList.remove("offline");
     connectButton.textContent = "เชื่อมต่อใหม่";
     startButton.disabled = false;
+    currentCard.classList.remove("hidden");
   } catch (error) {
     state.connected = false;
     notify(error.name === "NotAllowedError" ? "ไม่ได้รับอนุญาตใช้กล้อง กรุณาอนุญาตกล้องในเบราว์เซอร์" : error.message);
@@ -207,6 +210,19 @@ connectButton.addEventListener("click", connectCamera);
 startButton.addEventListener("click", startScreening);
 stopButton.addEventListener("click", stopScreening);
 retryButton.addEventListener("click", startScreening);
+newCustomerButton.addEventListener("click", () => {
+  if (state.running) return notify("กรุณาหยุดการตรวจก่อนเปลี่ยนผู้รับบริการ");
+  userId.value = "";
+  visitId.value = "";
+  confirmed.checked = false;
+  symptoms.checked = false;
+  setMode("baseline");
+  resultCard.className = "card result-card neutral";
+  resultTitle.textContent = "ยังไม่มีผล";
+  resultBody.textContent = "ทำตามขั้นตอนให้ครบเพื่อดูผลสรุป";
+  retryButton.classList.add("hidden");
+  userId.focus();
+});
 window.addEventListener("pagehide", () => {
   state.running = false;
   state.stream?.getTracks().forEach(track => track.stop());

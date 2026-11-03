@@ -103,6 +103,9 @@ class WebServerTests(unittest.TestCase):
             text = response.read().decode("utf-8")
         self.assertIn("StrokeVision", text)
         self.assertIn("viewport", text)
+        self.assertIn('id="stageList"', text)
+        self.assertIn('id="newCustomerButton"', text)
+        self.assertIn('id="currentCard" class="card current-card hidden"', text)
 
     def test_health_check_does_not_require_access_key(self):
         with urllib.request.urlopen(self.base + "/healthz", timeout=2) as response:
