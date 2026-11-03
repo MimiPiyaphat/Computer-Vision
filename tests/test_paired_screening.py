@@ -1,5 +1,6 @@
 """Synthetic engineering fixtures only; these are NOT clinical validation data."""
 
+import importlib.metadata
 import importlib.util
 from contextlib import closing
 import json
@@ -14,7 +15,7 @@ from unittest.mock import Mock, patch
 from src.arm_features import ArmFeatures
 from src.feature_store import FeatureStore, validate_record
 from src.features import FEATURE_KEYS, SETUP_KEYS, SCHEMA, SCORE, face_geometry, delta_features
-from src.protocol import load_policy
+from src.protocol import _installed_distribution, load_policy
 from src.threshold_validation import load_pairs, validate_threshold, write_report
 from src.visit_workflow import VisitWorkflow
 from src.session import ScreeningSession
@@ -23,6 +24,21 @@ from export_feature_pairs import export_pairs
 
 EMBEDDING = [1.0] + [0.0] * 511
 IDENTITY_MODEL = "synthetic-facenet-fixture"
+
+
+class RuntimePackageTests(unittest.TestCase):
+    @patch("src.protocol.importlib.metadata.version")
+    def test_opencv_signature_falls_back_to_headless_distribution(self, version):
+        def installed(name):
+            if name == "opencv-contrib-python-headless":
+                return "4.10.0.84"
+            raise importlib.metadata.PackageNotFoundError(name)
+
+        version.side_effect = installed
+        self.assertEqual(
+            _installed_distribution("opencv-python", "opencv-contrib-python-headless"),
+            ("opencv-contrib-python-headless", "4.10.0.84"),
+        )
 
 
 def record(score=0):

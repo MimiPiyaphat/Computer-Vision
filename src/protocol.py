@@ -14,6 +14,18 @@ CARE_MESSAGE = ("Reported symptoms need prompt medical attention. For sudden fac
                 "Do not wait for this camera test or a high AI score.")
 
 
+def _installed_distribution(*names):
+    """Return the first installed distribution without assuming a GUI OpenCV wheel."""
+    for name in names:
+        try:
+            return name, importlib.metadata.version(name)
+        except importlib.metadata.PackageNotFoundError:
+            continue
+    raise importlib.metadata.PackageNotFoundError(
+        "No supported distribution is installed: " + ", ".join(names)
+    )
+
+
 def pipeline_signature():
     """Bind actual model assets, package versions, feature code and settings."""
     import mediapipe
@@ -25,7 +37,12 @@ def pipeline_signature():
              Path(config.YOLO_POSE_MODEL)]
     paths += [root / "src" / name for name in ("features.py", "head_pose.py", "face_analytics.py", "arm_features.py", "projected_arm_angle.py", "arm_pose.py", "screening_flow.py")]
     assets = [hashlib.sha256(path.read_bytes()).hexdigest() for path in paths]
-    packages = {name: importlib.metadata.version(name) for name in ("mediapipe", "ultralytics", "opencv-python", "numpy", "torch", "torchvision")}
+    packages = {name: importlib.metadata.version(name)
+                for name in ("mediapipe", "ultralytics", "numpy", "torch", "torchvision")}
+    opencv_name, opencv_version = _installed_distribution(
+        "opencv-python", "opencv-contrib-python-headless", "opencv-python-headless", "opencv-contrib-python"
+    )
+    packages[opencv_name] = opencv_version
     settings = {key: value for key, value in vars(config).items() if key.isupper()
                 and not key.startswith(("FEATURE_STORE", "DELTA_POLICY", "CAPTURE_STATION", "BASELINE_MAX"))}
     return hashlib.sha256(json.dumps({"assets": assets, "packages": packages, "settings": settings}, sort_keys=True).encode()).hexdigest()
