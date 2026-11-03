@@ -75,8 +75,9 @@ For later runs:
 ### เปิดเป็นเว็บบนคอมและมือถือ
 
 หน้าเว็บใช้กล้องของเบราว์เซอร์ แต่ยังประมวลผลด้วย Python, MediaPipe,
-YOLOv8-Pose และ FaceNet บนเครื่องที่รันเซิร์ฟเวอร์ จึงใช้กฎและฐานข้อมูลเดียวกับ
-แอปเดสก์ท็อป เซิร์ฟเวอร์ไม่บันทึกรูปหรือวิดีโอ เริ่มเซิร์ฟเวอร์ด้วย:
+YOLOv8-Pose และตัวตรวจความสอดคล้องของบุคคลบนเครื่องที่รันเซิร์ฟเวอร์
+จึงใช้กฎและฐานข้อมูลเดียวกับแอปเดสก์ท็อป เซิร์ฟเวอร์ไม่บันทึกรูปหรือวิดีโอ
+เริ่มเซิร์ฟเวอร์ด้วย:
 
 ```powershell
 .\.venv\Scripts\python.exe web_app.py
@@ -118,7 +119,7 @@ cloudflared tunnel --url http://127.0.0.1:8000
 #### Deploy บน Render โดยไม่ต้องเปิดคอมทิ้งไว้
 
 ไฟล์ `render.yaml` เตรียม Free Web Service บน branch `main` ให้ bind กับพอร์ตของ
-Render และดาวน์โหลด FaceNet กับ YOLOv8-Pose ระหว่าง build ขั้นตอน deploy:
+Render และดาวน์โหลด YOLOv8-Pose ระหว่าง build ขั้นตอน deploy:
 
 1. Push branch `main` ขึ้น GitHub แล้วเข้า Render เลือก **New > Blueprint**
 2. เชื่อม repository นี้และยืนยัน Blueprint จาก `render.yaml`
@@ -127,8 +128,10 @@ Render และดาวน์โหลด FaceNet กับ YOLOv8-Pose ระ
 4. รอ build/deploy สำเร็จ แล้วเปิด
    `https://ชื่อบริการ.onrender.com/?key=ค่าที่ตั้งไว้`
 
-Blueprint ใช้แผน Free และจำกัดจำนวน thread เพื่อลดการใช้หน่วยความจำ เหมาะสำหรับ
-เดโมระยะสั้นเท่านั้น Free instance มี RAM จำกัดและระบบไฟล์ชั่วคราว ดังนั้น SQLite
+Blueprint ใช้แผน Free และจำกัดจำนวน thread เพื่อลดการใช้หน่วยความจำ พร้อมตั้ง
+`STROKEVISION_IDENTITY_BACKEND=landmark` เพื่อใช้ Face Mesh ที่โหลดอยู่แล้วตรวจ
+ความต่อเนื่องของบุคคลแทน FaceNet วิธีนี้ไม่ใช่การยืนยันตัวตนทางชีวมิติหรือการตรวจ
+liveness และเหมาะสำหรับเดโมระยะสั้นเท่านั้น Free instance มี RAM จำกัดและระบบไฟล์ชั่วคราว ดังนั้น SQLite
 และ baseline จะหายเมื่อ service พัก, restart หรือ deploy ใหม่ ควรทำก่อนนวดและ
 ตรวจซ้ำในช่วงที่ service เดิมยังทำงานอยู่ หากหน่วยความจำไม่พอต้องเปลี่ยนเป็นแผน
 ที่มี RAM มากขึ้น และใช้ persistent disk ก่อนใช้งานต่อเนื่อง Render เป็นผู้ยุติ
@@ -258,6 +261,9 @@ only the new generation remains active for future comparisons.
 - **CPU FaceNet:** separate 512-value embeddings; cosine similarity must be
   **>= 0.6**, an experimental value. This is identity consistency checking,
   not liveness or photo/replay protection.
+- **Hosted landmark backend:** the Render Free deployment normalises 512 face
+  landmark coordinates around the iris axis to reduce memory use. It is only a
+  lightweight continuity check and is less discriminative than FaceNet.
 
 Face x/y and scale are stored as acquisition metadata, **never baseline rejection
 checks or delta inputs**. Absolute head roll/yaw/pitch must stay within 18 degrees;

@@ -7,7 +7,7 @@ No face crops are written. Missing/invalid embeddings always fail closed.
 import hashlib
 import math
 from pathlib import Path
-from config import IDENTITY_MODEL_PATH, IDENTITY_CPU_THREADS
+from config import IDENTITY_MODEL_PATH, IDENTITY_CPU_THREADS, IDENTITY_BACKEND
 
 EMBEDDING_SIZE = 512
 MISMATCH_MESSAGE = "Identity mismatch: does not match registered user"
@@ -103,3 +103,49 @@ class FaceIdentity:
 
     def close(self):
         self.model = None
+
+
+class LandmarkFaceIdentity:
+    """Low-memory identity-consistency descriptor for constrained hosting.
+
+    The descriptor normalises MediaPipe face landmarks by the iris axis and
+    inter-iris distance.  It is deliberately labelled separately from FaceNet:
+    it is a demo continuity check, not biometric identity or liveness proof.
+    """
+
+    signature = "mediapipe-landmark-consistency-v1"
+
+    def embed(self, frame_bgr, landmarks):
+        del frame_bgr  # The mesh was extracted from this frame by FaceAnalyzer.
+        if landmarks is None or len(landmarks) != 478:
+            raise ValueError("Keep exactly one complete face visible for identity verification.")
+        left, right = landmarks[468], landmarks[473]
+        dx, dy = float(right.x - left.x), float(right.y - left.y)
+        scale_squared = dx * dx + dy * dy
+        if not math.isfinite(scale_squared) or scale_squared <= 1e-6:
+            raise ValueError("Move closer and face the camera for identity verification.")
+        centre_x = (float(left.x) + float(right.x)) / 2.0
+        centre_y = (float(left.y) + float(right.y)) / 2.0
+        # 256 evenly distributed mesh points x two normalised coordinates =
+        # the same 512-value storage contract used by FaceNet.
+        indices = [round(index * 467 / 255) for index in range(256)]
+        vector = []
+        for index in indices:
+            point = landmarks[index]
+            x, y = float(point.x) - centre_x, float(point.y) - centre_y
+            vector.extend(((x * dx + y * dy) / scale_squared,
+                           (-x * dy + y * dx) / scale_squared))
+        return normalized_embedding(vector)
+
+    def close(self):
+        pass
+
+
+def create_face_identity(backend=None):
+    """Create the configured verifier without importing heavy ML libraries."""
+    selected = (backend or IDENTITY_BACKEND).strip().lower()
+    if selected == "facenet":
+        return FaceIdentity()
+    if selected == "landmark":
+        return LandmarkFaceIdentity()
+    raise ValueError("STROKEVISION_IDENTITY_BACKEND must be 'facenet' or 'landmark'.")

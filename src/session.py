@@ -57,7 +57,7 @@ class ScreeningSession:
         self.face = FaceAnalyzer()
         self.arm = ArmPoseAnalyzer(require_angles=self.research)
         self.flow = ScreeningFlow(self.face, self.arm, require_angles=self.research)
-        from src.face_identity import FaceIdentity
+        from src.face_identity import create_face_identity
         from src.feature_store import FeatureStore
         from src.protocol import pipeline_signature
         from src.visit_workflow import VisitWorkflow
@@ -68,7 +68,7 @@ class ScreeningSession:
         context["pipeline"] += pipeline_suffix
         directory = FEATURE_STORE_DIR + "-research" if self.research else FEATURE_STORE_DIR
         self.workflow = VisitWorkflow(FeatureStore(directory), context, research=self.research)
-        self.identity_model = FaceIdentity()
+        self.identity_model = create_face_identity()
 
     def start(self, request=None):
         from src.protocol import CARE_MESSAGE

@@ -66,6 +66,10 @@ HEAD_POSE_MAX_DEGREES = 18.0
 IDENTITY_COSINE_THRESHOLD = 0.6
 IDENTITY_MODEL_PATH = "models/20180402-114759-vggface2.pt"
 IDENTITY_CPU_THREADS = 2
+# Hosted free instances have a 512 MB memory limit.  Keep the full FaceNet
+# verifier as the desktop default, while allowing the hosted demo to reuse the
+# already-loaded MediaPipe mesh for a lightweight consistency check.
+IDENTITY_BACKEND = os.environ.get("STROKEVISION_IDENTITY_BACKEND", "facenet").strip().lower()
 # Debounce transient blur/crop errors when a face leaves and re-enters frame.
 IDENTITY_REACQUIRE_MATCH_FRAMES = 3
 IDENTITY_REJECT_MISMATCH_FRAMES = 5
