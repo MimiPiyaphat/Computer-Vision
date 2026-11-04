@@ -120,6 +120,7 @@ class WebServerTests(unittest.TestCase):
             css = response.read().decode("utf-8")
         self.assertIn(".current-card{min-height:0;overflow:hidden", css)
         self.assertIn("overflow-wrap:anywhere", css)
+        self.assertIn(".welcome-copy h1{line-height:1.22", css)
 
     def test_health_check_does_not_require_access_key(self):
         with urllib.request.urlopen(self.base + "/healthz", timeout=2) as response:
