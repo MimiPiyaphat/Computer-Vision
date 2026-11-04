@@ -116,6 +116,11 @@ class WebServerTests(unittest.TestCase):
         for sound in ("gentle", "crystal", "warm", "short", "off"):
             self.assertIn(f'data-sound="{sound}"', text)
 
+        with urllib.request.urlopen(self.base + "/style.css", timeout=2) as response:
+            css = response.read().decode("utf-8")
+        self.assertIn(".current-card{min-height:0;overflow:hidden", css)
+        self.assertIn("overflow-wrap:anywhere", css)
+
     def test_health_check_does_not_require_access_key(self):
         with urllib.request.urlopen(self.base + "/healthz", timeout=2) as response:
             data = json.loads(response.read())
