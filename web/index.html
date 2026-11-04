@@ -6,12 +6,13 @@
   <meta name="theme-color" content="#f8f5ee">
   <title>StrokeVision | ดูแลก่อนและหลังนวด</title>
   <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/dev.css">
 </head>
 <body>
   <div class="app-shell">
     <header class="topbar">
       <button class="brand" type="button" aria-label="กลับหน้าแรก"><span class="brand-mark">S</span><span><strong>StrokeVision</strong><small>ดูแลก่อนและหลังนวด</small></span></button>
-      <div class="top-actions"><span id="connectionPill" class="pill offline"><i></i> ยังไม่เชื่อมต่อ</span><div class="sound-control"><button id="soundButton" class="button outline sound-button" type="button" aria-haspopup="listbox" aria-expanded="false" title="เลือกเสียงแจ้งเตือน"><span>♪</span><b>นุ่มสบาย</b><em>⌄</em></button><div id="soundMenu" class="sound-menu hidden" role="listbox" aria-label="เลือกเสียงแจ้งเตือน"><div class="sound-menu-title"><strong>เลือกเสียงแจ้งเตือน</strong><small>กดเพื่อฟังตัวอย่าง</small></div><button class="sound-option" data-sound="gentle" role="option"><span>◌</span><b>นุ่มสบาย</b><small>ละมุน ไม่ตกใจ</small><i>✓</i></button><button class="sound-option" data-sound="crystal" role="option"><span>✧</span><b>ระฆังใส</b><small>ชัดเจน ได้ยินง่าย</small><i>✓</i></button><button class="sound-option" data-sound="warm" role="option"><span>●</span><b>ไม้อบอุ่น</b><small>โทนต่ำ ผ่อนคลาย</small><i>✓</i></button><button class="sound-option" data-sound="short" role="option"><span>•</span><b>เสียงสั้น</b><small>สั้น กระชับ</small><i>✓</i></button><button class="sound-option" data-sound="off" role="option"><span>×</span><b>ปิดเสียง</b><small>ไม่เล่นเสียงแจ้งเตือน</small><i>✓</i></button></div></div><button id="newCustomerButton" class="button outline compact" type="button">เริ่มใหม่</button></div>
+      <div class="top-actions"><span id="connectionPill" class="pill offline"><i></i> ยังไม่เชื่อมต่อ</span><div class="sound-control"><button id="soundButton" class="button outline sound-button" type="button" aria-haspopup="listbox" aria-expanded="false" title="เลือกเสียงแจ้งเตือน"><span>♪</span><b>นุ่มสบาย</b><em>⌄</em></button><div id="soundMenu" class="sound-menu hidden" role="listbox" aria-label="เลือกเสียงแจ้งเตือน"><div class="sound-menu-title"><strong>เลือกเสียงแจ้งเตือน</strong><small>กดเพื่อฟังตัวอย่าง</small></div><button class="sound-option" data-sound="gentle" role="option"><span>◌</span><b>นุ่มสบาย</b><small>ละมุน ไม่ตกใจ</small><i>✓</i></button><button class="sound-option" data-sound="crystal" role="option"><span>✧</span><b>ระฆังใส</b><small>ชัดเจน ได้ยินง่าย</small><i>✓</i></button><button class="sound-option" data-sound="warm" role="option"><span>●</span><b>ไม้อบอุ่น</b><small>โทนต่ำ ผ่อนคลาย</small><i>✓</i></button><button class="sound-option" data-sound="short" role="option"><span>•</span><b>เสียงสั้น</b><small>สั้น กระชับ</small><i>✓</i></button><button class="sound-option" data-sound="off" role="option"><span>×</span><b>ปิดเสียง</b><small>ไม่เล่นเสียงแจ้งเตือน</small><i>✓</i></button></div></div><button id="devButton" class="button outline compact dev-button" type="button">Dev</button><button id="newCustomerButton" class="button outline compact" type="button">เริ่มใหม่</button></div>
     </header>
 
     <main>
@@ -90,7 +91,25 @@
 
     <footer><span>!</span> ระบบช่วยคัดกรอง ไม่ใช่การวินิจฉัย หากมีหน้าเบี้ยว แขนอ่อนแรง พูดผิดปกติ หรืออาการฉับพลัน ให้ติดต่อบริการฉุกเฉินทันที</footer>
   </div>
+  <div id="devOverlay" class="dev-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="devTitle">
+    <section id="devLoginPanel" class="card dev-login">
+      <button id="devLoginClose" class="dev-close" type="button" aria-label="ปิดหน้า Dev">×</button>
+      <p class="eyebrow">สำหรับผู้พัฒนาเท่านั้น</p>
+      <h2 id="devTitle">Developer metrics</h2>
+      <p>ใส่รหัสผ่านเพื่อดูผลการประเมินโมเดลและ confusion matrix</p>
+      <label>รหัสผ่าน<input id="devPassword" type="password" autocomplete="current-password" placeholder="ใส่รหัสผ่าน"></label>
+      <p id="devError" class="dev-error" role="alert"></p>
+      <button id="devUnlockButton" class="button primary wide" type="button">เข้าสู่หน้า Dev <span>→</span></button>
+    </section>
+    <section id="devDashboard" class="dev-dashboard hidden" aria-label="Developer model evaluation">
+      <header class="dev-header"><div><p class="eyebrow">DEVELOPER ONLY</p><h2>Model evaluation</h2></div><div><button id="devLockButton" class="button ghost compact" type="button">ล็อก</button><button id="devCloseButton" class="dev-close inline" type="button" aria-label="ปิดหน้า Dev">×</button></div></header>
+      <p class="dev-warning">ผลการทดลองสำหรับผู้พัฒนาเท่านั้น ไม่ใช่ความแม่นยำทางคลินิก ไม่ใช่ผลวินิจฉัย และไม่ใช้คำนวณความเสี่ยงในหน้าลูกค้า</p>
+      <nav id="devTabs" class="dev-tabs" aria-label="ชุดผลการประเมิน"></nav>
+      <div id="devPanels" class="dev-panels"></div>
+    </section>
+  </div>
   <div id="toast" class="toast" role="alert" hidden></div>
   <script src="/app.js" defer></script>
+  <script src="/dev.js" defer></script>
 </body>
 </html>

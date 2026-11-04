@@ -23,6 +23,7 @@ import cv2
 import numpy as np
 
 from config import CAPTURE_STATION_ID, FRAME_HEIGHT, FRAME_WIDTH
+from src.dev_access import DevAccess
 from ui.content import STEPS
 from ui.thai import customer_assessment, customer_result_status, display_text
 
@@ -173,12 +174,15 @@ class WebRuntime:
 
 class StrokeVisionHandler(BaseHTTPRequestHandler):
     runtime = None
+    dev_access = None
     access_key = ""
     static_files = {
         "/": ("index.html", "text/html; charset=utf-8"),
         "/index.html": ("index.html", "text/html; charset=utf-8"),
         "/app.js": ("app.js", "text/javascript; charset=utf-8"),
+        "/dev.js": ("dev.js", "text/javascript; charset=utf-8"),
         "/style.css": ("style.css", "text/css; charset=utf-8"),
+        "/dev.css": ("dev.css", "text/css; charset=utf-8"),
     }
 
     def log_message(self, format_, *args):
@@ -249,9 +253,18 @@ class StrokeVisionHandler(BaseHTTPRequestHandler):
                 result = self.runtime.stop()
             elif path == "/api/disconnect":
                 result = self.runtime.disconnect()
+            elif path == "/api/dev/reports":
+                body = self._read_json()
+                password = body.get("password")
+                if not isinstance(password, str) or not password:
+                    raise ValueError("กรุณาใส่รหัสผ่านสำหรับผู้พัฒนา")
+                rehab, volunteers, roboflow = self.dev_access.unlock_all_reports(password)
+                result = {"rehab": rehab, "volunteers": volunteers, "roboflow": roboflow}
             else:
                 return self._send_json(404, {"error": "Not found"})
             self._send_json(200, result)
+        except PermissionError as exc:
+            self._send_json(403, {"error": str(exc)})
         except (ValueError, json.JSONDecodeError) as exc:
             self._send_json(400, {"error": display_text(str(exc))})
         except RuntimeError as exc:
@@ -260,9 +273,10 @@ class StrokeVisionHandler(BaseHTTPRequestHandler):
             self._send_json(500, {"error": f"ระบบทำงานผิดพลาด: {exc}"})
 
 
-def create_server(host, port, access_key, runtime=None):
+def create_server(host, port, access_key, runtime=None, dev_access=None):
     handler = type("ConfiguredStrokeVisionHandler", (StrokeVisionHandler,), {
         "runtime": runtime or WebRuntime(),
+        "dev_access": dev_access or DevAccess(),
         "access_key": access_key,
     })
     return ThreadingHTTPServer((host, port), handler)

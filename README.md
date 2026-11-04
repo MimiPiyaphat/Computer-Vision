@@ -106,7 +106,7 @@ cloudflared tunnel --url http://127.0.0.1:8000
 เมื่อใช้ tunnel เฟรมกล้องจะส่งแบบเข้ารหัสผ่านผู้ให้บริการ tunnel มายังเครื่องเซิร์ฟเวอร์
 ควรขอความยินยอมจากผู้ถูกบันทึกก่อนเริ่ม หน้าเว็บผูก baseline กับเบราว์เซอร์เดิม
 จึงควรตรวจก่อนและหลังด้วยอุปกรณ์และเบราว์เซอร์เดียวกัน
-หน้า Developer metrics ยังอยู่ในแอปเดสก์ท็อปเท่านั้น
+หน้าเว็บมีปุ่ม **Dev** สำหรับเปิด Developer metrics โดยต้องใส่รหัสผ่านโครงการก่อน
 
 หากมีใบรับรอง HTTPS ของเครือข่ายอยู่แล้ว สามารถรันโดยตรงได้:
 
@@ -162,7 +162,7 @@ performance or approved clinical cutoffs. Real face/arm datasets are still pendi
 ## Developer evaluation and Roboflow experiment
 
 The password-gated developer dashboard is separate from the customer result. Open
-**Developer metrics** in the desktop app and use the project password to inspect
+**Developer metrics** in the desktop app, or click **Dev** in the browser UI, and use the project password to inspect
 the rehabilitation, volunteer-gesture and Roboflow object-detection reports. None
 of these reports changes the customer-facing comparison rules.
 

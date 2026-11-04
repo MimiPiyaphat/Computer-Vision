@@ -37,6 +37,14 @@ class FakeSession:
         self.closed = True
 
 
+class FakeDevAccess:
+    def unlock_all_reports(self, password):
+        if password != "test-password":
+            raise PermissionError("รหัสผ่านไม่ถูกต้อง")
+        return ({"schema": "rehab-transfer-report-v1"}, None,
+                {"schema": "roboflow-object-detection-report-v1"})
+
+
 class WebPayloadTests(unittest.TestCase):
     def test_snapshot_removes_frame_and_builds_progress(self):
         payload = snapshot_payload(FakeSession().read_frame(None))
@@ -88,7 +96,7 @@ class WebRuntimeTests(unittest.TestCase):
 
 class WebServerTests(unittest.TestCase):
     def setUp(self):
-        self.server = create_server("127.0.0.1", 0, "test-key", WebRuntime(lambda: FakeSession()))
+        self.server = create_server("127.0.0.1", 0, "test-key", WebRuntime(lambda: FakeSession()), FakeDevAccess())
         self.thread = threading.Thread(target=self.server.serve_forever, daemon=True)
         self.thread.start()
         self.base = f"http://127.0.0.1:{self.server.server_port}"
@@ -112,6 +120,9 @@ class WebServerTests(unittest.TestCase):
         self.assertIn('id="continueButton"', text)
         self.assertIn('id="soundButton"', text)
         self.assertIn('id="soundMenu"', text)
+        self.assertIn('id="devButton"', text)
+        self.assertIn('id="devOverlay"', text)
+        self.assertNotIn("676767", text)
         self.assertNotIn('id="timerText"', text)
         for sound in ("gentle", "crystal", "warm", "short", "off"):
             self.assertIn(f'data-sound="{sound}"', text)
@@ -121,6 +132,10 @@ class WebServerTests(unittest.TestCase):
         self.assertIn(".current-card{min-height:0;overflow:hidden", css)
         self.assertIn("overflow-wrap:anywhere", css)
         self.assertIn(".welcome-copy h1{line-height:1.22", css)
+
+        with urllib.request.urlopen(self.base + "/dev.js", timeout=2) as response:
+            dev_script = response.read().decode("utf-8")
+        self.assertNotIn("676767", dev_script)
 
     def test_health_check_does_not_require_access_key(self):
         with urllib.request.urlopen(self.base + "/healthz", timeout=2) as response:
@@ -140,6 +155,22 @@ class WebServerTests(unittest.TestCase):
         with urllib.request.urlopen(request, timeout=2) as response:
             data = json.loads(response.read())
         self.assertTrue(data["connected"])
+
+    def test_dev_reports_require_password_and_return_only_after_unlock(self):
+        def request(password):
+            return urllib.request.Request(
+                self.base + "/api/dev/reports", method="POST",
+                data=json.dumps({"password": password}).encode(),
+                headers={"Content-Type": "application/json", "X-Access-Key": "test-key"})
+
+        with self.assertRaises(urllib.error.HTTPError) as caught:
+            urllib.request.urlopen(request("wrong"), timeout=2)
+        self.assertEqual(caught.exception.code, 403)
+        with urllib.request.urlopen(request("test-password"), timeout=2) as response:
+            reports = json.loads(response.read())
+        self.assertEqual(reports["rehab"]["schema"], "rehab-transfer-report-v1")
+        self.assertIsNone(reports["volunteers"])
+        self.assertEqual(reports["roboflow"]["schema"], "roboflow-object-detection-report-v1")
 
 
 if __name__ == "__main__":
