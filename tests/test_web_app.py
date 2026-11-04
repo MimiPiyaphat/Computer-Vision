@@ -111,6 +111,9 @@ class WebServerTests(unittest.TestCase):
         self.assertIn('id="loginButton"', text)
         self.assertIn('id="continueButton"', text)
         self.assertIn('id="soundButton"', text)
+        self.assertIn('id="soundMenu"', text)
+        for sound in ("gentle", "crystal", "warm", "short", "off"):
+            self.assertIn(f'data-sound="{sound}"', text)
 
     def test_health_check_does_not_require_access_key(self):
         with urllib.request.urlopen(self.base + "/healthz", timeout=2) as response:

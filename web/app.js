@@ -37,10 +37,19 @@ const visitModeText = document.querySelector("#visitModeText");
 const timerValue = document.querySelector("#timerValue");
 const timerRing = document.querySelector(".timer-ring");
 const soundButton = document.querySelector("#soundButton");
+const soundMenu = document.querySelector("#soundMenu");
+const soundOptions = [...document.querySelectorAll(".sound-option")];
 
 const state = { mode: "baseline", stream: null, connected: false, running: false, loop: 0, lastStage: null };
 let audioContext = null;
-let soundEnabled = localStorage.getItem("strokevision-sound") !== "off";
+const SOUND_PRESETS = {
+  gentle: { label: "นุ่มสบาย", icon: "♪", type: "sine", gain: .042, next: [[523, 0, .16], [659, .14, .22]], complete: [[523, 0, .16], [659, .14, .16], [784, .28, .24]] },
+  crystal: { label: "ระฆังใส", icon: "✧", type: "triangle", gain: .048, next: [[740, 0, .11], [988, .1, .22]], complete: [[659, 0, .12], [880, .12, .14], [1175, .25, .24]] },
+  warm: { label: "ไม้อบอุ่น", icon: "●", type: "sine", gain: .065, next: [[392, 0, .1], [523, .12, .18]], complete: [[392, 0, .12], [494, .13, .14], [587, .27, .2]] },
+  short: { label: "เสียงสั้น", icon: "•", type: "triangle", gain: .045, next: [[698, 0, .1]], complete: [[698, 0, .1], [880, .13, .13]] },
+};
+let soundChoice = localStorage.getItem("strokevision-sound-choice") || "gentle";
+if (!(soundChoice in SOUND_PRESETS) && soundChoice !== "off") soundChoice = "gentle";
 const queryKey = new URLSearchParams(location.search).get("key");
 if (queryKey) {
   sessionStorage.setItem("strokevision-access-key", queryKey);
@@ -61,28 +70,34 @@ function notify(message) {
 }
 
 function updateSoundButton() {
-  soundButton.setAttribute("aria-pressed", String(soundEnabled));
-  soundButton.querySelector("span").textContent = soundEnabled ? "♪" : "×";
-  soundButton.querySelector("b").textContent = soundEnabled ? "เสียง: เปิด" : "เสียง: ปิด";
+  const preset = SOUND_PRESETS[soundChoice];
+  soundButton.setAttribute("aria-pressed", String(soundChoice !== "off"));
+  soundButton.querySelector("span").textContent = preset?.icon || "×";
+  soundButton.querySelector("b").textContent = preset?.label || "ปิดเสียง";
+  soundOptions.forEach(option => {
+    const selected = option.dataset.sound === soundChoice;
+    option.classList.toggle("selected", selected);
+    option.setAttribute("aria-selected", String(selected));
+  });
 }
 
 function enableAudio() {
-  if (!soundEnabled) return;
+  if (soundChoice === "off") return;
   const AudioContext = window.AudioContext || window.webkitAudioContext;
   if (!AudioContext) return;
   audioContext ||= new AudioContext();
   if (audioContext.state === "suspended") audioContext.resume().catch(() => {});
 }
 
-function playTone(frequency, delay = 0, duration = .12) {
-  if (!soundEnabled || !audioContext || audioContext.state !== "running") return;
+function playTone(frequency, delay = 0, duration = .12, preset = SOUND_PRESETS[soundChoice]) {
+  if (!preset || !audioContext || audioContext.state !== "running") return;
   const start = audioContext.currentTime + delay;
   const oscillator = audioContext.createOscillator();
   const gain = audioContext.createGain();
-  oscillator.type = "sine";
+  oscillator.type = preset.type;
   oscillator.frequency.setValueAtTime(frequency, start);
   gain.gain.setValueAtTime(.0001, start);
-  gain.gain.exponentialRampToValueAtTime(.055, start + .015);
+  gain.gain.exponentialRampToValueAtTime(preset.gain, start + .015);
   gain.gain.exponentialRampToValueAtTime(.0001, start + duration);
   oscillator.connect(gain).connect(audioContext.destination);
   oscillator.start(start);
@@ -91,11 +106,18 @@ function playTone(frequency, delay = 0, duration = .12) {
 
 function playCue(kind = "next") {
   enableAudio();
-  if (kind === "complete") {
-    playTone(523, 0, .14); playTone(659, .13, .14); playTone(784, .26, .2);
-  } else {
-    playTone(587, 0, .12); playTone(784, .1, .18);
-  }
+  const preset = SOUND_PRESETS[soundChoice];
+  if (!preset) return;
+  (kind === "complete" ? preset.complete : preset.next).forEach(tone => playTone(...tone, preset));
+}
+
+function setSoundChoice(choice, preview = true) {
+  soundChoice = choice;
+  localStorage.setItem("strokevision-sound-choice", choice);
+  updateSoundButton();
+  soundMenu.classList.add("hidden");
+  soundButton.setAttribute("aria-expanded", "false");
+  if (preview && choice !== "off") { enableAudio(); playCue("next"); }
 }
 
 function showScreen(id) {
@@ -324,11 +346,25 @@ function resetCustomer() {
 }
 newCustomerButton.addEventListener("click", resetCustomer);
 finishButton.addEventListener("click", resetCustomer);
-soundButton.addEventListener("click", () => {
-  soundEnabled = !soundEnabled;
-  localStorage.setItem("strokevision-sound", soundEnabled ? "on" : "off");
-  updateSoundButton();
-  if (soundEnabled) { enableAudio(); playTone(659, 0, .16); }
+soundButton.addEventListener("click", event => {
+  event.stopPropagation();
+  const opening = soundMenu.classList.contains("hidden");
+  soundMenu.classList.toggle("hidden", !opening);
+  soundButton.setAttribute("aria-expanded", String(opening));
+});
+soundOptions.forEach(option => option.addEventListener("click", () => setSoundChoice(option.dataset.sound)));
+document.addEventListener("click", event => {
+  if (!event.target.closest(".sound-control")) {
+    soundMenu.classList.add("hidden");
+    soundButton.setAttribute("aria-expanded", "false");
+  }
+});
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape") {
+    soundMenu.classList.add("hidden");
+    soundButton.setAttribute("aria-expanded", "false");
+    soundButton.focus();
+  }
 });
 document.querySelector(".brand").addEventListener("click", () => {
   if (!state.running) showScreen("loginScreen");
