@@ -36,8 +36,11 @@ const customerCode = document.querySelector("#customerCode");
 const visitModeText = document.querySelector("#visitModeText");
 const timerValue = document.querySelector("#timerValue");
 const timerRing = document.querySelector(".timer-ring");
+const soundButton = document.querySelector("#soundButton");
 
-const state = { mode: "baseline", stream: null, connected: false, running: false, loop: 0 };
+const state = { mode: "baseline", stream: null, connected: false, running: false, loop: 0, lastStage: null };
+let audioContext = null;
+let soundEnabled = localStorage.getItem("strokevision-sound") !== "off";
 const queryKey = new URLSearchParams(location.search).get("key");
 if (queryKey) {
   sessionStorage.setItem("strokevision-access-key", queryKey);
@@ -55,6 +58,44 @@ function notify(message) {
   toast.hidden = false;
   clearTimeout(notify.timer);
   notify.timer = setTimeout(() => { toast.hidden = true; }, 5000);
+}
+
+function updateSoundButton() {
+  soundButton.setAttribute("aria-pressed", String(soundEnabled));
+  soundButton.querySelector("span").textContent = soundEnabled ? "♪" : "×";
+  soundButton.querySelector("b").textContent = soundEnabled ? "เสียง: เปิด" : "เสียง: ปิด";
+}
+
+function enableAudio() {
+  if (!soundEnabled) return;
+  const AudioContext = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContext) return;
+  audioContext ||= new AudioContext();
+  if (audioContext.state === "suspended") audioContext.resume().catch(() => {});
+}
+
+function playTone(frequency, delay = 0, duration = .12) {
+  if (!soundEnabled || !audioContext || audioContext.state !== "running") return;
+  const start = audioContext.currentTime + delay;
+  const oscillator = audioContext.createOscillator();
+  const gain = audioContext.createGain();
+  oscillator.type = "sine";
+  oscillator.frequency.setValueAtTime(frequency, start);
+  gain.gain.setValueAtTime(.0001, start);
+  gain.gain.exponentialRampToValueAtTime(.055, start + .015);
+  gain.gain.exponentialRampToValueAtTime(.0001, start + duration);
+  oscillator.connect(gain).connect(audioContext.destination);
+  oscillator.start(start);
+  oscillator.stop(start + duration + .02);
+}
+
+function playCue(kind = "next") {
+  enableAudio();
+  if (kind === "complete") {
+    playTone(523, 0, .14); playTone(659, .13, .14); playTone(784, .26, .2);
+  } else {
+    playTone(587, 0, .12); playTone(784, .1, .18);
+  }
 }
 
 function showScreen(id) {
@@ -138,6 +179,11 @@ function renderSnapshot(data) {
   const remaining = data.duration ? Math.max(0, data.duration - data.elapsed) : null;
   timerValue.textContent = remaining == null ? "—" : Math.ceil(remaining);
   timerRing.style.setProperty("--ring", `${Math.round((data.progress || 0) * 100)}%`);
+  const finished = data.state === "summary" || data.state === "identity_rejected";
+  if (state.running && data.stage_index != null && data.stage_index !== state.lastStage) {
+    playCue(finished ? "complete" : "next");
+    state.lastStage = data.stage_index;
+  }
 
   if (data.result) {
     resultTitle.textContent = data.result.title;
@@ -146,7 +192,7 @@ function renderSnapshot(data) {
     resultCard.className = `card result-card ${status.includes("alert") || status === "delta_alert" ? "risk" : status.includes("incomplete") || status.includes("failed") || status.includes("inconclusive") ? "retry" : "safe"}`;
     retryButton.classList.toggle("hidden", !(status.includes("incomplete") || status.includes("failed") || status.includes("inconclusive")));
   }
-  if (data.state === "summary" || data.state === "identity_rejected") {
+  if (finished) {
     state.running = false;
     stopButton.disabled = true;
     startButton.disabled = false;
@@ -223,6 +269,8 @@ async function startScreening() {
     currentCard.classList.remove("hidden");
     readyCard.classList.add("hidden");
     state.running = true;
+    state.lastStage = null;
+    enableAudio();
     state.loop += 1;
     setLocked(true);
     stopButton.disabled = false;
@@ -245,10 +293,10 @@ async function stopScreening() {
 }
 
 modeButtons.forEach(button => button.addEventListener("click", () => setMode(button.dataset.mode)));
-loginButton.addEventListener("click", enterCustomer);
+loginButton.addEventListener("click", () => { enableAudio(); enterCustomer(); });
 userId.addEventListener("keydown", event => { if (event.key === "Enter") visitId.focus(); });
 visitId.addEventListener("keydown", event => { if (event.key === "Enter") enterCustomer(); });
-continueButton.addEventListener("click", continueToCapture);
+continueButton.addEventListener("click", () => { enableAudio(); continueToCapture(); });
 backToLogin.addEventListener("click", () => showScreen("loginScreen"));
 backToMode.addEventListener("click", () => {
   if (state.running) return notify("กรุณาหยุดการตรวจก่อนเลือกใหม่");
@@ -276,6 +324,12 @@ function resetCustomer() {
 }
 newCustomerButton.addEventListener("click", resetCustomer);
 finishButton.addEventListener("click", resetCustomer);
+soundButton.addEventListener("click", () => {
+  soundEnabled = !soundEnabled;
+  localStorage.setItem("strokevision-sound", soundEnabled ? "on" : "off");
+  updateSoundButton();
+  if (soundEnabled) { enableAudio(); playTone(659, 0, .16); }
+});
 document.querySelector(".brand").addEventListener("click", () => {
   if (!state.running) showScreen("loginScreen");
 });
@@ -289,6 +343,7 @@ window.addEventListener("pagehide", () => {
 });
 
 setMode("baseline");
+updateSoundButton();
 showScreen("loginScreen");
 renderStages([
   "ตรวจสอบกล้อง", "ใบหน้าผ่อนคลาย", "ยิ้ม", "หลับตา", "กะพริบตา", "ยกแขน", "สรุปผล",
