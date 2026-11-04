@@ -112,6 +112,7 @@ class WebServerTests(unittest.TestCase):
         self.assertIn('id="continueButton"', text)
         self.assertIn('id="soundButton"', text)
         self.assertIn('id="soundMenu"', text)
+        self.assertNotIn('id="timerText"', text)
         for sound in ("gentle", "crystal", "warm", "short", "off"):
             self.assertIn(f'data-sound="{sound}"', text)
 

@@ -20,7 +20,6 @@ const instruction = document.querySelector("#instruction");
 const stageDetail = document.querySelector("#stageDetail");
 const stageBadge = document.querySelector("#stageBadge");
 const progressBar = document.querySelector("#progressBar");
-const timerText = document.querySelector("#timerText");
 const resultCard = document.querySelector("#resultCard");
 const resultTitle = document.querySelector("#resultTitle");
 const resultBody = document.querySelector("#resultBody");
@@ -197,7 +196,6 @@ function renderSnapshot(data) {
   instruction.textContent = data.instruction || "ทำตามคำแนะนำบนหน้าจอ";
   stageDetail.textContent = active?.instruction || "ระบบกำลังประมวลผลข้อมูลจากกล้อง";
   progressBar.style.width = `${Math.round((data.progress || 0) * 100)}%`;
-  timerText.textContent = data.duration ? `${Math.min(data.elapsed, data.duration).toFixed(1)} / ${data.duration.toFixed(0)} วินาที` : "";
   const remaining = data.duration ? Math.max(0, data.duration - data.elapsed) : null;
   timerValue.textContent = remaining == null ? "—" : Math.ceil(remaining);
   timerRing.style.setProperty("--ring", `${Math.round((data.progress || 0) * 100)}%`);
