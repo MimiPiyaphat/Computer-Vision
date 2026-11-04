@@ -5,13 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#f8f5ee">
   <title>StrokeVision | ดูแลก่อนและหลังนวด</title>
+  <link rel="icon" type="image/png" href="/assets/strokevision-icon-a.png">
+  <link rel="apple-touch-icon" href="/assets/strokevision-icon-a.png">
   <link rel="stylesheet" href="/style.css">
   <link rel="stylesheet" href="/dev.css">
 </head>
 <body>
   <div class="app-shell">
     <header class="topbar">
-      <button class="brand" type="button" aria-label="กลับหน้าแรก"><span class="brand-mark">S</span><span><strong>StrokeVision</strong><small>ดูแลก่อนและหลังนวด</small></span></button>
+      <button class="brand" type="button" aria-label="StrokeVision · กลับหน้าแรก"><img class="brand-logo" src="/assets/strokevision-logo-a.png" alt="StrokeVision"></button>
       <div class="top-actions"><span id="connectionPill" class="pill offline"><i></i> ยังไม่เชื่อมต่อ</span><div class="sound-control"><button id="soundButton" class="button outline sound-button" type="button" aria-haspopup="listbox" aria-expanded="false" title="เลือกเสียงแจ้งเตือน"><span>♪</span><b>นุ่มสบาย</b><em>⌄</em></button><div id="soundMenu" class="sound-menu hidden" role="listbox" aria-label="เลือกเสียงแจ้งเตือน"><div class="sound-menu-title"><strong>เลือกเสียงแจ้งเตือน</strong><small>กดเพื่อฟังตัวอย่าง</small></div><button class="sound-option" data-sound="gentle" role="option"><span>◌</span><b>นุ่มสบาย</b><small>ละมุน ไม่ตกใจ</small><i>✓</i></button><button class="sound-option" data-sound="crystal" role="option"><span>✧</span><b>ระฆังใส</b><small>ชัดเจน ได้ยินง่าย</small><i>✓</i></button><button class="sound-option" data-sound="warm" role="option"><span>●</span><b>ไม้อบอุ่น</b><small>โทนต่ำ ผ่อนคลาย</small><i>✓</i></button><button class="sound-option" data-sound="short" role="option"><span>•</span><b>เสียงสั้น</b><small>สั้น กระชับ</small><i>✓</i></button><button class="sound-option" data-sound="off" role="option"><span>×</span><b>ปิดเสียง</b><small>ไม่เล่นเสียงแจ้งเตือน</small><i>✓</i></button></div></div><button id="devButton" class="button outline compact dev-button" type="button">Dev</button><button id="newCustomerButton" class="button outline compact" type="button">เริ่มใหม่</button></div>
     </header>
 

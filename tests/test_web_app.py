@@ -122,6 +122,9 @@ class WebServerTests(unittest.TestCase):
         self.assertIn('id="soundMenu"', text)
         self.assertIn('id="devButton"', text)
         self.assertIn('id="devOverlay"', text)
+        self.assertIn('class="brand-logo"', text)
+        self.assertIn('/assets/strokevision-logo-a.png', text)
+        self.assertIn('/assets/strokevision-icon-a.png', text)
         self.assertNotIn("676767", text)
         self.assertNotIn('id="timerText"', text)
         for sound in ("gentle", "crystal", "warm", "short", "off"):
@@ -136,6 +139,11 @@ class WebServerTests(unittest.TestCase):
         with urllib.request.urlopen(self.base + "/dev.js", timeout=2) as response:
             dev_script = response.read().decode("utf-8")
         self.assertNotIn("676767", dev_script)
+
+        for asset in ("strokevision-logo-a.png", "strokevision-icon-a.png"):
+            with urllib.request.urlopen(self.base + f"/assets/{asset}", timeout=2) as response:
+                self.assertEqual(response.headers.get_content_type(), "image/png")
+                self.assertTrue(response.read().startswith(b"\x89PNG\r\n\x1a\n"))
 
     def test_health_check_does_not_require_access_key(self):
         with urllib.request.urlopen(self.base + "/healthz", timeout=2) as response:

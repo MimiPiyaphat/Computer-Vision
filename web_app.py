@@ -183,6 +183,8 @@ class StrokeVisionHandler(BaseHTTPRequestHandler):
         "/dev.js": ("dev.js", "text/javascript; charset=utf-8"),
         "/style.css": ("style.css", "text/css; charset=utf-8"),
         "/dev.css": ("dev.css", "text/css; charset=utf-8"),
+        "/assets/strokevision-logo-a.png": ("assets/strokevision-logo-a.png", "image/png"),
+        "/assets/strokevision-icon-a.png": ("assets/strokevision-icon-a.png", "image/png"),
     }
 
     def log_message(self, format_, *args):

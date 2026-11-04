@@ -1,3 +1,5 @@
+> 🌐 **ทดลองใช้งานบนเว็บ:** [StrokeVision AI](https://strokevision-ai.onrender.com/)
+
 # StrokeVision AI
 
 ## ภาพรวมโครงการ (Project overview)
